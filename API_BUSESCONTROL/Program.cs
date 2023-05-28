@@ -1,4 +1,5 @@
 using API_BUSESCONTROL.Data;
+using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,8 @@ namespace API_BUSESCONTROL {
 
             builder.Services.AddScoped<IOnibusRepository, OnibusRepository>();
             builder.Services.AddScoped<IPaletaCoresRepository, PaletaCoresRepository>();
+            builder.Services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            builder.Services.AddScoped<IEmail, Email>();
 
             builder.Services.AddCors();
 

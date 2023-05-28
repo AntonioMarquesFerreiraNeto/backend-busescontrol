@@ -20,7 +20,7 @@ namespace API_BUSESCONTROL.Controllers {
             var onibusList = _onibusRepository.PaginateListAtivos(paginaAtual, statusPaginacao);
             var qtPaginate = _onibusRepository.QtPaginasAtivas();
             if (onibusList == null) {
-                return NotFound();
+                return NotFound("Desculpe, ônibus não encontrados!");
             }
             var response = new {
                 OnibusList = onibusList,
@@ -37,7 +37,7 @@ namespace API_BUSESCONTROL.Controllers {
                 QtPaginate = qtPaginate
             };
             if (onibusList == null) {
-                return NotFound();
+                return NotFound("Desculpe, ônibus não encontrado!");
             }
             return Ok(response);
         }
@@ -60,9 +60,6 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult GetOnibusById(int id) {
             try {
                 var onibus = _onibusRepository.GetOnibusById(id);
-                if (onibus == null) {
-                    return NotFound();
-                }
                 return Ok(onibus);
             }
             catch (Exception error) {
@@ -87,10 +84,6 @@ namespace API_BUSESCONTROL.Controllers {
         [HttpPatch("Inativar/{id}")]
         public IActionResult InativarOnibus(int id) {
             try {
-                var existingOnibus = _onibusRepository.GetOnibusById(id);
-                if (existingOnibus == null) {
-                    return NotFound();
-                }
                 _onibusRepository.InativarOnibus(id);
                 return NoContent();
             }
@@ -101,10 +94,6 @@ namespace API_BUSESCONTROL.Controllers {
         [HttpPatch("Ativar/{id}")]
         public IActionResult AtivarOnibus(int? id) {
             try {
-                var onibus = _onibusRepository.GetOnibusById(id);
-                if (onibus == null) {
-                    return NotFound();
-                }
                 _onibusRepository.AtivarOnibus(id);
                 return NoContent();
             }
@@ -119,7 +108,7 @@ namespace API_BUSESCONTROL.Controllers {
             try {
                 var existingOnibus = _onibusRepository.GetOnibusById(id);
                 if (existingOnibus == null) {
-                    return NotFound();
+                    return NotFound("Desculpe, ônibus não encontrado!");
                 }
                 _onibusRepository.DeleteOnibus(id);
                 return NoContent();

@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\ValidationsModels\V\**" />
+    <Content Remove="Models\ValidationsModels\V\**" />
+    <EmbeddedResource Remove="Models\ValidationsModels\V\**" />
+    <None Remove="Models\ValidationsModels\V\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
@@ -22,6 +29,10 @@
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\ValidationsModels\Contratos\" />
   </ItemGroup>
 
 </Project>

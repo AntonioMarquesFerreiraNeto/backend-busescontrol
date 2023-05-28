@@ -25,20 +25,17 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(error.Message);
             }
         }
-
         public Onibus GetOnibusById(int? id) {
             Onibus onibus = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id);
             if (onibus == null) throw new Exception("Desculpe, ônibus não encontrado!");
             return onibus;
         }
-
         public List<Onibus> OnibusAtivosAll() {
-            return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Ativo).ToList();
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).ToList();
         }
         public List<Onibus> OnibusInativosAll() {
-            return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Inativo).ToList();
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Inativo).ToList();
         }
-
         public Onibus UpdateOnibus(Onibus onibus) {
             try {
                 Onibus onibusDB = GetOnibusById(onibus.Id);
@@ -71,9 +68,8 @@ namespace API_BUSESCONTROL.Repository {
         }
         public Onibus InativarOnibus(int? id) {
             try {
-                Onibus onibusInativar = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id);
-                if (onibusInativar == null) throw new Exception("Desculpe, ônibus não encontrado!");
-                onibusInativar.StatusOnibus = OnibusStatus.Inativo;
+                Onibus onibusInativar = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, ônibus não encontrado!");
+                onibusInativar.StatusOnibus = StatusFrota.Inativo;
                 _bancoContext.Onibus.Update(onibusInativar);
                 _bancoContext.SaveChanges();
                 return onibusInativar;
@@ -82,12 +78,10 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(ex.Message);
             }
         }
-
         public Onibus AtivarOnibus(int? id) {
             try {
-                Onibus onibusAtivar = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id);
-                if (onibusAtivar == null) throw new Exception("Desculpe, ônibus não encontrado!");
-                onibusAtivar.StatusOnibus = OnibusStatus.Ativo;
+                Onibus onibusAtivar = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, ônibus não encontrado!");
+                onibusAtivar.StatusOnibus = StatusFrota.Ativo;
                 _bancoContext.Onibus.Update(onibusAtivar);
                 _bancoContext.SaveChanges();
                 return onibusAtivar;
@@ -95,6 +89,40 @@ namespace API_BUSESCONTROL.Repository {
             catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
+        }
+        public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginate) {
+            if (statusPaginate == true) {
+                int indiceInicial = (paginaAtual - 1) * 10;
+                return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indiceInicial).Take(10).ToList();
+            }
+            if (paginaAtual < 2) {
+                throw new Exception("Desculpe, ação inválida!");
+            }
+            int indice = (paginaAtual - 2) * 10;
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indice).Take(10).ToList();
+        }
+        public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate) {
+            if (statusPaginate == true) {
+                int indiceInicial = (paginaAtual - 1) * 10;
+                return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indiceInicial).Take(10).ToList();
+            }
+            if (paginaAtual < 2) {
+                throw new Exception("Desculpe, ação inválida!");
+            }
+            int indice = (paginaAtual - 2) * 10;
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indice).Take(10).ToList();
+        }
+        public int QtPaginasAtivas() {
+            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Ativo);
+            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
+            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
+            return qtPaginas;
+        }
+        public int QtPaginasInativas() {
+            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Inativo);
+            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
+            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
+            return qtPaginas;
         }
 
         public bool ValidationDuplicate(Onibus onibus) {
@@ -104,7 +132,6 @@ namespace API_BUSESCONTROL.Repository {
             }
             return false;
         }
-
         public bool ValidationDuplicateEdit(Onibus onibus, Onibus onibusDB) {
             List<Onibus> listFrota = _bancoContext.Onibus.ToList();
             if (listFrota.Any(x => (onibus.Placa != onibusDB.Placa && onibus.Placa == x.Placa) || (onibus.Renavam != onibusDB.Renavam && onibus.Renavam == x.Renavam) || (onibus.Chassi != onibusDB.Chassi && onibus.Chassi == x.Chassi))) {
@@ -112,7 +139,6 @@ namespace API_BUSESCONTROL.Repository {
             }
             return false;
         }
-
         public Onibus SetTrimFrota(Onibus onibus) {
             onibus.Marca = onibus.Marca!.Trim();
             onibus.NameBus = onibus.NameBus!.Trim();
@@ -125,47 +151,6 @@ namespace API_BUSESCONTROL.Repository {
             //Aplica o ToUpper no chassi e o método trim.
             onibus.Chassi = onibus.Chassi!.ToUpper().Trim();
             return onibus;
-        }
-
-        public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            else {
-                if (paginaAtual < 2) {
-                    return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Ativo).Skip(0).Take(10).ToList();
-                }
-                int indiceInicial = (paginaAtual - 2) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
-            }
-        }
-        public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            else {
-                if (paginaAtual < 2) {
-                    return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Inativo).Skip(0).Take(10).ToList();
-                }
-                int indiceInicial = (paginaAtual - 2) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == OnibusStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
-            }
-        }
-
-        public int QtPaginasAtivas() {
-            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == OnibusStatus.Ativo);
-            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
-            return qtPaginas;
-        }
-
-        public int QtPaginasInativas() {
-            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == OnibusStatus.Inativo);
-            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
-            return qtPaginas;
         }
     }
 }

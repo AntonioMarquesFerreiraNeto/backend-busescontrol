@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace API_BUSESCONTROL.Models.ValidationsModels
+namespace API_BUSESCONTROL.Models.ValidationsModels.Frota
 {
     public class ValidarAssentos : ValidationAttribute
     {
@@ -9,9 +9,7 @@ namespace API_BUSESCONTROL.Models.ValidationsModels
         public override bool IsValid(object value)
         {
             if (string.IsNullOrEmpty(value.ToString()))
-            {
                 return false;
-            }
             return ValAssentos(value.ToString());
         }
 
@@ -19,9 +17,7 @@ namespace API_BUSESCONTROL.Models.ValidationsModels
         {
             int assentos = int.Parse(value.ToString());
             if (assentos < 10 || assentos > 200)
-            {
                 return false;
-            }
             return true;
         }
 

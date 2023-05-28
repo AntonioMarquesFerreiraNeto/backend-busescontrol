@@ -10,5 +10,6 @@ namespace API_BUSESCONTROL.Data {
 
         public DbSet<Onibus> Onibus { get; set; }
         public DbSet<PaletaCores> PaletaCores { get; set; }
+        public DbSet<Funcionario> Funcionario { get; set; }
     }
 }

@@ -37,9 +37,6 @@ namespace API_BUSESCONTROL.Controllers {
         [HttpDelete("{id}")]
         public IActionResult DeletePaleta(int? id) {
             try {
-                if (string.IsNullOrEmpty(id.ToString())) {
-                    return NotFound();
-                }
                 _paletaCoresRepository.DeletePaletaCores(id);
                 return Ok();
             } catch (Exception error) {

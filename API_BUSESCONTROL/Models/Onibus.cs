@@ -1,5 +1,6 @@
 ﻿using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Models.ValidationsModels;
+using API_BUSESCONTROL.Models.ValidationsModels.Frota;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 
@@ -39,12 +40,12 @@ namespace API_BUSESCONTROL.Models {
         [Required(ErrorMessage = "Campo obrigatório!")]
         public string? CorBus { get; set; }
 
-        public OnibusStatus StatusOnibus { get; set; }
+        public StatusFrota StatusOnibus { get; set; }
 
         //public virtual List<Contrato> Contratos { get; set; }
 
         public string ReturnStatusOnibus() {
-            if (StatusOnibus == OnibusStatus.Ativo) {
+            if (StatusOnibus == StatusFrota.Ativo) {
                 return "Ativos";
             }
             return "Inativos";
