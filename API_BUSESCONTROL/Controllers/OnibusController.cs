@@ -19,9 +19,6 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult GetOnibusAtivosPaginate(int paginaAtual, bool statusPaginacao) {
             var onibusList = _onibusRepository.PaginateListAtivos(paginaAtual, statusPaginacao);
             var qtPaginate = _onibusRepository.QtPaginasAtivas();
-            if (onibusList == null) {
-                return NotFound("Desculpe, ônibus não encontrados!");
-            }
             var response = new {
                 OnibusList = onibusList,
                 QtPaginate = qtPaginate
@@ -36,9 +33,6 @@ namespace API_BUSESCONTROL.Controllers {
                 OnibusList = onibusList,
                 QtPaginate = qtPaginate
             };
-            if (onibusList == null) {
-                return NotFound("Desculpe, ônibus não encontrado!");
-            }
             return Ok(response);
         }
 

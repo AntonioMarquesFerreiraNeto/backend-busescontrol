@@ -33,7 +33,6 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult GetFuncionariosAtivosPaginate(int paginaAtual, bool statusPaginacao) {
             List<Funcionario> list = _funcionarioRepository.PaginateListAtivos(paginaAtual, statusPaginacao);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
-            if (list == null) return NotFound("Nenhum registro encontrado!");
             var response = new {
                 funciList = list,
                 qtPaginate = _funcionarioRepository.QtPaginasAtivas()
@@ -45,7 +44,6 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult GetFuncionariosInativosPaginate(int paginaAtual, bool statusPaginacao) {
             List<Funcionario> list = _funcionarioRepository.PaginateListInativos(paginaAtual, statusPaginacao);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
-            if (list == null) return NotFound("Nenhum registro encontrado!");
             var response = new {
                 funciList = list,
                 qtPaginate = _funcionarioRepository.QtPaginasInativas()

@@ -7,8 +7,6 @@ namespace API_BUSESCONTROL.Models.ValidationsModels.Pessoas
     {
         public override bool IsValid(object value)
         {
-            if (value == null || string.IsNullOrEmpty(value.ToString()))
-                return true;
             return ValidaEmail(value.ToString());
         }
         public bool ValidaEmail(string email)

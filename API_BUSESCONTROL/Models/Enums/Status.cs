@@ -16,4 +16,8 @@
         Assistente = 1,
         Administrador = 2
     }
+    public enum ClienteStatus : int {
+        Ativo = 0,
+        Inativo = 1
+    }
 }

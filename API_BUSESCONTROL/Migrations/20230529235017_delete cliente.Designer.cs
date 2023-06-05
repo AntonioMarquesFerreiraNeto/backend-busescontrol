@@ -3,6 +3,7 @@ using System;
 using API_BUSESCONTROL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,72 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API_BUSESCONTROL.Migrations
 {
     [DbContext(typeof(BancoContext))]
-    partial class BancoContextModelSnapshot : ModelSnapshot
+    [Migration("20230529235017_delete cliente")]
+    partial class deletecliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("API_BUSESCONTROL.Models.Cliente", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Bairro")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Cep")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("varchar(8)");
-
-                    b.Property<string>("Cidade")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ComplementoResidencial")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Ddd")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Logradouro")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NumeroResidencial")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("varchar(9)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cliente");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Cliente");
-                });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
                 {
@@ -216,70 +160,6 @@ namespace API_BUSESCONTROL.Migrations
                     b.HasKey("id");
 
                     b.ToTable("PaletaCores");
-                });
-
-            modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
-                {
-                    b.HasBaseType("API_BUSESCONTROL.Models.Cliente");
-
-                    b.Property<string>("Cpf")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("DataNascimento")
-                        .IsRequired()
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int?>("IdVinculacaoContratual")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NameMae")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Rg")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("PessoaFisica");
-                });
-
-            modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaJuridica", b =>
-                {
-                    b.HasBaseType("API_BUSESCONTROL.Models.Cliente");
-
-                    b.Property<string>("Cnpj")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("InscricaoEstadual")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("InscricaoMunicipal")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NomeFantasia")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("RazaoSocial")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("PessoaJuridica_Status");
-
-                    b.HasDiscriminator().HasValue("PessoaJuridica");
                 });
 #pragma warning restore 612, 618
         }

@@ -21,6 +21,7 @@ namespace API_BUSESCONTROL {
             builder.Services.AddScoped<IOnibusRepository, OnibusRepository>();
             builder.Services.AddScoped<IPaletaCoresRepository, PaletaCoresRepository>();
             builder.Services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+            builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
             builder.Services.AddScoped<IEmail, Email>();
 
             builder.Services.AddCors();
