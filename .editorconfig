@@ -8,3 +8,6 @@ csharp_prefer_braces = false
 
 # CS8604: Possível argumento de referência nula.
 dotnet_diagnostic.CS8604.severity = silent
+
+# CS8620: O argumento não pode ser usado para o parâmetro devido a diferenças na nulidade dos tipos de referência.
+dotnet_diagnostic.CS8620.severity = none

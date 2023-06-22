@@ -2,6 +2,7 @@ using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace API_BUSESCONTROL {
     public class Program {
@@ -22,9 +23,14 @@ namespace API_BUSESCONTROL {
             builder.Services.AddScoped<IPaletaCoresRepository, PaletaCoresRepository>();
             builder.Services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+            builder.Services.AddScoped<IContratoRepository, ContratoRepository>();
             builder.Services.AddScoped<IEmail, Email>();
 
             builder.Services.AddCors();
+
+            // Permitir o ciclo de objetos é essencial para o funcionamento adequado do meu sistema, uma vez que a não permissão seria inviável para alguns serviços.
+            builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
             var app = builder.Build();
 

@@ -118,5 +118,11 @@ namespace API_BUSESCONTROL.Controllers {
                 return StatusCode(500, error.Message);
             }
         }
+
+        [HttpGet("MotoristasVinculacao")]
+        public IActionResult GetMotoristasAll() {
+            var list = _funcionarioRepository.GetAllMotoristas();
+            return Ok(list);
+        }
     }
 }

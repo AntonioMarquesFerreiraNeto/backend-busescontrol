@@ -111,6 +111,12 @@ namespace API_BUSESCONTROL.Controllers {
                 return StatusCode(500, error.Message);
             }
         }
+
+        [HttpGet("OnibusVinculacao")]
+        public IActionResult GetMotoristasAll() {
+            var list = _onibusRepository.GetAll();
+            return Ok(list);
+        }
     }
 }
 

@@ -142,6 +142,10 @@ namespace API_BUSESCONTROL.Repository {
             return qtPaginas;
         }
 
+        public List<Funcionario> GetAllMotoristas() {
+            return _bancoContext.Funcionario.Where(x => x.Cargo == CargoFuncionario.Motorista && x.Status == FuncionarioStatus.Ativo).ToList();  
+        }
+
         public Funcionario TrimFuncionario(Funcionario value) {
             value.Name = value.Name!.Trim();
             value.Telefone = value.Telefone!.Trim();

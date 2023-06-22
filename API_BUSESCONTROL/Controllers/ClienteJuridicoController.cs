@@ -97,5 +97,12 @@ namespace API_BUSESCONTROL.Controllers {
                 return StatusCode(500, error.Message);
             }
         }
+
+        [HttpGet("ClientesAutorizados")]
+        public IActionResult ClientesAutorizados() {
+            var list = _clienteRepository.GetClientesParaVinculacaoPJ();
+            return Ok(list);
+        }
+
     }
 }

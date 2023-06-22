@@ -25,6 +25,9 @@ namespace API_BUSESCONTROL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("Adimplente")
+                        .HasColumnType("int");
+
                     b.Property<string>("Bairro")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -75,6 +78,101 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("Cliente");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Cliente");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.ClientesContrato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContratoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataEmissaoPdfRescisao")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("PessoaFisicaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PessoaJuridicaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessRescisao")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContratoId");
+
+                    b.HasIndex("PessoaFisicaId");
+
+                    b.HasIndex("PessoaJuridicaId");
+
+                    b.ToTable("ClientesContrato");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Andamento")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Aprovacao")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataEmissao")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DataVencimento")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Detalhamento")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("MotoristaId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OnibusId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Pagament")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QtParcelas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusContrato")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ValorMonetario")
+                        .IsRequired()
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorParcelaContrato")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorParcelaContratoPorCliente")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorTotalPagoContrato")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotoristaId");
+
+                    b.HasIndex("OnibusId");
+
+                    b.ToTable("Contrato");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
@@ -280,6 +378,61 @@ namespace API_BUSESCONTROL.Migrations
                         .HasColumnName("PessoaJuridica_Status");
 
                     b.HasDiscriminator().HasValue("PessoaJuridica");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.ClientesContrato", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
+                        .WithMany("ClientesContrato")
+                        .HasForeignKey("ContratoId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaFisica", "PessoaFisica")
+                        .WithMany("ClientesContrato")
+                        .HasForeignKey("PessoaFisicaId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaJuridica", "PessoaJuridica")
+                        .WithMany("ClientesContrato")
+                        .HasForeignKey("PessoaJuridicaId");
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("PessoaFisica");
+
+                    b.Navigation("PessoaJuridica");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Funcionario", "Motorista")
+                        .WithMany()
+                        .HasForeignKey("MotoristaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API_BUSESCONTROL.Models.Onibus", "Onibus")
+                        .WithMany()
+                        .HasForeignKey("OnibusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Motorista");
+
+                    b.Navigation("Onibus");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
+                {
+                    b.Navigation("ClientesContrato");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
+                {
+                    b.Navigation("ClientesContrato");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaJuridica", b =>
+                {
+                    b.Navigation("ClientesContrato");
                 });
 #pragma warning restore 612, 618
         }

@@ -145,6 +145,9 @@ namespace API_BUSESCONTROL.Repository {
         public List<PessoaFisica> GetClientesParaVinculacao() {
             return _bancoContext.PessoaFisica.Where(x => string.IsNullOrEmpty(x.IdVinculacaoContratual.ToString()) && x.Status == ClienteStatus.Ativo).ToList();
         }
+        public List<PessoaJuridica> GetClientesParaVinculacaoPJ() {
+            return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Ativo).ToList();
+        }
 
         public PessoaJuridica CreateClientePJ(PessoaJuridica cliente) {
             try {
@@ -277,10 +280,6 @@ namespace API_BUSESCONTROL.Repository {
                 return true;
             }
             return false;
-        }
-
-        public List<PessoaJuridica> GetClientesParaVinculacaoPJ() {
-            return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Ativo).ToList();
         }
     }
 }

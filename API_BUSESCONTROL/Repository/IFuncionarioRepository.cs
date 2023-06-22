@@ -11,6 +11,7 @@ namespace API_BUSESCONTROL.Repository {
         public Funcionario AtivarUsuario(int? id);
         public List<Funcionario> PaginateListAtivos(int paginaAtual, bool statusPaginacao);
         public List<Funcionario> PaginateListInativos(int paginaAtual, bool statusPaginacao);
+        public List<Funcionario> GetAllMotoristas();
         public int QtPaginasAtivas();
         public int QtPaginasInativas();
     }

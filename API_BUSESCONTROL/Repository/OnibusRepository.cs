@@ -136,6 +136,10 @@ namespace API_BUSESCONTROL.Repository {
             return qtPaginas;
         }
 
+        public List<Onibus> GetAll() {
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).ToList();
+        }
+
         public bool ValidationDuplicate(Onibus onibus) {
             List<Onibus> listFrota = _bancoContext.Onibus.ToList();
             if (listFrota.Any(x => x.Placa == onibus.Placa || x.Chassi == onibus.Chassi || x.Renavam == onibus.Renavam)) {

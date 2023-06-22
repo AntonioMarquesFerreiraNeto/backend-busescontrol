@@ -1,4 +1,5 @@
-﻿using API_BUSESCONTROL.Models;
+﻿using API_BUSESCONTROL.Data.Map;
+using API_BUSESCONTROL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API_BUSESCONTROL.Data {
@@ -15,5 +16,15 @@ namespace API_BUSESCONTROL.Data {
         public DbSet<PessoaJuridica> PessoaJuridica { get; set; }
         //Para o entity não criar duas tabelas (pessoaFisica e pessoaJuridica).
         public DbSet<Cliente> Cliente { get; set; }
+
+        public DbSet<Contrato> Contrato { get; set; }
+        public DbSet<ClientesContrato> ClientesContrato { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+
+            modelBuilder.ApplyConfiguration(new MapContrato());
+            modelBuilder.ApplyConfiguration(new MapClientesContrato());
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

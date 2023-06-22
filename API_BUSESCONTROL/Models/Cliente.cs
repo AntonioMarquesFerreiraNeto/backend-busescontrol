@@ -1,4 +1,5 @@
-﻿using API_BUSESCONTROL.Models.ValidationsModels.Pessoas;
+﻿using API_BUSESCONTROL.Models.Enums;
+using API_BUSESCONTROL.Models.ValidationsModels.Pessoas;
 using System.ComponentModel.DataAnnotations;
 
 namespace API_BUSESCONTROL.Models {
@@ -49,9 +50,10 @@ namespace API_BUSESCONTROL.Models {
         [MinLength(2, ErrorMessage = "Campo inválido!")]
         public string? Ddd { get; set; }
 
-        //public Adimplencia Adimplente { get; set; }
+        public Adimplencia Adimplente { get; set; }
 
-        //public virtual List<ClientesContrato> ClientesContratos { get; set; }
+        public virtual List<ClientesContrato>? ClientesContrato { get; set; }
+
         //public virtual List<Financeiro> Financeiros { get; set; }
 
         public string ReturnTelefoneCliente() {

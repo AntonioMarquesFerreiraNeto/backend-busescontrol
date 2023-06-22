@@ -11,6 +11,7 @@ namespace API_BUSESCONTROL.Repository {
         public int QtPaginasInativas();
         public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginacao);
         public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate);
+        public List<Onibus> GetAll();
         public Onibus GetOnibusById(int? id);
     }
 }
