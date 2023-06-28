@@ -37,3 +37,10 @@ C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\obj\Debug\net6.0\r
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\obj\Debug\net6.0\API_BUSESCONTROL.pdb
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\obj\Debug\net6.0\API_BUSESCONTROL.genruntimeconfig.cache
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\obj\Debug\net6.0\ref\API_BUSESCONTROL.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\ClosedXML.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\DocumentFormat.OpenXml.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\ExcelNumberFormat.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Irony.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\SixLabors.Fonts.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.IO.Packaging.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\XLParser.dll

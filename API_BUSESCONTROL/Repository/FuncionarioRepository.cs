@@ -82,6 +82,9 @@ namespace API_BUSESCONTROL.Repository {
         }
         public Funcionario InativarFuncionario(int? id) {
             Funcionario funcionarioDB = GetFuncionarioById(id);
+            if (_bancoContext.Contrato.Any(x => x.MotoristaId == id && x.Andamento == Andamento.EmAndamento)) {
+                throw new Exception("Motorista vinculado em contratos em andamento!");
+            }
             funcionarioDB.Status = FuncionarioStatus.Inativo;
             if (funcionarioDB.Cargo != CargoFuncionario.Motorista) funcionarioDB.StatusUsuario = UsuarioStatus.Inativo;
             _bancoContext.Funcionario.Update(funcionarioDB);

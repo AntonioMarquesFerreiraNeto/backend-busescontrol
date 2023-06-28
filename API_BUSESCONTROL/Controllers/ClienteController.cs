@@ -1,4 +1,5 @@
 ﻿using API_BUSESCONTROL.Models;
+using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -88,6 +89,7 @@ namespace API_BUSESCONTROL.Controllers {
                 return StatusCode(500, error.Message);
             }
         }
+        
 
         [HttpPatch("InativarCliente/{id}")]
         public IActionResult InativarCliente(int? id) {

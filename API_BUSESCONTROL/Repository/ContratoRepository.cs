@@ -4,6 +4,7 @@ using API_BUSESCONTROL.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Diagnostics.Contracts;
 
 namespace API_BUSESCONTROL.Repository {
     public class ContratoRepository : IContratoRepository {
@@ -14,13 +15,10 @@ namespace API_BUSESCONTROL.Repository {
             _bancoContext = bancoContext;
         }
 
-        public Contrato AtivarContrato(int id) {
-            throw new NotImplementedException();
-        }
-
         public Contrato CreateContrato(Contrato contrato, List<ClientesContrato> lista) {
             try {
                 AddClientesContrato(contrato, lista);
+                contrato.SetValoresParcelas(lista.Count);
                 _bancoContext.Contrato.Add(contrato);
                 _bancoContext.SaveChanges();
                 return contrato;
@@ -40,7 +38,7 @@ namespace API_BUSESCONTROL.Repository {
                     _bancoContext.ClientesContrato.Add(data);
                 }
                 else {
-                    var data = new ClientesContrato { 
+                    var data = new ClientesContrato {
                         Contrato = contrato,
                         PessoaJuridicaId = item.PessoaJuridicaId
                     };
@@ -53,12 +51,14 @@ namespace API_BUSESCONTROL.Repository {
             throw new NotImplementedException();
         }
 
-        public Contrato InativarContrato(int id) {
-            throw new NotImplementedException();
-        }
-
         public Contrato GetContratoById(int id) {
-            throw new NotImplementedException();
+            return _bancoContext.Contrato
+                .Include(x => x.Motorista)
+                .Include(x => x.Onibus)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                .AsNoTracking()
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, contrato não encontrado!");
         }
 
         public List<Contrato> GetContratosAtivos(int paginaAtual, bool statusPag) {
@@ -121,6 +121,74 @@ namespace API_BUSESCONTROL.Repository {
             int qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Inativo);
             int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
             return qtPaginas;
+        }
+
+        public Contrato AtivarContrato(int id) {
+            throw new NotImplementedException();
+        }
+
+        public Contrato InativarContrato(int id) {
+            Contrato contratoDB = _bancoContext.Contrato.FirstOrDefault(x => x.Id == id);
+            if (contratoDB!.Aprovacao == StatusAprovacao.Aprovado) throw new Exception("Não é possível inativar contratos em andamento.");
+            contratoDB.StatusContrato = ContratoStatus.Inativo;
+            _bancoContext.Contrato.Update(contratoDB);
+            _bancoContext.SaveChanges();
+            return contratoDB;
+        }
+
+        public Contrato AprovarContrato(int id) {
+            Contrato contratoDB = GetContratoById(id);
+            if (contratoDB.Aprovacao == StatusAprovacao.Aprovado) {
+                throw new Exception("Desculpe, contrato não encontrado!");
+            }
+            if (contratoDB.StatusContrato == ContratoStatus.Inativo) {
+                throw new Exception("Não é possível aprovar contratos inativos!");
+            }
+            if (ValidarClientInativos(contratoDB)) {
+                throw new Exception("Não é possível aprovar contrato de clientes inativos!");
+            }
+            if (contratoDB.Motorista!.Status == FuncionarioStatus.Inativo) {
+                throw new Exception("Não é possível aprovar contrato com motorista vinculado inativado!");
+            }
+            if (contratoDB.Onibus!.StatusOnibus == StatusFrota.Inativo) {
+                throw new Exception("Não é possível aprovar contrato com ônibus vinculado inativado!");
+            }
+            contratoDB.Aprovacao = StatusAprovacao.Aprovado;
+            contratoDB.Andamento = Andamento.EmAndamento;
+            contratoDB.DataEmissao = DateTime.Now.Date;
+            _bancoContext.Contrato.Update(contratoDB);
+            _bancoContext.SaveChanges();
+            return contratoDB;
+        }
+        public bool ValidarClientInativos(Contrato value) {
+            List<PessoaFisica> pessoaFisicas = _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Inativo)
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato).ToList();
+
+            List<PessoaJuridica> pessoaJuridicas = _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Inativo)
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato).ToList();
+            foreach (var item in pessoaFisicas) {
+                if (item.ClientesContrato.Any(x => x.ContratoId == value.Id)) {
+                    return true;
+                }
+            }
+            foreach (var item in pessoaJuridicas) {
+                if (item.ClientesContrato.Any(x => x.ContratoId == value.Id)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Contrato RevogarContrato(int id) {
+            Contrato contratoDB = _bancoContext.Contrato.FirstOrDefault(x => x.Id == id);
+            if (contratoDB == null) throw new Exception("Desculpe, contrato não encontrado!");
+            if (contratoDB.Aprovacao == StatusAprovacao.Aprovado) {
+                throw new Exception("Contratos aprovados não podem ser negados!");
+            }
+            contratoDB.Aprovacao = StatusAprovacao.Negado;
+            _bancoContext.Contrato.Update(contratoDB);
+            _bancoContext.SaveChanges();
+            return contratoDB;
         }
     }
 }

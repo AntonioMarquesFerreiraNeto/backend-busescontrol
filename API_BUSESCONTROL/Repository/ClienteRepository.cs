@@ -1,6 +1,7 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace API_BUSESCONTROL.Repository {
@@ -29,7 +30,7 @@ namespace API_BUSESCONTROL.Repository {
             try {
                 PessoaFisica clienteDB = GetClienteFisicoById(cliente.Id);
                 if (DuplicataEditar(cliente, clienteDB)) throw new Exception("Cliente já se encontra registrado!");
-                if (_bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) throw new Exception("Cliente responsável por outro cliente não pode ser menor de idade!");
+                if (ValClienTResponAlterInvalid(cliente, clienteDB)) throw new Exception("Cliente inadimplente não pode ter vinculação alterada!");
                 clienteDB.Name = cliente.Name!.Trim();
                 clienteDB.DataNascimento = cliente.DataNascimento;
                 clienteDB.Cpf = cliente.Cpf!.Trim();
@@ -46,6 +47,13 @@ namespace API_BUSESCONTROL.Repository {
                 clienteDB.Bairro = cliente.Bairro!.Trim();
                 clienteDB.Estado = cliente.Estado!.Trim();
                 clienteDB.Cidade = cliente.Cidade!.Trim();
+
+                if (ValidationContratoAndamento(clienteDB)) {
+                    throw new Exception("Clientes que possuem contratos em andamento não podem ser menores de idade!");
+                }
+                if(!string.IsNullOrEmpty(clienteDB.IdVinculacaoContratual.ToString()) && _bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
+                    throw new Exception("Cliente possui menores de idade vinculado!");
+                }
                 _bancoContext.PessoaFisica.Update(clienteDB);
                 _bancoContext.SaveChanges();
                 return clienteDB;
@@ -55,6 +63,20 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(error.Message);
             }
         }
+        public bool ValidationContratoAndamento(PessoaFisica pessoaFisica) {
+            PessoaFisica cliente = _bancoContext.PessoaFisica.Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato).FirstOrDefault(x => x.Id == pessoaFisica.Id);
+            if (cliente!.ClientesContrato.Any(x => x.Contrato.Aprovacao == StatusAprovacao.Aprovado && !string.IsNullOrEmpty(pessoaFisica.IdVinculacaoContratual.ToString()))) {
+                return true;
+            }
+            return false;
+        }
+        //Método que não deixa cliente inadimplente ter seu responsável alterado. 
+        public bool ValClienTResponAlterInvalid(PessoaFisica pessoaFisica, PessoaFisica pessoaFisicaDB) {
+            if (pessoaFisicaDB.Adimplente == Adimplencia.Inadimplente && pessoaFisica.IdVinculacaoContratual != pessoaFisicaDB.IdVinculacaoContratual) {
+                return true;
+            }
+            return false;
+        }
 
         public PessoaFisica GetClienteFisicoById(int? id) {
             PessoaFisica cliente = _bancoContext.PessoaFisica.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente encontrado!");
@@ -63,10 +85,20 @@ namespace API_BUSESCONTROL.Repository {
 
         public PessoaFisica InativarCliente(int? id) {
             PessoaFisica cliente = GetClienteFisicoById(id);
+            if (_bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == cliente.Id)) {
+                throw new Exception("Cliente possui vinculo com menor de idade em contratos em andamento!");
+            }
+            if (ValContratoAndamentoPf(cliente.Id)) throw new Exception("Cliente possui contratos em andamento!");
+            if (cliente.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
+            DesabilitarClientesVinculados(cliente, null!);
             cliente.Status = ClienteStatus.Inativo;
             _bancoContext.PessoaFisica.Update(cliente);
             _bancoContext.SaveChanges();
             return cliente;
+        }
+        public bool ValContratoAndamentoPf(int id) {
+            bool retorno = _bancoContext.PessoaFisica.Any(x => x.Id == id && x.ClientesContrato.Any(x => x.Contrato!.Andamento != Andamento.Encerrado)) ? true : false;
+            return retorno;
         }
 
         public PessoaFisica AtivarCliente(int? id) {
@@ -193,10 +225,21 @@ namespace API_BUSESCONTROL.Repository {
 
         public PessoaJuridica InativarClientePJ(int? id) {
             PessoaJuridica clienteDB = GetClienteByIdPJ(id);
+            if (_bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
+                throw new Exception("Cliente possui vinculo com menor de idade em contratos em andamento!");
+            }
+            if (ValContratoAndamentoPj(clienteDB.Id)) throw new Exception("Cliente possui contratos em andamento!");
+            if (clienteDB.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
+
+            DesabilitarClientesVinculados(null!, clienteDB);
             clienteDB.Status = ClienteStatus.Inativo;
             _bancoContext.PessoaJuridica.Update(clienteDB);
             _bancoContext.SaveChanges();
             return clienteDB;
+        }
+        public bool ValContratoAndamentoPj(int id) {
+            bool retorno = _bancoContext.PessoaJuridica.Any(x => x.Id == id && x.ClientesContrato.Any(x => x.Contrato!.Andamento != Andamento.Encerrado)) ? true : false;
+            return retorno;
         }
 
         public PessoaJuridica AtivarClientePJ(int? id) {
@@ -280,6 +323,25 @@ namespace API_BUSESCONTROL.Repository {
                 return true;
             }
             return false;
+        }
+
+        public void DesabilitarClientesVinculados(PessoaFisica pessoaFisica, PessoaJuridica pessoaJuridica) {
+            if (pessoaFisica != null) {
+                List<PessoaFisica> clientes = _bancoContext.PessoaFisica.Where(x => x.IdVinculacaoContratual == pessoaFisica.Id).ToList();
+                foreach (var model in clientes) {
+                    model.Status = ClienteStatus.Inativo;
+                    _bancoContext.Update(model);
+                    _bancoContext.SaveChanges();
+                }
+            }
+            else if (pessoaJuridica != null) {
+                List<PessoaFisica> clientes = _bancoContext.PessoaFisica.Where(x => x.IdVinculacaoContratual == pessoaJuridica.Id).ToList();
+                foreach (var model in clientes) {
+                    model.Status = ClienteStatus.Inativo;
+                    _bancoContext.Update(model);
+                    _bancoContext.SaveChanges();
+                }
+            }
         }
     }
 }

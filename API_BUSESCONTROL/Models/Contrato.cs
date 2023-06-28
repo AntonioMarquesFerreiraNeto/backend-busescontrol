@@ -62,6 +62,12 @@ namespace API_BUSESCONTROL.Models {
 
         //public virtual List<Rescisao> Rescisoes { get; set; }
 
+
+        public void SetValoresParcelas(int qtClientes) {
+            ValorParcelaContrato = ValorMonetario / QtParcelas;
+            ValorParcelaContratoPorCliente = ValorParcelaContrato / qtClientes;
+        }
+
         public bool ValidarValorMonetario() {
             if (ValorMonetario < (decimal)150) {
                 return true;
@@ -77,7 +83,7 @@ namespace API_BUSESCONTROL.Models {
         }
 
         public bool ValidationDataEmissao() {
-            if (DataEmissao < DateTime.Now.Date) {
+            if (DataEmissao!.Value.Date < DateTime.Now.Date || DataEmissao.Value.Date > DateTime.Now.Date) {
                 return true;
             }
             return false; 

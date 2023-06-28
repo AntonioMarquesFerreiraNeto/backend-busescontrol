@@ -75,6 +75,9 @@ namespace API_BUSESCONTROL.Repository {
         public Onibus InativarOnibus(int? id) {
             try {
                 Onibus onibusInativar = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, ônibus não encontrado!");
+                if (_bancoContext.Contrato.Any(x => x.OnibusId == id && x.Andamento == Andamento.EmAndamento)) {
+                    throw new Exception("Ônibus vinculado em contratos em andamento!");
+                }
                 onibusInativar.StatusOnibus = StatusFrota.Inativo;
                 _bancoContext.Onibus.Update(onibusInativar);
                 _bancoContext.SaveChanges();

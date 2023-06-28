@@ -26,8 +26,8 @@ namespace API_BUSESCONTROL.Controllers {
                     else if (contrato.ValidationDatas()) {
                         return BadRequest("Data de vencimento anterior à data de emissão!");
                     }
-                    else if (contrato.ValidationDataEmissao()){
-                        return BadRequest("Data de emissão não pode ser anterior ao dia atual!");
+                    else if (contrato.ValidationDataEmissao()) {
+                        return BadRequest("Data de emissão não pode ser diferente do dia atual!");
                     }
                     else if (contrato.ValidationDataVencimento()) {
                         return BadRequest("O contrato não pode ser superior a dois anos!");
@@ -57,6 +57,49 @@ namespace API_BUSESCONTROL.Controllers {
                 qtPaginas = _contratoRepository.ReturnQtPaginasAtivos()
             };
             return Ok(response);
+        }
+
+        [HttpGet("GetContratosInativos/{paginaAtual}/{statusPag}")]
+        public IActionResult GetContratosInativos(int paginaAtual, bool statusPag) {
+            List<Contrato> contratos = _contratoRepository.GetContratosInativos(paginaAtual, statusPag);
+            var response = new {
+                contractList = contratos,
+                qtPaginas = _contratoRepository.ReturnQtPaginasInativos()
+            };
+            return Ok(response);
+        }
+
+        [HttpPatch("Aprovar/{id}")]
+        public IActionResult AprovarContrato(int id) {
+            try {
+                _contratoRepository.AprovarContrato(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpPatch("Revogar/{id}")]
+        public IActionResult RevogarContrato(int id) {
+            try {
+                _contratoRepository.RevogarContrato(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpPatch("Inativar/{id}")]
+        public IActionResult InativarContrato(int id) {
+            try {
+                _contratoRepository.InativarContrato(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
         }
     }
 }
