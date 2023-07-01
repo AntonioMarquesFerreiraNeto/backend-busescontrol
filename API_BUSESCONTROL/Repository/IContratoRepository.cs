@@ -3,7 +3,7 @@
 namespace API_BUSESCONTROL.Repository {
     public interface IContratoRepository {
         public Contrato CreateContrato(Contrato contrato, List<ClientesContrato> lista);
-        public Contrato UpdateContrato(Contrato contrato);
+        public Contrato UpdateContrato(Contrato contrato, List<ClientesContrato> lista);
         public Contrato InativarContrato(int id);
         public Contrato AtivarContrato(int id);
         public Contrato AprovarContrato(int id);

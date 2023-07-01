@@ -1,10 +1,9 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Presentation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using System.Diagnostics.Contracts;
 
 namespace API_BUSESCONTROL.Repository {
     public class ContratoRepository : IContratoRepository {
@@ -30,25 +29,64 @@ namespace API_BUSESCONTROL.Repository {
         public void AddClientesContrato(Contrato contrato, List<ClientesContrato> lista) {
             var list = lista;
             foreach (var item in list.ToList()) {
-                if (item.PessoaFisica != null) {
+                var data = new ClientesContrato {
+                    Contrato = contrato,
+                    PessoaJuridicaId = item.PessoaJuridicaId,
+                    PessoaFisicaId = item.PessoaFisicaId
+                };
+                _bancoContext.ClientesContrato.Add(data);
+            }
+        }
+
+        public Contrato UpdateContrato(Contrato contrato, List<ClientesContrato> lista) {
+            try {
+                Contrato contratoDB = _bancoContext.Contrato.FirstOrDefault(x => x.Id == contrato.Id) ?? throw new Exception("Contrato não encontrado!");
+                if (contrato.Aprovacao == StatusAprovacao.Aprovado) throw new Exception("Contrato aprovado não pode ser editado!");
+                contratoDB.OnibusId = contrato!.OnibusId;
+                contratoDB.MotoristaId = contrato!.MotoristaId;
+                contratoDB.QtParcelas = (contrato.Pagament == ModelPagament.Avista) ? 1 : contrato.QtParcelas;
+                contratoDB.DataEmissao = contrato.DataEmissao;
+                contratoDB.DataVencimento = contrato.DataVencimento;
+                contratoDB.Detalhamento = contrato.Detalhamento;
+                contratoDB.Pagament = contrato.Pagament;
+                contratoDB.ValorMonetario = contrato.ValorMonetario;
+                contratoDB.SetValoresParcelas(lista.Count);
+                UpdateClientesContrato(contrato, lista);
+                _bancoContext.Contrato.Update(contratoDB);
+                _bancoContext.SaveChanges();
+                return contratoDB;    
+            }
+            catch (Exception error) {
+                throw new Exception(error.Message);
+            }
+        }
+        public void UpdateClientesContrato(Contrato contrato, List<ClientesContrato> lista) {
+            var clientesContratoDB = _bancoContext.ClientesContrato.Where(x => x.ContratoId == contrato.Id).ToList();
+
+            //Adicionar os clientes que não estão no banco de dados. 
+            foreach (var item in lista) {
+                var encontrado = clientesContratoDB.Any(x => (
+                    (x.PessoaFisicaId != null && item.PessoaFisicaId != null && x.PessoaFisicaId == item.PessoaFisicaId) ||
+                    (x.PessoaJuridicaId != null && item.PessoaJuridicaId != null && x.PessoaJuridicaId == item.PessoaJuridicaId)
+                ) && x.ContratoId == contrato.Id);
+
+                if (!encontrado) {
                     var data = new ClientesContrato {
-                        Contrato = contrato,
-                        PessoaFisicaId = item.PessoaFisicaId
-                    };
-                    _bancoContext.ClientesContrato.Add(data);
-                }
-                else {
-                    var data = new ClientesContrato {
-                        Contrato = contrato,
+                        ContratoId = contrato.Id,
+                        PessoaFisicaId = item.PessoaFisicaId,
                         PessoaJuridicaId = item.PessoaJuridicaId
                     };
                     _bancoContext.ClientesContrato.Add(data);
                 }
             }
-        }
 
-        public Contrato UpdateContrato(Contrato contrato) {
-            throw new NotImplementedException();
+
+            //Remove clientes que não estão mais no contrato recebido.
+            foreach (var dataRemove in clientesContratoDB) {
+                if (!lista.Any(x => x.Id == dataRemove.Id)) {
+                    _bancoContext.ClientesContrato.Remove(dataRemove);
+                }
+            }
         }
 
         public Contrato GetContratoById(int id) {
