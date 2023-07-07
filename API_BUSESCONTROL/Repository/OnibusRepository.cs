@@ -1,9 +1,12 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using API_BUSESCONTROL.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace API_BUSESCONTROL.Repository {
+namespace API_BUSESCONTROL.Repository
+{
 
     public class OnibusRepository : IOnibusRepository {
 
@@ -104,25 +107,33 @@ namespace API_BUSESCONTROL.Repository {
         public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginate) {
             if (statusPaginate == true) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.Onibus
+                    .AsNoTracking().Include(x => x.Contratos)
+                    .Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) {
                 throw new Exception("Desculpe, ação inválida!");
             }
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.Onibus
+                .AsNoTracking().Include(x => x.Contratos)
+                .Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indice).Take(10).ToList();
         }
 
         public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate) {
             if (statusPaginate == true) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.Onibus
+                    .AsNoTracking().Include(x => x.Contratos)
+                    .Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) {
                 throw new Exception("Desculpe, ação inválida!");
             }
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.Onibus
+                .AsNoTracking().Include(x => x.Contratos)
+                .Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indice).Take(10).ToList();
         }
 
         public int QtPaginasAtivas() {

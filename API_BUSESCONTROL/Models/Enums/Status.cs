@@ -56,4 +56,14 @@
         NoRescisao = 0,
         PdfBaixado = 1,
     }
+
+    //Fornecedor 
+    public enum TypePessoa : int {
+        PessoaFisica = 0,
+        PessoaJuridica = 1
+    }
+    public enum FornecedorStatus : int {
+        Ativo = 0,
+        Inativo = 1
+    }
 }

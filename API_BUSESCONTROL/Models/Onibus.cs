@@ -42,7 +42,7 @@ namespace API_BUSESCONTROL.Models {
 
         public StatusFrota StatusOnibus { get; set; }
 
-        //public virtual List<Contrato> Contratos { get; set; }
+        public virtual List<Contrato>? Contratos { get; set; }
 
         public string ReturnStatusOnibus() {
             if (StatusOnibus == StatusFrota.Ativo) {

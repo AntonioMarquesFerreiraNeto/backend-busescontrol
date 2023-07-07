@@ -1,10 +1,12 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace API_BUSESCONTROL.Repository {
+namespace API_BUSESCONTROL.Repository
+{
     public class ClienteRepository : IClienteRepository {
 
         private readonly BancoContext _bancoContext;
@@ -51,13 +53,13 @@ namespace API_BUSESCONTROL.Repository {
                 if (ValidationContratoAndamento(clienteDB)) {
                     throw new Exception("Clientes que possuem contratos em andamento não podem ser menores de idade!");
                 }
-                if(!string.IsNullOrEmpty(clienteDB.IdVinculacaoContratual.ToString()) && _bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
+                if (!string.IsNullOrEmpty(clienteDB.IdVinculacaoContratual.ToString()) && _bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
                     throw new Exception("Cliente possui menores de idade vinculado!");
                 }
                 _bancoContext.PessoaFisica.Update(clienteDB);
                 _bancoContext.SaveChanges();
                 return clienteDB;
-                
+
             }
             catch (Exception error) {
                 throw new Exception(error.Message);
@@ -88,7 +90,7 @@ namespace API_BUSESCONTROL.Repository {
             if (_bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == cliente.Id)) {
                 throw new Exception("Cliente possui vinculo com menor de idade em contratos em andamento!");
             }
-            if (ValContratoAndamentoPf(cliente.Id)) throw new Exception("Cliente possui contratos em andamento!");
+            if (ValContratoAndamentoPf(cliente.Id)) throw new Exception("Cliente possui contratos em andamento ou encerrados!");
             if (cliente.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
             DesabilitarClientesVinculados(cliente, null!);
             cliente.Status = ClienteStatus.Inativo;
@@ -112,21 +114,29 @@ namespace API_BUSESCONTROL.Repository {
         public List<PessoaFisica> GetClientesAtivos(int paginaAtual, bool statusPaginate) {
             if (statusPaginate == true) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.PessoaFisica
+                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                    .Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.PessoaFisica
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                .Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
         }
 
         public List<PessoaFisica> GetClientesInativos(int paginaAtual, bool statusPaginate) {
             if (statusPaginate == true) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.PessoaFisica
+                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                    .Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida");
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.PessoaFisica
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                .Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
         }
 
         public int QtPaginasClientesAtivos() {
@@ -228,7 +238,7 @@ namespace API_BUSESCONTROL.Repository {
             if (_bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
                 throw new Exception("Cliente possui vinculo com menor de idade em contratos em andamento!");
             }
-            if (ValContratoAndamentoPj(clienteDB.Id)) throw new Exception("Cliente possui contratos em andamento!");
+            if (ValContratoAndamentoPj(clienteDB.Id)) throw new Exception("Cliente possui contratos em andamento ou encerrados!");
             if (clienteDB.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
 
             DesabilitarClientesVinculados(null!, clienteDB);
@@ -257,21 +267,29 @@ namespace API_BUSESCONTROL.Repository {
         public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, bool statusPagina) {
             if (statusPagina) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.PessoaJuridica
+                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                    .Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.PessoaJuridica
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                .Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
         }
 
         public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, bool statusPagina) {
             if (statusPagina) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.PessoaJuridica
+                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                    .Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.PessoaJuridica
+                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                .Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
         }
 
         public int QtPaginasClientesAtivosPJ() {

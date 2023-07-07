@@ -77,7 +77,7 @@ namespace API_BUSESCONTROL.Models {
 
         public UsuarioStatus StatusUsuario { get; set; }
 
-        /*public virtual List<Contrato> Contratos { get; set; }*/
+        public virtual List<Contrato>? Contratos { get; set; }
 
         public bool ValidarSenha(string senha) {
             if (senha.GerarHash() == Senha) {

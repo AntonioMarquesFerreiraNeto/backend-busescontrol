@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KOg3pHkEkhZD1HPsH3o5FfHW/B7s+k91lZoV8h7Z3A8L2L9va0S+KOvD7gtCeq1rvWOpX9c+9ZrFQfsm3LRqFg==",
+  "dgSpecHash": "FhemXyye53Ov3HthqVybTzAo67kKlWrtCg3milZ5CWgrUclKVTYXjC3fushOCgdnGwYg6PqeYDpplEK3PP+wDg==",
   "success": true,
   "projectFilePath": "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\API_BUSESCONTROL.csproj",
   "expectedPackageFiles": [
@@ -109,7 +109,9 @@
     "C:\\Users\\anton\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\anton\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
     "C:\\Users\\anton\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
-    "C:\\Users\\anton\\.nuget\\packages\\xlparser\\1.5.2\\xlparser.1.5.2.nupkg.sha512"
+    "C:\\Users\\anton\\.nuget\\packages\\xlparser\\1.5.2\\xlparser.1.5.2.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\xunit.abstractions\\2.0.3\\xunit.abstractions.2.0.3.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\xunit.extensibility.core\\2.5.0\\xunit.extensibility.core.2.5.0.nupkg.sha512"
   ],
   "logs": []
 }

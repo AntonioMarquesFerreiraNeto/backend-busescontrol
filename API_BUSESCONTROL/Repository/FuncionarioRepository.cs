@@ -2,10 +2,12 @@
 using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using API_BUSESCONTROL.Repository.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace API_BUSESCONTROL.Repository {
+namespace API_BUSESCONTROL.Repository
+{
     public class FuncionarioRepository : IFuncionarioRepository {
 
         private readonly BancoContext _bancoContext;
@@ -44,6 +46,7 @@ namespace API_BUSESCONTROL.Repository {
             try {
                 Funcionario funcionarioDB = GetFuncionarioById(funcionario.Id);
                 if (DuplicataEditar(funcionario, funcionarioDB)) throw new Exception("Funcionário já se encontra registrado!");
+                if (ValidarVinculoMotorista(funcionario.Cargo, funcionarioDB.Id)) throw new Exception("Motoristas com contratos não podem ter seus cargos alterados!");
                 if (funcionario.Cargo != CargoFuncionario.Motorista && string.IsNullOrEmpty(funcionarioDB.Senha)) {
                     funcionarioDB.Senha = funcionarioDB.GerarSenha();
                     if (!EnviarSenha(funcionarioDB)) throw new Exception("Desculpe, não conseguimos enviar o e-mail com a senha.");
@@ -72,6 +75,15 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(error.Message);
             }
         }
+        public bool ValidarVinculoMotorista(CargoFuncionario cargoFuncionario, int funcionarioId) {
+            if (cargoFuncionario != CargoFuncionario.Motorista) {
+                if (_bancoContext.Contrato.Any(x => x.MotoristaId == funcionarioId && x.StatusContrato == ContratoStatus.Ativo)) {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
 
         public Funcionario AtivarFuncionario(int? id) {
             Funcionario funcionarioDB = GetFuncionarioById(id);
@@ -80,6 +92,7 @@ namespace API_BUSESCONTROL.Repository {
             _bancoContext.SaveChanges();
             return funcionarioDB;
         }
+
         public Funcionario InativarFuncionario(int? id) {
             Funcionario funcionarioDB = GetFuncionarioById(id);
             if (_bancoContext.Contrato.Any(x => x.MotoristaId == id && x.Andamento == Andamento.EmAndamento)) {
@@ -99,6 +112,7 @@ namespace API_BUSESCONTROL.Repository {
             _bancoContext.SaveChanges();
             return funcionarioDB;
         }
+
         public Funcionario AtivarUsuario(int? id) {
             Funcionario funcionarioDB = GetFuncionarioById(id);
             if (funcionarioDB.Cargo == CargoFuncionario.Motorista) throw new Exception("Desculpe, ação inválida!");
@@ -112,32 +126,39 @@ namespace API_BUSESCONTROL.Repository {
             //Se o statusPaginação for igual a true, deve paginar para próxima página, caso contrário, página anterior.
             if (statusPaginacao) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                    .Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) {
                 throw new Exception("Desculpe, ação inválida!");
             }
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                .Skip(indice).Take(10).ToList();
         }
+
         public List<Funcionario> PaginateListInativos(int paginaAtual, bool statusPaginacao) {
             //Se o statusPaginação for igual a true, deve paginar para próxima página, caso contrário, página anterior.
             if (statusPaginacao) {
                 int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
+                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                    .Skip(indiceInicial).Take(10).ToList();
             }
             if (paginaAtual < 2) {
                 throw new Exception("Desculpe, ação inválida!");
             }
             int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).Skip(indice).Take(10).ToList();
+            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                .Skip(indice).Take(10).ToList();
         }
+
         public int QtPaginasAtivas() {
             var qtOnibus = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo);
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
             int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
             return qtPaginas;
         }
+
         public int QtPaginasInativas() {
             var qtOnibus = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo);
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
@@ -146,7 +167,7 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<Funcionario> GetAllMotoristas() {
-            return _bancoContext.Funcionario.Where(x => x.Cargo == CargoFuncionario.Motorista && x.Status == FuncionarioStatus.Ativo).ToList();  
+            return _bancoContext.Funcionario.Where(x => x.Cargo == CargoFuncionario.Motorista && x.Status == FuncionarioStatus.Ativo).ToList();
         }
 
         public Funcionario TrimFuncionario(Funcionario value) {

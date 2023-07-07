@@ -1,12 +1,13 @@
 ﻿using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
-using API_BUSESCONTROL.Repository;
+using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
 
-namespace API_BUSESCONTROL.Controllers {
+namespace API_BUSESCONTROL.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class ClienteController : ControllerBase {

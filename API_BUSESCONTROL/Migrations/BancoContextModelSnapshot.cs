@@ -175,6 +175,80 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("Contrato");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Fornecedor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Bairro")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Cep")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<string>("Cidade")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Cnpj")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ComplementoResidencial")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DataFornecedor")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Ddd")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Logradouro")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NameOrRazaoSocial")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NumeroResidencial")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("varchar(9)");
+
+                    b.Property<int>("TypePessoa")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Fornecedor");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
                 {
                     b.Property<int>("Id")
@@ -404,13 +478,13 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
                 {
                     b.HasOne("API_BUSESCONTROL.Models.Funcionario", "Motorista")
-                        .WithMany()
+                        .WithMany("Contratos")
                         .HasForeignKey("MotoristaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API_BUSESCONTROL.Models.Onibus", "Onibus")
-                        .WithMany()
+                        .WithMany("Contratos")
                         .HasForeignKey("OnibusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -423,6 +497,16 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
                 {
                     b.Navigation("ClientesContrato");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
+                {
+                    b.Navigation("Contratos");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Onibus", b =>
+                {
+                    b.Navigation("Contratos");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>

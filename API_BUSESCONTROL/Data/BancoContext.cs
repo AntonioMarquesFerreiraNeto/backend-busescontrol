@@ -14,6 +14,8 @@ namespace API_BUSESCONTROL.Data {
         public DbSet<Funcionario> Funcionario { get; set; }
         public DbSet<PessoaFisica> PessoaFisica { get; set; }
         public DbSet<PessoaJuridica> PessoaJuridica { get; set; }
+        public DbSet<Fornecedor> Fornecedor { get; set; }
+
         //Para o entity não criar duas tabelas (pessoaFisica e pessoaJuridica).
         public DbSet<Cliente> Cliente { get; set; }
 

@@ -1,8 +1,9 @@
 ﻿using API_BUSESCONTROL.Models;
-using API_BUSESCONTROL.Repository;
+using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API_BUSESCONTROL.Controllers {
+namespace API_BUSESCONTROL.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class PaletaCoresController : ControllerBase {

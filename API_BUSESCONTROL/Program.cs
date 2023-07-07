@@ -1,10 +1,12 @@
 using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Repository;
+using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
-namespace API_BUSESCONTROL {
+namespace API_BUSESCONTROL
+{
     public class Program {
         public static void Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,7 @@ namespace API_BUSESCONTROL {
             builder.Services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
             builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
             builder.Services.AddScoped<IContratoRepository, ContratoRepository>();
+            builder.Services.AddScoped<IFornecedorRepository, FornecedorRepository>();
             builder.Services.AddScoped<IEmail, Email>();
 
             builder.Services.AddCors();

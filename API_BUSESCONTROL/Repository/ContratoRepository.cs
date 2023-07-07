@@ -1,11 +1,13 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
+using API_BUSESCONTROL.Repository.Interfaces;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Presentation;
 using Microsoft.EntityFrameworkCore;
 
-namespace API_BUSESCONTROL.Repository {
+namespace API_BUSESCONTROL.Repository
+{
     public class ContratoRepository : IContratoRepository {
 
         private readonly BancoContext _bancoContext;
@@ -60,9 +62,18 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(error.Message);
             }
         }
-        public void UpdateClientesContrato(Contrato contrato, List<ClientesContrato> lista) {
+        public void UpdateClientesContrato(Contrato contrato, List<ClientesContrato> lista) {  
             var clientesContratoDB = _bancoContext.ClientesContrato.Where(x => x.ContratoId == contrato.Id).ToList();
 
+            //Remove clientes que não estão mais no contrato recebido.
+            foreach (var dataRemove in clientesContratoDB) {
+                if (!lista.Any(x => x.PessoaFisicaId == dataRemove.PessoaFisicaId)) {
+                    _bancoContext.ClientesContrato.Remove(dataRemove);
+                }
+                if (!lista.Any(x => x.PessoaJuridicaId == dataRemove.PessoaJuridicaId)) {
+                    _bancoContext.ClientesContrato.Remove(dataRemove);
+                }
+            }
             //Adicionar os clientes que não estão no banco de dados. 
             foreach (var item in lista) {
                 var encontrado = clientesContratoDB.Any(x => (
@@ -79,14 +90,6 @@ namespace API_BUSESCONTROL.Repository {
                     _bancoContext.ClientesContrato.Add(data);
                 }
             }
-
-
-            //Remove clientes que não estão mais no contrato recebido.
-            foreach (var dataRemove in clientesContratoDB) {
-                if (!lista.Any(x => x.Id == dataRemove.Id)) {
-                    _bancoContext.ClientesContrato.Remove(dataRemove);
-                }
-            }
         }
 
         public Contrato GetContratoById(int id) {
@@ -97,6 +100,24 @@ namespace API_BUSESCONTROL.Repository {
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                 .AsNoTracking()
                 .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, contrato não encontrado!");
+        }
+        public List<Contrato> GetAllContratosAtivos() {
+            return _bancoContext.Contrato
+                .Include(x => x.Motorista)
+                .Include(x => x.Onibus)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                .AsNoTracking()
+                .Where(x => x.StatusContrato == ContratoStatus.Ativo).ToList();
+        }
+        public List<Contrato> GetAllContratosInativos() {
+            return _bancoContext.Contrato
+                .Include(x => x.Motorista)
+                .Include(x => x.Onibus)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                .AsNoTracking()
+                .Where(x => x.StatusContrato == ContratoStatus.Inativo).ToList();
         }
 
         public List<Contrato> GetContratosAtivos(int paginaAtual, bool statusPag) {
@@ -109,7 +130,7 @@ namespace API_BUSESCONTROL.Repository {
                .Include(x => x.Motorista)
                .Include(x => x.Onibus)
                .AsNoTracking()
-               .ToList();
+               .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
             }
             else {
                 if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
@@ -122,7 +143,7 @@ namespace API_BUSESCONTROL.Repository {
                     .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                     .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                     .AsNoTracking()
-                    .ToList();
+                    .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
             }
         }
         public int ReturnQtPaginasAtivos() {
@@ -140,7 +161,7 @@ namespace API_BUSESCONTROL.Repository {
                .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
                .AsNoTracking().Include(x => x.Motorista)
                .AsNoTracking().Include(x => x.Onibus)
-               .ToList();
+               .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
             }
             else {
                 if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
@@ -152,7 +173,7 @@ namespace API_BUSESCONTROL.Repository {
                     .AsNoTracking().Include(x => x.Onibus)
                     .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaFisica)
                     .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
-                    .ToList();
+                    .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
             }
         }
         public int ReturnQtPaginasInativos() {

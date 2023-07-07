@@ -1,10 +1,13 @@
 ﻿using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Models;
+using API_BUSESCONTROL.Repository.Interfaces;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 
-namespace API_BUSESCONTROL.Repository {
+namespace API_BUSESCONTROL.Repository
+{
     public class PaletaCoresRepository : IPaletaCoresRepository {
 
         private readonly BancoContext _bancoContext;
@@ -50,7 +53,7 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<PaletaCores> ListPaletaCores() {
-            return _bancoContext.PaletaCores.ToList();
+            return _bancoContext.PaletaCores.OrderByDescending(x => x.id).ToList();
         }
     }
 }

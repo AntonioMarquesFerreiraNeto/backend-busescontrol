@@ -44,3 +44,5 @@ C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\I
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\SixLabors.Fonts.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.IO.Packaging.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\XLParser.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\xunit.abstractions.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\xunit.core.dll

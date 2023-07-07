@@ -1,6 +1,6 @@
 ﻿using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
-using API_BUSESCONTROL.Repository;
+using API_BUSESCONTROL.Repository.Interfaces;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Diagnostics.Contracts;
 
-namespace API_BUSESCONTROL.Controllers {
+namespace API_BUSESCONTROL.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class ContratoController : ControllerBase {
@@ -143,11 +144,11 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("RelatorioExcel")]
-        public IActionResult ReturnPlanilhaExcel() {
+        [HttpGet("RelatorioExcel/{ativo}")]
+        public IActionResult ReturnPlanilhaExcel(bool ativo) {
             try {
-                List<Contrato> contratos = _contratoRepository.GetContratosAtivos(1, true);
-                if (contratos == null) return BadRequest("Nenhum registro encontrado!");
+                List<Contrato> contratos = (ativo) ? _contratoRepository.GetAllContratosAtivos() : _contratoRepository.GetAllContratosInativos();
+                if (contratos == null || contratos.Count == 0) return NotFound("Nenhum registro encontrado!");
 
                 using (var folhaBook = new XLWorkbook()) {
                     var folha = folhaBook.AddWorksheet("sample sheet");
@@ -160,29 +161,19 @@ namespace API_BUSESCONTROL.Controllers {
                     folha.Cell(1, "F").Value = "Aprovação";
                     folha.Cell(1, "G").Value = "Andamento";
 
-                    var col1 = folha.Column("A");
-                    var col2 = folha.Column("B");
-                    var col3 = folha.Column("C");
-                    var col4 = folha.Column("D");
-                    var col5 = folha.Column("E");
-                    var col6 = folha.Column("F");
-                    var col7 = folha.Column("G");
+                    var colunas = new[] { "A", "B", "C", "D", "E", "F", "G" };
 
-                    col1.Width = 10;
-                    col2.Width = 20;
-                    col3.Width = 20;
-                    col4.Width = 20;
-                    col5.Width = 20;
-                    col6.Width = 20;
-                    col7.Width = 20;
+                    foreach (var coluna in colunas) {
+                        var col = folha.Column(coluna);
+                        col.Width = 20;
+                        col.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
 
-                    col1.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col2.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col3.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col4.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col5.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col6.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-                    col7.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+                        var titulo = folha.Cell(1, coluna);
+                        titulo.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                        titulo.Style.Font.SetBold();
+                        titulo.Style.Font.FontColor = XLColor.Blue;
+                    }
+
 
                     foreach (var item in contratos) {
                         folha.Cell(contratos.IndexOf(item) + 2, "A").Value = item.Id;
@@ -213,7 +204,8 @@ namespace API_BUSESCONTROL.Controllers {
 
                     using (MemoryStream stream = new MemoryStream()) {
                         folhaBook.SaveAs(stream);
-                        string nomeArquivo = "Buses control - Contratos ativos.xlsx";
+                        string nameContrato = (ativo) ? "Contratos ativos" : "Contratos inativos";
+                        string nomeArquivo = $"Buses control - {nameContrato}.xlsx";
                         return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nomeArquivo);
                     }
                 }
