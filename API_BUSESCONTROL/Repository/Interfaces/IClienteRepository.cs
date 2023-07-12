@@ -13,6 +13,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<PessoaFisica> GetClientesAtivos(int paginaAtual, bool statusPagina);
         public List<PessoaFisica> GetClientesInativos(int paginaAtual, bool statusPagina);
         public List<PessoaFisica> GetClientesParaVinculacao();
+        public List<PessoaFisica> GetClientesAdimplentes();
         public int QtPaginasClientesAtivos();
         public int QtPaginasClientesInativos();
 

@@ -6,8 +6,7 @@ using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Presentation;
 using Microsoft.EntityFrameworkCore;
 
-namespace API_BUSESCONTROL.Repository
-{
+namespace API_BUSESCONTROL.Repository {
     public class ContratoRepository : IContratoRepository {
 
         private readonly BancoContext _bancoContext;
@@ -56,13 +55,13 @@ namespace API_BUSESCONTROL.Repository
                 UpdateClientesContrato(contrato, lista);
                 _bancoContext.Contrato.Update(contratoDB);
                 _bancoContext.SaveChanges();
-                return contratoDB;    
+                return contratoDB;
             }
             catch (Exception error) {
                 throw new Exception(error.Message);
             }
         }
-        public void UpdateClientesContrato(Contrato contrato, List<ClientesContrato> lista) {  
+        public void UpdateClientesContrato(Contrato contrato, List<ClientesContrato> lista) {
             var clientesContratoDB = _bancoContext.ClientesContrato.Where(x => x.ContratoId == contrato.Id).ToList();
 
             //Remove clientes que não estão mais no contrato recebido.
@@ -124,26 +123,30 @@ namespace API_BUSESCONTROL.Repository
             if (statusPag) {
                 int indiceInicial = (paginaAtual - 1) * 10;
                 return _bancoContext.Contrato
-               .Where(x => x.StatusContrato == ContratoStatus.Ativo).Skip(indiceInicial).Take(10)
+               .Where(x => x.StatusContrato == ContratoStatus.Ativo)
+               .OrderByDescending(x => x.Id)
+               .Skip(indiceInicial).Take(10)
                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                .Include(x => x.Motorista)
                .Include(x => x.Onibus)
                .AsNoTracking()
-               .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
+               .ToList();
             }
             else {
                 if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
                 int indice = (paginaAtual - 2) * 2;
                 return _bancoContext.Contrato
-                    .Where(x => x.StatusContrato == ContratoStatus.Ativo).Skip(indice).Take(10)
+                    .Where(x => x.StatusContrato == ContratoStatus.Ativo)
+                    .OrderByDescending(x => x.Id)
+                    .Skip(indice).Take(10)
                     .AsNoTracking().Include(x => x.Motorista)
                     .AsNoTracking().Include(x => x.Onibus)
                     .AsNoTracking()
                     .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                     .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                     .AsNoTracking()
-                    .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
+                    .ToList();
             }
         }
         public int ReturnQtPaginasAtivos() {
@@ -156,24 +159,28 @@ namespace API_BUSESCONTROL.Repository
             if (statusPag) {
                 int indiceInicial = (paginaAtual - 1) * 10;
                 return _bancoContext.Contrato
-               .Where(x => x.StatusContrato == ContratoStatus.Inativo).Skip(indiceInicial).Take(10)
+               .Where(x => x.StatusContrato == ContratoStatus.Inativo)
+               .OrderByDescending(x => x.Id)
+               .Skip(indiceInicial).Take(10)
                .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaFisica)
                .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
                .AsNoTracking().Include(x => x.Motorista)
                .AsNoTracking().Include(x => x.Onibus)
-               .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
+               .ToList();
             }
             else {
                 if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
                 int indice = (paginaAtual - 2) * 2;
 
                 return _bancoContext.Contrato
-                    .Where(x => x.StatusContrato == ContratoStatus.Inativo).Skip(indice).Take(10)
+                    .Where(x => x.StatusContrato == ContratoStatus.Inativo)
+                    .OrderByDescending(x => x.Id)
+                    .Skip(indice).Take(10)
                     .AsNoTracking().Include(x => x.Motorista)
                     .AsNoTracking().Include(x => x.Onibus)
                     .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaFisica)
                     .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
-                    .OrderBy(x => x.Andamento != Andamento.Aguardando).ToList();
+                    .ToList();
             }
         }
         public int ReturnQtPaginasInativos() {

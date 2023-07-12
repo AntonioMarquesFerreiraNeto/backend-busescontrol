@@ -112,5 +112,20 @@ namespace API_BUSESCONTROL.Models {
                 return resultado;
             }
         }
+
+        public string ReturnTypePagament() {
+            string msgPagament = (Pagament == ModelPagament.Avista) ? "À vista" : "Parcelado";
+            return msgPagament;
+        }
+
+        public string ReturnValorTotCliente() {
+            decimal valorTotClient = (decimal)(ValorParcelaContratoPorCliente! * QtParcelas!);
+            return valorTotClient.ToString("C2");
+        }
+
+        public string ReturnDiaPagamento() {
+            DateTime dia = DataEmissao!.Value;
+            return $"{dia.Day}";
+        }
     }
 }

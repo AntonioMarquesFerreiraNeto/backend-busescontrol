@@ -2,6 +2,15 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "BouncyCastle/1.8.9": {
+        "type": "package",
+        "compile": {
+          "lib/BouncyCastle.Crypto.dll": {}
+        },
+        "runtime": {
+          "lib/BouncyCastle.Crypto.dll": {}
+        }
+      },
       "ClosedXML/0.102.0": {
         "type": "package",
         "dependencies": {
@@ -24,18 +33,18 @@
           }
         }
       },
-      "DocumentFormat.OpenXml/2.16.0": {
+      "DocumentFormat.OpenXml/2.20.0": {
         "type": "package",
         "dependencies": {
           "System.IO.Packaging": "4.7.0"
         },
         "compile": {
-          "lib/netstandard2.0/DocumentFormat.OpenXml.dll": {
+          "lib/net6.0/DocumentFormat.OpenXml.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/DocumentFormat.OpenXml.dll": {
+          "lib/net6.0/DocumentFormat.OpenXml.dll": {
             "related": ".xml"
           }
         }
@@ -81,6 +90,18 @@
         },
         "runtime": {
           "lib/netstandard1.6/Irony.dll": {}
+        }
+      },
+      "iTextSharp/5.5.13.3": {
+        "type": "package",
+        "dependencies": {
+          "BouncyCastle": "1.8.9"
+        },
+        "compile": {
+          "lib/itextsharp.dll": {}
+        },
+        "runtime": {
+          "lib/itextsharp.dll": {}
         }
       },
       "Microsoft.EntityFrameworkCore/6.0.1": {
@@ -388,6 +409,28 @@
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {
             "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.Win32.SystemEvents/7.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
+            "assetType": "runtime",
+            "rid": "win"
           }
         }
       },
@@ -873,6 +916,31 @@
         "compile": {
           "ref/netstandard1.5/System.Diagnostics.Tracing.dll": {
             "related": ".xml"
+          }
+        }
+      },
+      "System.Drawing.Common/7.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "7.0.0"
+        },
+        "compile": {
+          "lib/net6.0/System.Drawing.Common.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Drawing.Common.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net6.0/System.Drawing.Common.dll": {
+            "assetType": "runtime",
+            "rid": "win"
           }
         }
       },
@@ -1843,6 +1911,19 @@
     }
   },
   "libraries": {
+    "BouncyCastle/1.8.9": {
+      "sha512": "axnBgvdD5n+FnEG6efk/tfKuMFru7R/EoISH9zjh319yb3HD24TEHSAbNN/lTRT2ulOGRxDgOsCjkuk08iwWPg==",
+      "type": "package",
+      "path": "bouncycastle/1.8.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "bouncycastle.1.8.9.nupkg.sha512",
+        "bouncycastle.nuspec",
+        "lib/BouncyCastle.Crypto.dll"
+      ]
+    },
     "ClosedXML/0.102.0": {
       "sha512": "y4AiOq/XwJxbTV8wb9h32Ze9zme7oN6Qa7mpgzlCTK847d6P8BC3NDuqBj3X9RnC/CXmSwsmRS/vrIz7aHwijQ==",
       "type": "package",
@@ -1859,14 +1940,14 @@
         "nuget-logo.png"
       ]
     },
-    "DocumentFormat.OpenXml/2.16.0": {
-      "sha512": "RhpnDgyyx1KjZm98T3w3bSXFHG/7ZNUaVmz4NAUA+jmV3PcVNZeW87Y04CpBNLdDHEMSspirfo0B5kLRaoE97w==",
+    "DocumentFormat.OpenXml/2.20.0": {
+      "sha512": "+oFMsEppo/W6KpGTRXaJl2jTFYn9zeon4FaZuDoCijQ1/0JaPENaCef7d4Y3f8v116eKhVBwd4Ya+/NDglxkjw==",
       "type": "package",
-      "path": "documentformat.openxml/2.16.0",
+      "path": "documentformat.openxml/2.20.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "documentformat.openxml.2.16.0.nupkg.sha512",
+        "documentformat.openxml.2.20.0.nupkg.sha512",
         "documentformat.openxml.nuspec",
         "icon.png",
         "lib/net35/DocumentFormat.OpenXml.dll",
@@ -1875,6 +1956,8 @@
         "lib/net40/DocumentFormat.OpenXml.xml",
         "lib/net46/DocumentFormat.OpenXml.dll",
         "lib/net46/DocumentFormat.OpenXml.xml",
+        "lib/net6.0/DocumentFormat.OpenXml.dll",
+        "lib/net6.0/DocumentFormat.OpenXml.xml",
         "lib/netstandard1.3/DocumentFormat.OpenXml.dll",
         "lib/netstandard1.3/DocumentFormat.OpenXml.xml",
         "lib/netstandard2.0/DocumentFormat.OpenXml.dll",
@@ -1927,6 +2010,22 @@
         "lib/net452/Irony.dll",
         "lib/net461/Irony.dll",
         "lib/netstandard1.6/Irony.dll"
+      ]
+    },
+    "iTextSharp/5.5.13.3": {
+      "sha512": "vtnMhTEJdZFCkLqaQLjD8aqTBIVKHPrSFuSXnxbLEJlvE/j/l88fvG9wtsejXTmhtErMo0lA9T2LdfdfbwplYw==",
+      "type": "package",
+      "path": "itextsharp/5.5.13.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "gnu-agpl-v3.0.md",
+        "itextsharp.5.5.13.3.nupkg.sha512",
+        "itextsharp.nuspec",
+        "lib/iTextSharp.xml",
+        "lib/itextsharp.dll",
+        "notice.txt"
       ]
     },
     "Microsoft.EntityFrameworkCore/6.0.1": {
@@ -2360,6 +2459,37 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
+      ]
+    },
+    "Microsoft.Win32.SystemEvents/7.0.0": {
+      "sha512": "2nXPrhdAyAzir0gLl8Yy8S5Mnm/uBSQQA7jEsILOS1MTyS7DbmV1NgViMtvV1sfCD1ebITpNwb1NIinKeJgUVQ==",
+      "type": "package",
+      "path": "microsoft.win32.systemevents/7.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Win32.SystemEvents.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Win32.SystemEvents.targets",
+        "lib/net462/Microsoft.Win32.SystemEvents.dll",
+        "lib/net462/Microsoft.Win32.SystemEvents.xml",
+        "lib/net6.0/Microsoft.Win32.SystemEvents.dll",
+        "lib/net6.0/Microsoft.Win32.SystemEvents.xml",
+        "lib/net7.0/Microsoft.Win32.SystemEvents.dll",
+        "lib/net7.0/Microsoft.Win32.SystemEvents.xml",
+        "lib/netstandard2.0/Microsoft.Win32.SystemEvents.dll",
+        "lib/netstandard2.0/Microsoft.Win32.SystemEvents.xml",
+        "microsoft.win32.systemevents.7.0.0.nupkg.sha512",
+        "microsoft.win32.systemevents.nuspec",
+        "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll",
+        "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.xml",
+        "runtimes/win/lib/net7.0/Microsoft.Win32.SystemEvents.dll",
+        "runtimes/win/lib/net7.0/Microsoft.Win32.SystemEvents.xml",
+        "useSharedDesignerContext.txt"
       ]
     },
     "MySqlConnector/2.1.2": {
@@ -3246,6 +3376,43 @@
         "ref/xamarinwatchos10/_._",
         "system.diagnostics.tracing.4.3.0.nupkg.sha512",
         "system.diagnostics.tracing.nuspec"
+      ]
+    },
+    "System.Drawing.Common/7.0.0": {
+      "sha512": "KIX+oBU38pxkKPxvLcLfIkOV5Ien8ReN78wro7OF5/erwcmortzeFx+iBswlh2Vz6gVne0khocQudGwaO1Ey6A==",
+      "type": "package",
+      "path": "system.drawing.common/7.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Drawing.Common.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Drawing.Common.targets",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net462/System.Drawing.Common.dll",
+        "lib/net462/System.Drawing.Common.xml",
+        "lib/net6.0/System.Drawing.Common.dll",
+        "lib/net6.0/System.Drawing.Common.xml",
+        "lib/net7.0/System.Drawing.Common.dll",
+        "lib/net7.0/System.Drawing.Common.xml",
+        "lib/netstandard2.0/System.Drawing.Common.dll",
+        "lib/netstandard2.0/System.Drawing.Common.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "runtimes/win/lib/net6.0/System.Drawing.Common.dll",
+        "runtimes/win/lib/net6.0/System.Drawing.Common.xml",
+        "runtimes/win/lib/net7.0/System.Drawing.Common.dll",
+        "runtimes/win/lib/net7.0/System.Drawing.Common.xml",
+        "system.drawing.common.7.0.0.nupkg.sha512",
+        "system.drawing.common.nuspec",
+        "useSharedDesignerContext.txt"
       ]
     },
     "System.Globalization/4.3.0": {
@@ -5795,11 +5962,14 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "ClosedXML >= 0.102.0",
+      "DocumentFormat.OpenXml >= 2.20.0",
       "Microsoft.EntityFrameworkCore >= 6.0.1",
       "Microsoft.EntityFrameworkCore.Design >= 6.0.1",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.1",
       "Pomelo.EntityFrameworkCore.MySql >= 6.0.1",
       "Swashbuckle.AspNetCore >= 6.2.3",
+      "System.Drawing.Common >= 7.0.0",
+      "iTextSharp >= 5.5.13.3",
       "xunit.extensibility.core >= 2.5.0"
     ]
   },
@@ -5852,6 +6022,10 @@
             "target": "Package",
             "version": "[0.102.0, )"
           },
+          "DocumentFormat.OpenXml": {
+            "target": "Package",
+            "version": "[2.20.0, )"
+          },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
             "version": "[6.0.1, )"
@@ -5875,6 +6049,14 @@
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[6.2.3, )"
+          },
+          "System.Drawing.Common": {
+            "target": "Package",
+            "version": "[7.0.0, )"
+          },
+          "iTextSharp": {
+            "target": "Package",
+            "version": "[5.5.13.3, )"
           },
           "xunit.extensibility.core": {
             "target": "Package",
@@ -5903,5 +6085,27 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "O pacote 'BouncyCastle 1.8.9' foi restaurado usando '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' em vez da estrutura de destino do projeto 'net6.0'. Esse pacote pode não ser totalmente compatível com o seu projeto.",
+      "libraryId": "BouncyCastle",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "O pacote 'iTextSharp 5.5.13.3' foi restaurado usando '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' em vez da estrutura de destino do projeto 'net6.0'. Esse pacote pode não ser totalmente compatível com o seu projeto.",
+      "libraryId": "iTextSharp",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
 }

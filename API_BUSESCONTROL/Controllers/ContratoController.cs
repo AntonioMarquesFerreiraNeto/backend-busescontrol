@@ -4,21 +4,29 @@ using API_BUSESCONTROL.Repository.Interfaces;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Spreadsheet;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Diagnostics.Contracts;
+using Font = iTextSharp.text.Font;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 
-namespace API_BUSESCONTROL.Controllers
-{
+namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class ContratoController : ControllerBase {
 
         private readonly IContratoRepository _contratoRepository;
+        private readonly IClienteRepository _clienteRepository;
+        public string textoContratante;
+        public string nomeCliente;
 
-        public ContratoController(IContratoRepository contratoRepository) {
+        public ContratoController(IContratoRepository contratoRepository, IClienteRepository clienteRepository) {
             _contratoRepository = contratoRepository;
+            _clienteRepository = clienteRepository;
         }
 
         [HttpPost]
@@ -184,23 +192,6 @@ namespace API_BUSESCONTROL.Controllers
                         folha.Cell(contratos.IndexOf(item) + 2, "F").Value = ReturnAprovacao(item.Aprovacao);
                         folha.Cell(contratos.IndexOf(item) + 2, "G").Value = ReturnAndamento(item.Andamento);
                     }
-                    string ReturnAprovacao(StatusAprovacao status) {
-                        switch (status) {
-                            case StatusAprovacao.EmAnalise: return "Em análise";
-                            case StatusAprovacao.Negado: return "Negado";
-                            case StatusAprovacao.Aprovado: return "Aprovado";
-                            default: return "Status não encontrado.";
-                        }
-                    }
-                    string ReturnAndamento(Andamento andamento) {
-                        switch (andamento) {
-                            case Andamento.Aguardando: return "Aguardando";
-                            case Andamento.EmAndamento: return "Em andamento";
-                            case Andamento.Encerrado: return "Encerrado";
-                            default: return "status não encontrado";
-                        }
-
-                    }
 
                     using (MemoryStream stream = new MemoryStream()) {
                         folhaBook.SaveAs(stream);
@@ -213,6 +204,333 @@ namespace API_BUSESCONTROL.Controllers
             catch (Exception error) {
                 return BadRequest(error.Message);
             }
+        }
+
+        [HttpGet("RelatorioPDF/{ativo}")]
+        public IActionResult RelatorioPdf(bool ativo) {
+            try {
+                List<Contrato> contratos = (ativo) ? _contratoRepository.GetAllContratosAtivos() : _contratoRepository.GetAllContratosInativos();
+                if (!contratos.Any() || contratos == null) {
+                    return NotFound("Nenhum registro encontrado!");
+                }
+                var pxPorMm = 72 / 35.2f;
+                Document doc = new Document(PageSize.A4, 15 * pxPorMm, 15 * pxPorMm,
+                    15 * pxPorMm, 15 * pxPorMm);
+                MemoryStream stream = new MemoryStream();
+                PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+                writer.CloseStream = false;
+                doc.Open();
+                var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 16,
+                    iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
+                Paragraph paragrofoJustificado = new Paragraph("",
+                new Font(fonteBase, 10, Font.NORMAL));
+                Paragraph paragrofoRodape = new Paragraph("",
+                new Font(fonteBase, 09, Font.NORMAL));
+                paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
+                string txtTitulo = (ativo) ? "ativos" : "inativos";
+                var titulo = new Paragraph($"Contratos {txtTitulo}\n\n\n", fonteParagrafo);
+                titulo.Alignment = Element.ALIGN_CENTER;
+
+                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdf.jpeg");
+                if (caminhoImgLeft != null) {
+                    Image logo = Image.GetInstance(caminhoImgLeft);
+                    float razaoImg = logo.Width / logo.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo.ScaleToFit(larguraLogo, alturaImg);
+                    var margemEsquerda = doc.PageSize.Width - doc.RightMargin - larguraLogo - 2;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo.SetAbsolutePosition(margemEsquerda, margemTopo);
+                    writer.DirectContent.AddImage(logo, false);
+                }
+                var caminhoImgRight = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdfRight.jpg");
+                if (caminhoImgRight != null) {
+                    Image logo2 = Image.GetInstance(caminhoImgRight);
+                    float razaoImg = logo2.Width / logo2.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo2.ScaleToFit(larguraLogo, alturaImg);
+                    var margemRight = pxPorMm * 15;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo2.SetAbsolutePosition(margemRight, margemTopo);
+                    writer.DirectContent.AddImage(logo2, false);
+                }
+                var tabela = new PdfPTable(7);
+                float[] larguraColunas = { 0.4f, 1.7f, 1f, 1f, 1f, 1f, 1f };
+                tabela.SetWidths(larguraColunas);
+                tabela.DefaultCell.BorderWidth = 0;
+                tabela.WidthPercentage = 105;
+                CriarCelulaTexto(tabela, "ID", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Datas", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Valor total", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Qt parcelas", PdfPCell.ALIGN_CENTER, true);
+                CriarCelulaTexto(tabela, "Pagamento", PdfPCell.ALIGN_CENTER, true);
+                CriarCelulaTexto(tabela, "Aprovação", PdfPCell.ALIGN_CENTER, true);
+                CriarCelulaTexto(tabela, "Andamento", PdfPCell.ALIGN_CENTER, true);
+                foreach (var item in contratos.OrderBy(x => x.Andamento)) {
+                    string valorTot = item.ValorMonetario!.Value.ToString("C2");
+                    CriarCelulaTexto(tabela, item.Id.ToString(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, ReturnPeriodoContrato(item), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, valorTot, PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.QtParcelas.ToString(), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, (item.Pagament == ModelPagament.Parcelado) ? "Parcelado" : "À vista", PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, ReturnAprovacao(item.Aprovacao), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, ReturnAndamento(item.Andamento), PdfPCell.ALIGN_CENTER);
+                }
+
+                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
+                //footer.Alignment = Element.ALIGN_LEFT;
+                PdfPTable footerTbl = new PdfPTable(1);
+                footerTbl.WidthPercentage = 100f;
+                footerTbl.TotalWidth = 1000f;
+                footerTbl.HorizontalAlignment = 0;
+                PdfPCell cell = new PdfPCell(footer);
+                cell.Border = 0;
+                cell.Colspan = 1;
+                cell.PaddingLeft = 0;
+                cell.HorizontalAlignment = 0;
+                footerTbl.DefaultCell.HorizontalAlignment = 0;
+                footerTbl.WidthPercentage = 100;
+                footerTbl.AddCell(cell);
+                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
+                string rodape2 = $"\nDocumento gerado em: {DateTime.Now.ToString("dd/MM/yyyy")}";
+                paragrofoRodape.Add(rodape2);
+                doc.Add(titulo);
+                doc.Add(paragrofoJustificado);
+                doc.Add(tabela);
+                doc.Add(paragrofoRodape);
+                doc.Close();
+
+                string nomeContrato = (ativo) ? "Relatório - contratos ativos" : "Relatório - contratos inativos";
+                stream.Flush();
+                stream.Position = 0;
+                return File(stream, "application/pdf", $"{nomeContrato}.pdf");
+            }
+            catch (Exception erro) {
+                return BadRequest(erro.Message);
+            }
+        }
+
+        static void CriarCelulaTexto(PdfPTable tabela, string texto, int alinhamentoHorz = PdfPCell.ALIGN_LEFT,
+                bool negrito = false, bool italico = false, int tamanhoFont = 10, int alturaCelula = 30) {
+
+            int estilo = Font.NORMAL;
+            if (negrito && italico) {
+                estilo = Font.BOLDITALIC;
+            }
+            else if (negrito) {
+                estilo = Font.BOLD;
+            }
+            else if (italico) {
+                estilo = Font.ITALIC;
+            }
+            var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+            var fonteCelula = new Font(fonteBase, tamanhoFont, estilo, BaseColor.DARK_GRAY);
+            var bgColor = BaseColor.WHITE;
+            if (tabela.Rows.Count % 2 == 1) {
+                bgColor = new BaseColor(0.95f, 0.95f, 0.95f);
+            }
+            var celula = new PdfPCell(new Phrase(texto, fonteCelula));
+            celula.HorizontalAlignment = alinhamentoHorz;
+            celula.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
+            celula.Border = 0;
+            celula.BorderWidthBottom = 1;
+            celula.BackgroundColor = bgColor;
+            celula.FixedHeight = alturaCelula;
+            tabela.AddCell(celula);
+        }
+
+        [HttpGet("PdfContratoCliente/{id}/{clienteFisicoId}/{clienteJuridicoId}")]
+        public IActionResult ReturnPdfContratoCliente(int id, int clienteFisicoId, int clienteJuridicoId) {
+            try {
+                Contrato contrato = _contratoRepository.GetContratoById(id);
+                if (contrato == null) {
+                    return NotFound("Nenhum registro encontrado!");
+                }
+                var pxPorMm = 72 / 25.2f;
+                Document doc = new Document(PageSize.A4, 15 * pxPorMm, 15 * pxPorMm,
+                    15 * pxPorMm, 15 * pxPorMm);
+                MemoryStream stream = new MemoryStream();
+                PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+                writer.CloseStream = false;
+                doc.Open();
+                var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 16,
+                    iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
+                Paragraph paragrofoJustificado = new Paragraph("",
+                new Font(fonteBase, 12, Font.NORMAL));
+                paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
+                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 12, Font.NORMAL));
+                paragrafoCenter.Alignment = Element.ALIGN_CENTER;
+                var titulo = new Paragraph($"Contrato de serviço Nº {contrato.Id}\n\n", fonteParagrafo);
+                titulo.Alignment = Element.ALIGN_CENTER;
+
+                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdf.jpeg");
+                if (caminhoImgLeft != null) {
+                    Image logo = Image.GetInstance(caminhoImgLeft);
+                    float razaoImg = logo.Width / logo.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo.ScaleToFit(larguraLogo, alturaImg);
+                    var margemEsquerda = doc.PageSize.Width - doc.RightMargin - larguraLogo - 2;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo.SetAbsolutePosition(margemEsquerda, margemTopo);
+                    writer.DirectContent.AddImage(logo, false);
+                }
+                var caminhoImgRight = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdfRight.jpg");
+                if (caminhoImgRight != null) {
+                    Image logo2 = Image.GetInstance(caminhoImgRight);
+                    float razaoImg = logo2.Width / logo2.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo2.ScaleToFit(larguraLogo, alturaImg);
+                    var margemRight = pxPorMm * 15;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo2.SetAbsolutePosition(margemRight, margemTopo);
+                    writer.DirectContent.AddImage(logo2, false);
+                }
+
+                string titulo_contratante = "\nCONTRATANTE:";
+
+                if (clienteFisicoId != 0) {
+                    var data = contrato.ClientesContrato.FirstOrDefault(x => x.PessoaFisicaId == clienteFisicoId);
+                    PessoaFisica pessoaFisica = data!.PessoaFisica;
+                    if (pessoaFisica == null) {
+                        return NotFound("Nenhum registro encontrado!");
+                    }
+                    if (!string.IsNullOrEmpty(pessoaFisica.IdVinculacaoContratual.ToString())) {
+                        PessoaFisica pessoaFisicaResponsavel = _clienteRepository.GetClienteFisicoById(pessoaFisica.IdVinculacaoContratual!.Value);
+                        if (pessoaFisicaResponsavel != null) {
+                            nomeCliente = pessoaFisica.Name!;
+                            textoContratante = $"{titulo_contratante}\n{pessoaFisicaResponsavel.Name} portador(a) do " +
+                                $"CPF: {pessoaFisicaResponsavel.ReturnCpfCliente()}, RG: {pessoaFisicaResponsavel.Rg}, filho(a) da Sr. {pessoaFisicaResponsavel.NameMae}, residente domiciliado no imovel Nº {pessoaFisicaResponsavel.NumeroResidencial}({pessoaFisicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaFisicaResponsavel.ComplementoResidencial}, no bairro {pessoaFisicaResponsavel.Bairro}," +
+                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato representado(a) como responsável legal pelo(a) requerente do contrato que será descrito a seguir: " +
+                                $"\n{pessoaFisica.Name} portador(a) do " +
+                                $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                        }
+                        else {
+                            nomeCliente = pessoaFisica.Name!;
+                            PessoaJuridica pessoaJuridicaResponsavel = _clienteRepository.GetClienteByIdPJ(pessoaFisica.IdVinculacaoContratual.Value);
+                            textoContratante = $"{titulo_contratante}\n{pessoaJuridicaResponsavel.RazaoSocial}, inscrita no CNPJ: {pessoaJuridicaResponsavel.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridicaResponsavel.InscricaoEstadual}, inscrição municipal: {pessoaJuridicaResponsavel.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridicaResponsavel.NomeFantasia}, " +
+                            $"residente domiciliado no imovel Nº {pessoaJuridicaResponsavel.NumeroResidencial} ({pessoaJuridicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaJuridicaResponsavel.ComplementoResidencial}, no bairro {pessoaJuridicaResponsavel.Bairro}," +
+                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato representada como responsável legal pelo(a) requerente do contrato que será descrito a seguir:" +
+                            $"\n{pessoaFisica.Name} portador(a) do " +
+                                $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                        }
+
+                    }
+                    else {
+                        nomeCliente = pessoaFisica.Name!;
+                        textoContratante = $"{titulo_contratante}\n{pessoaFisica.Name} portador(a) do " +
+                        $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
+                        $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}. Neste ato representado(a) como o requerente do contrato.\n\n\n";
+                    }
+                }
+                else {
+                    var data = contrato.ClientesContrato.FirstOrDefault(x => x.PessoaJuridicaId == clienteJuridicoId);
+                    PessoaJuridica pessoaJuridica = data!.PessoaJuridica;
+                    if (pessoaJuridica == null) {
+                        return NotFound("Nenhum registro encontrado!");
+                    }
+                    nomeCliente = pessoaJuridica.NomeFantasia!;
+                    textoContratante = $"{titulo_contratante}\n{pessoaJuridica.RazaoSocial}, inscrita no CNPJ: {pessoaJuridica.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridica.InscricaoEstadual}, inscrição municipal: {pessoaJuridica.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridica.NomeFantasia}, " +
+                    $"residente domiciliado no imovel Nº {pessoaJuridica.NumeroResidencial} ({pessoaJuridica.Logradouro}), próximo ao complemento residencial {pessoaJuridica.ComplementoResidencial}, no bairro {pessoaJuridica.Bairro}," +
+                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}. Neste ato representada como a requerente do contrato.\n\n\n";
+                }
+
+                string titulo_contratada = $"CONTRATADA:";
+                string textoContratada = $"{titulo_contratada}\nBuss viagens LTDA, pessoa jurídica de direito privado para prestação de serviço, na proteção da LEI Nº 13.429º. " +
+                    $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 03.115.484/0001-02, sobre a liderança do sócio fundador Manoel Rodrigues." +
+                    $" Neste ato representada como  a empresa responsável pela realização da prestações de serviços do contrato.\n\n\n";
+
+                string titulo_primeira_clausula = $"1 — CLÁUSULA PRIMEIRA";
+                string PrimeiraClausula = $"{titulo_primeira_clausula}\nO presente contrato tem por objeto a prestação de serviço especial de transporte rodoviário na rota definida no registro do contrato: {contrato.Detalhamento}\n\n\n";
+
+                string titulo_segunda_clausula = $"2 — CLÁUSULA SEGUNDA";
+                string SegundaClausula = $"{titulo_segunda_clausula} \nO(s) veículo(s) que realizará(ão) o transporte será(ão) discriminado(s) a seguir: \n" +
+                    $"  • Veículo {contrato.Onibus!.Marca}, modelo {contrato.Onibus.NameBus}, placa {contrato.Onibus.Placa}, número de chassi {contrato.Onibus.Chassi}, veículo {contrato.Onibus.CorBus!.ToLower()}, fabricado em {contrato.Onibus.DataFabricacao}, e com capacidade de lotação para {contrato.Onibus.Assentos} passageiros.\n No caso de problemas com o(s) veículo(s) acima designado(s), " +
+                    $"poderá ser utilizado outro veículo, desde que conste habilitado no Sistema de Habilitação de Transportes de Passageiros – SisHAB, da ANTT. \n\n";
+
+                string titulo_terceira_clausula = $"\n3 — CLÁUSULA TERCEIRA";
+                string TerceiraClausula = $"{titulo_terceira_clausula} \nO contratante deve estar ciente que deverá cumprir com as datas de pagamento determinadas do contrato. Desta forma, estando ciente de valores de juros adicionais em caso de inadimplência. Nos quais são 2% ao mês por parcela atrasada.\n\n\n";
+
+                string titulo_quarta_clausula = $"4 — CLÁUSULA QUARTA";
+                string QuartaClausula;
+                if (contrato.Pagament == Models.Enums.ModelPagament.Avista) {
+                    QuartaClausula = $"{titulo_quarta_clausula} \nPelos serviços prestados a Contratante pagará a Contratada o valor de {contrato.ReturnValorTotCliente()}, na data atual com três dias úteis. Em parcela única, pois, o contrato foi deferido como à vista.\n\n";
+                }
+                else {
+                    QuartaClausula = $"{titulo_quarta_clausula} \nPelos serviços prestados a Contratante pagará a Contratada o valor de {contrato.ReturnValorTotCliente()}, e os respectivos pagamentos serão realizados dia {contrato.ReturnDiaPagamento()} de cada mês. Dividos em {contrato.QtParcelas} parcelas no valor {contrato.ValorParcelaContratoPorCliente!.Value.ToString("C2")}. No entanto, a primeira parcela do contrato terá três dias úteis para realização do pagamento após a aprovação do contrato.\n\n";
+                }
+                string titulo_quinta_clausula = $"\n5 — CLÁUSULA QUINTA";
+                string QuintaClausula = $"{titulo_quinta_clausula}\nEm caso de rescisão de contrato anterior a data acordada sem o devido pagamento da(s) parcela(s), o cliente deve estar ciente que haverá multa de 3% do valor total por cliente ( {contrato.ReturnValorTotCliente()} ), pela rescisão do contrato.\n\n\n";
+
+                string titulo_sexta_clausula = $"6 — CLÁUSULA SEXTA";
+                string SextaClausula = $"{titulo_sexta_clausula} \nO período da prestação do serviço será de  {ReturnPeriodoContrato(contrato)}, que é a data acordada no registro do contrato.\n\n\n";
+
+                string titulo_setima_clausula = $"7 — CLÁUSULA SÉTIMA";
+                string SetimaClausula = $"{titulo_setima_clausula}\nO CONTRATANTE fica ciente que somente será permitido o transporte de passageiros limitados à capacidade de passageiros sentados no(s) veículo(s) utilizado(s), ficando expressamente proibido o transporte de passageiros em pé ou acomodados no corredor, bem como passageiros que não estiverem constando na relação autorizada pela ANTT.\n\n\n";
+
+                string traco = "\n___________________________________________\n";
+                string assinaturaCliente = "Assinatura do representante legal contratante\n\n";
+                string traco2 = "___________________________________________________________\n";
+                string assinaturaEmpresa = "Assinatura da empresa representante da prestação do serviço";
+                string traco3 = "________________________________________________\n";
+                string assinaturaAdm = "Assinatura do administrador que aprovou o contrato\n\n";
+
+                paragrofoJustificado.Add(textoContratante);
+                paragrofoJustificado.Add(textoContratada);
+                paragrofoJustificado.Add(PrimeiraClausula);
+                paragrofoJustificado.Add(SegundaClausula);
+                paragrofoJustificado.Add(TerceiraClausula);
+                paragrofoJustificado.Add(QuartaClausula);
+                paragrofoJustificado.Add(QuintaClausula);
+                paragrofoJustificado.Add(SextaClausula);
+                paragrofoJustificado.Add(SetimaClausula);
+
+                paragrafoCenter.Add(traco);
+                paragrafoCenter.Add(assinaturaCliente);
+                paragrafoCenter.Add(traco3);
+                paragrafoCenter.Add(assinaturaAdm);
+                paragrafoCenter.Add(traco2);
+                paragrafoCenter.Add(assinaturaEmpresa);
+
+                doc.Add(titulo);
+                doc.Add(paragrofoJustificado);
+                doc.Add(paragrafoCenter);
+
+                doc.Close();
+
+                stream.Flush();
+                stream.Position = 0;
+                return File(stream, "application/pdf", $"Contrato - {nomeCliente}.pdf");
+            }
+            catch (Exception erro) {
+                return BadRequest(erro.Message);
+            }
+        }
+
+        string ReturnAprovacao(StatusAprovacao status) {
+            switch (status) {
+                case StatusAprovacao.EmAnalise: return "Em análise";
+                case StatusAprovacao.Negado: return "Negado";
+                case StatusAprovacao.Aprovado: return "Aprovado";
+                default: return "Status não encontrado.";
+            }
+        }
+        string ReturnAndamento(Andamento andamento) {
+            switch (andamento) {
+                case Andamento.Aguardando: return "Em tramitação";
+                case Andamento.EmAndamento: return "Em andamento";
+                case Andamento.Encerrado: return "Encerrado";
+                default: return "status não encontrado";
+            }
+        }
+        string ReturnPeriodoContrato(Contrato contrato) {
+            return $"{contrato.DataEmissao!.Value.ToString("dd/MM/yyyy")} até {contrato.DataVencimento!.Value.ToString("dd/MM/yyyy")}";
         }
     }
 }

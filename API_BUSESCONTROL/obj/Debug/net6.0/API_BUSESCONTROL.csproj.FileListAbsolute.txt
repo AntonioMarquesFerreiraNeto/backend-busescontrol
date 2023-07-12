@@ -46,3 +46,9 @@ C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\S
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\XLParser.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\xunit.abstractions.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\xunit.core.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\itextsharp.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.Drawing.Common.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll

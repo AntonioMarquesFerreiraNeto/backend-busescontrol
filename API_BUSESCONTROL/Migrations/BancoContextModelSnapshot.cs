@@ -195,15 +195,9 @@ namespace API_BUSESCONTROL.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Cnpj")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ComplementoResidencial")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Cpf")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("DataFornecedor")

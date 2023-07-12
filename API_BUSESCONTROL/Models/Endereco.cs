@@ -17,10 +17,6 @@ namespace API_BUSESCONTROL.Models {
 
         [Required(ErrorMessage = "Campo obrigatório!")]
         [MinLength(2, ErrorMessage = "Campo inválido!")]
-        public string? ComplementoResidencial { get; set; }
-
-        [Required(ErrorMessage = "Campo obrigatório!")]
-        [MinLength(2, ErrorMessage = "Campo inválido!")]
         public string? Bairro { get; set; }
 
         [MinLength(3, ErrorMessage = "Campo inválido!")]
@@ -28,7 +24,6 @@ namespace API_BUSESCONTROL.Models {
         public string? Cidade { get; set; }
 
         [Required(ErrorMessage = "Campo obrigatório!")]
-
         [MinLength(2, ErrorMessage = "Campo inválido!")]
         public string? Estado { get; set; }
 
