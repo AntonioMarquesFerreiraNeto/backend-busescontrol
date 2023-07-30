@@ -175,6 +175,77 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("Contrato");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContratoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataEmissao")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DataVencimento")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DespesaReceita")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Detalhamento")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("FinanceiroStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Pagament")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PessoaFisicaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PessoaJuridicaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QtParcelas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeEfetuacao")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ValorParcelaDR")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorTotDR")
+                        .IsRequired()
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorTotTaxaJurosPaga")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal?>("ValorTotalPago")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContratoId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.HasIndex("PessoaFisicaId");
+
+                    b.HasIndex("PessoaJuridicaId");
+
+                    b.ToTable("Financeiro");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Fornecedor", b =>
                 {
                     b.Property<int>("Id")
@@ -384,6 +455,72 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("PaletaCores");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Parcela", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataEfetuacao")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DataVencimentoParcela")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("FinanceiroId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NomeParcela")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("StatusPagamento")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ValorJuros")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinanceiroId");
+
+                    b.ToTable("Parcela");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Rescisao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContratoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataRescisao")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("Multa")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int?>("PessoaFisicaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PessoaJuridicaId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ValorPagoContrato")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContratoId");
+
+                    b.HasIndex("PessoaFisicaId");
+
+                    b.HasIndex("PessoaJuridicaId");
+
+                    b.ToTable("Rescisao");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
                 {
                     b.HasBaseType("API_BUSESCONTROL.Models.Cliente");
@@ -488,9 +625,73 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("Onibus");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
+                        .WithMany("Financeiros")
+                        .HasForeignKey("ContratoId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaFisica", "PessoaFisica")
+                        .WithMany("Financeiros")
+                        .HasForeignKey("PessoaFisicaId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaJuridica", "PessoaJuridica")
+                        .WithMany("Financeiros")
+                        .HasForeignKey("PessoaJuridicaId");
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("Fornecedor");
+
+                    b.Navigation("PessoaFisica");
+
+                    b.Navigation("PessoaJuridica");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Parcela", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Financeiro", "Financeiro")
+                        .WithMany("Parcelas")
+                        .HasForeignKey("FinanceiroId");
+
+                    b.Navigation("Financeiro");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Rescisao", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
+                        .WithMany()
+                        .HasForeignKey("ContratoId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaFisica", "PessoaFisica")
+                        .WithMany()
+                        .HasForeignKey("PessoaFisicaId");
+
+                    b.HasOne("API_BUSESCONTROL.Models.PessoaJuridica", "PessoaJuridica")
+                        .WithMany()
+                        .HasForeignKey("PessoaJuridicaId");
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("PessoaFisica");
+
+                    b.Navigation("PessoaJuridica");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
                 {
                     b.Navigation("ClientesContrato");
+
+                    b.Navigation("Financeiros");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
+                {
+                    b.Navigation("Parcelas");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
@@ -506,11 +707,15 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
                 {
                     b.Navigation("ClientesContrato");
+
+                    b.Navigation("Financeiros");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaJuridica", b =>
                 {
                     b.Navigation("ClientesContrato");
+
+                    b.Navigation("Financeiros");
                 });
 #pragma warning restore 612, 618
         }

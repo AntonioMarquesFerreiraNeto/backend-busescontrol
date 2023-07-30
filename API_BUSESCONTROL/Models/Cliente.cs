@@ -54,7 +54,7 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<ClientesContrato>? ClientesContrato { get; set; }
 
-        //public virtual List<Financeiro> Financeiros { get; set; }
+        public virtual List<Financeiro>? Financeiros { get; set; }
 
         public string ReturnTelefoneCliente() {
             string tel = Telefone;

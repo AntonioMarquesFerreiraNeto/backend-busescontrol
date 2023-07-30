@@ -25,7 +25,7 @@ namespace API_BUSESCONTROL.Models {
         [MinLength(11, ErrorMessage = "Campo inválido!")]
         public string? InscricaoMunicipal { get; set; }
 
-        //public virtual List<Rescisao> Rescisoes { get; set; }
+        public virtual List<Rescisao>? Rescisoes { get; set; }
 
         public ClienteStatus Status { get; set; }
 

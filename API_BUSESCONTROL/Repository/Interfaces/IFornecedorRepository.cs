@@ -9,6 +9,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public Fornecedor GetFornecedorById(int id);
         public List<Fornecedor> GetFornecedoresAtivos(int paginaAtual, bool status);
         public List<Fornecedor> GetFornecedoresInativos(int paginaAtual, bool status);
+        public List<Fornecedor> GetAllFornecedoresAutorizados();
         public int GetTotPaginasAtivos();
         public int GetTotPaginasInativos();
     }

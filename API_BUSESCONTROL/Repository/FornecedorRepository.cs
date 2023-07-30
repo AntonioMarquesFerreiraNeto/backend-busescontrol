@@ -127,5 +127,9 @@ namespace API_BUSESCONTROL.Repository {
 
             return existeOutroFornecedor;
         }
+
+        public List<Fornecedor> GetAllFornecedoresAutorizados() {
+            return _bancoContext.Fornecedor.Where(x => x.Status == FornecedorStatus.Ativo).ToList();
+        }
     }
 }

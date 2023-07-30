@@ -115,5 +115,11 @@ namespace API_BUSESCONTROL.Controllers {
             };
             return Ok(response);
         }
+
+        [HttpGet("FornecedoresAutorizados")]
+        public IActionResult GetAllFornecedores() {
+            var list = _fornecedorRepository.GetAllFornecedoresAutorizados();
+            return Ok(list);
+        }
     }
 }

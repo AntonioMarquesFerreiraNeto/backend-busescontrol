@@ -20,12 +20,17 @@ namespace API_BUSESCONTROL.Data {
         public DbSet<Cliente> Cliente { get; set; }
 
         public DbSet<Contrato> Contrato { get; set; }
+        public DbSet<Financeiro> Financeiro { get; set; }
+        public DbSet<Parcela> Parcela { get; set; }
+        public DbSet<Rescisao> Rescisao { get; set; }
         public DbSet<ClientesContrato> ClientesContrato { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
             modelBuilder.ApplyConfiguration(new MapContrato());
             modelBuilder.ApplyConfiguration(new MapClientesContrato());
+            modelBuilder.ApplyConfiguration(new MapFinanceiro());
+            modelBuilder.ApplyConfiguration(new MapRescisao());
             base.OnModelCreating(modelBuilder);
         }
     }

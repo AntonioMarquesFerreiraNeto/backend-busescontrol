@@ -66,4 +66,27 @@
         Ativo = 0,
         Inativo = 1
     }
+
+    //Financeiro
+    public enum TypeEfetuacao : int {
+        Credito = 0,
+        Especie = 1,
+        Debito = 2
+    }
+    public enum DespesaReceita : int {
+        Despesa = 0,
+        Receita = 1
+    }
+    public enum FinanceiroStatus : int {
+        Inativo = 0,
+        Ativo = 1,
+    }
+
+    //Parcela
+    public enum SituacaoPagamento : int {
+        AguardandoPagamento = 0,
+        PagamentoContabilizado = 1,
+        Atrasada = 2
+    }
+
 }

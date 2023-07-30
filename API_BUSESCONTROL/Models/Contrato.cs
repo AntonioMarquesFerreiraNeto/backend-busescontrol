@@ -1,7 +1,6 @@
 ﻿using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Models.ValidationsModels.Contratos;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 
 namespace API_BUSESCONTROL.Models {
     public class Contrato {
@@ -58,9 +57,9 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<ClientesContrato>? ClientesContrato { get; set; }
 
-        //public virtual List<Financeiro> Financeiros { get; set; }
+        public virtual List<Financeiro>? Financeiros { get; set; }
 
-        //public virtual List<Rescisao> Rescisoes { get; set; }
+        public virtual List<Rescisao> Rescisoes { get; set; }
 
 
         public void SetValoresParcelas(int qtClientes) {
