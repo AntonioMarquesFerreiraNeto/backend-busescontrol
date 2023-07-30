@@ -42,6 +42,32 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
+        [HttpPut]
+        public IActionResult EditLancamento(Financeiro financeiro) {
+            try {
+                if (ModelState.IsValid) {
+                    if (financeiro.ValidarValorMonetario()) {
+                        return BadRequest("Valor monetário menor que R$ 150.00!");
+                    }
+                    else if (financeiro.ValidationDatas()) {
+                        return BadRequest("Data de vencimento anterior à data de emissão!");
+                    }
+                    else if (financeiro.ValidationDataVencimento()) {
+                        return BadRequest("Financeiro não pode ser superior a quatro anos!");
+                    }
+                    else if (financeiro.ValidationQtParcelas()) {
+                        return BadRequest("Quantidade de parcelas inválida!");
+                    }
+                    _financeiroRepository.EditarLancamento(financeiro);
+                    return Ok(financeiro);
+                }
+                return BadRequest(financeiro);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
         [HttpGet("GetFinanceiro/{pageNumber}/{pesquisa?}")]
         public IActionResult ListarFinanceiro(int pageNumber = 1,  string? pesquisa = "") {
             try {
@@ -51,6 +77,39 @@ namespace API_BUSESCONTROL.Controllers {
                     qtPaginas = _financeiroRepository.ReturnQtPaginas(pesquisa)
                 };
                 return Ok(data);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpPatch("InativarFinanceiro/{id}")]
+        public IActionResult Inativar(int id) {
+            try {
+                _financeiroRepository.InativarReceitaOrDespesa(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpGet("GetFinanceiroById/{id}")]
+        public IActionResult Contabilizacoes(int id) {
+            try{
+                var financeiro = _financeiroRepository.listPorIdFinanceiro(id);
+                return Ok(financeiro);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpPatch("ContabilizarPagamento/{id}")]
+        public IActionResult Contabilizar(int id) {
+            try {
+                _financeiroRepository.ContabilizarParcela(id);
+                return NoContent();
             }
             catch (Exception error) {
                 return StatusCode(500, error.Message);

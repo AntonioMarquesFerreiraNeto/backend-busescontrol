@@ -393,7 +393,7 @@ namespace API_BUSESCONTROL.Repository {
             try {
                 Financeiro financeiroDB = _bancoContext.Financeiro.FirstOrDefault(x => x.Id == financeiro.Id);
                 if (financeiroDB == null) throw new Exception("Desculpe, ID não foi encontrado!");
-                if (!string.IsNullOrEmpty(financeiroDB.ContratoId.ToString())) throw new Exception("Desculpe, ID não foi encontrado!");
+                if (!string.IsNullOrEmpty(financeiroDB.ContratoId.ToString())) throw new Exception("Desculpe, financeiro de contratos não podem ser editados!");
                 if (!string.IsNullOrEmpty(financeiroDB.ValorTotalPago.ToString())) throw new Exception("Lançamento possuí parcelas paga!");
                 if (financeiroDB.FinanceiroStatus == FinanceiroStatus.Inativo) throw new Exception("Desculpe, financeiro inativado!");
                 financeiroDB.Pagament = financeiro.Pagament;
@@ -446,12 +446,12 @@ namespace API_BUSESCONTROL.Repository {
         }
 
 
-        public Financeiro InativarReceitaOrDespesa(Financeiro financeiro) {
+        public Financeiro InativarReceitaOrDespesa(int id) {
             try {
-                Financeiro financeiroDB = listPorIdFinanceiro(financeiro.Id);
+                Financeiro financeiroDB = listPorIdFinanceiro(id);
                 if (financeiroDB == null || !string.IsNullOrEmpty(financeiroDB.ContratoId.ToString())) throw new Exception("Desculpe, ID não foi encontrado!");
                 if (financeiroDB.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.PagamentoContabilizado)) {
-                    throw new Exception("Desculpe, receitas/despesas com parcelas contabilizadas não pode ser inativado!");
+                    throw new Exception("Desculpe, receitas/despesas com parcelas contabilizadas não pode ser inativadas!");
                 }
                 financeiroDB.FinanceiroStatus = FinanceiroStatus.Inativo;
                 _bancoContext.Financeiro.Update(financeiroDB);
@@ -466,11 +466,12 @@ namespace API_BUSESCONTROL.Repository {
         public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa) {
             if (pageNumber < 1 || string.IsNullOrEmpty(pageNumber.ToString())) throw new Exception("Ação inválida");
             return _bancoContext.Financeiro
+                .OrderByDescending(x => x.Id)
                 .Where(x => x.PessoaFisica.Name.Contains(pesquisa) 
-                || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) 
-                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) 
-                || x.Id.ToString().Contains(pesquisa))
-                
+                    || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) 
+                    || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) 
+                    || x.Id.ToString().Contains(pesquisa)
+                    || x.ContratoId.ToString().Contains(pesquisa))
                 .Include(x => x.Contrato)
                 .Include(x => x.PessoaFisica)
                 .Include(x => x.PessoaJuridica)
@@ -484,9 +485,10 @@ namespace API_BUSESCONTROL.Repository {
 
         public int ReturnQtPaginas(string pesquisa) {
 
-            int qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa) 
-                || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) 
-                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) 
+            int qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa)
+                || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
+                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa)
+                || x.Id.ToString().Contains(pesquisa)
                 || x.ContratoId.ToString().Contains(pesquisa));
 
             int qtPage = (int)Math.Ceiling((double) qtFinanceiro / 10);

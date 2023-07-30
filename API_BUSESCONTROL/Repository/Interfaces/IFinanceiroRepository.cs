@@ -11,7 +11,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public Financeiro RescisaoContrato(Financeiro financeiro);
         public Financeiro AdicionarLancamento(Financeiro financeiro);
         public Financeiro EditarLancamento(Financeiro financeiro);
-        public Financeiro InativarReceitaOrDespesa(Financeiro financeiro);
+        public Financeiro InativarReceitaOrDespesa(int id);
         public void TaskMonitorParcelas();
         public void TaskMonitorParcelasLancamento();
         public void TaskMonitorPdfRescisao();

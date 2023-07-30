@@ -223,6 +223,7 @@ namespace API_BUSESCONTROL.Repository {
             contratoDB.Andamento = Andamento.EmAndamento;
             contratoDB.DataEmissao = DateTime.Now.Date;
             _bancoContext.Contrato.Update(contratoDB);
+            CreateFinanceiroContrato(contratoDB);
             _bancoContext.SaveChanges();
             return contratoDB;
         }
@@ -243,6 +244,36 @@ namespace API_BUSESCONTROL.Repository {
                 }
             }
             return false;
+        }
+
+        public void CreateFinanceiroContrato(Contrato contrato) {
+            //Incluindo financeiro no clientesContrato.
+            foreach (var clientesContrato in contrato.ClientesContrato!) {
+                Financeiro financeiroDB = new Financeiro();
+                financeiroDB.Contrato = contrato;
+                financeiroDB.PessoaFisica = clientesContrato.PessoaFisica;
+                financeiroDB.PessoaJuridica = clientesContrato.PessoaJuridica;
+                financeiroDB.DataVencimento = contrato.DataVencimento;
+                financeiroDB.DespesaReceita = DespesaReceita.Receita;
+                financeiroDB.ValorTotDR = contrato.ValorParcelaContratoPorCliente * contrato.QtParcelas;
+                financeiroDB.ValorParcelaDR = contrato.ValorParcelaContratoPorCliente;
+                financeiroDB.DataEmissao = contrato.DataEmissao;
+                financeiroDB.QtParcelas = contrato.QtParcelas;
+                financeiroDB.Detalhamento = contrato.Detalhamento;
+                financeiroDB.Pagament = contrato.Pagament;
+                financeiroDB.FinanceiroStatus = FinanceiroStatus.Ativo;
+                _bancoContext.Financeiro.Add(financeiroDB);
+                for (int parcelas = 1; parcelas <= contrato.QtParcelas; parcelas++) {
+                    Parcela parcela = new Parcela {
+                        Financeiro = financeiroDB, StatusPagamento = SituacaoPagamento.AguardandoPagamento,
+                        DataVencimentoParcela = contrato.DataEmissao!.Value.AddMonths(parcelas - 1), NomeParcela = parcelas.ToString()
+                    };
+                    if (parcelas == 1) {
+                        parcela.DataVencimentoParcela = contrato.DataEmissao.Value.AddDays(3);
+                    }
+                    _bancoContext.Parcela.Add(parcela);
+                }
+            }
         }
 
         public Contrato RevogarContrato(int id) {
