@@ -44,7 +44,7 @@ namespace API_BUSESCONTROL.Repository {
                 .AsNoTracking().Include(x => x.Contrato)
                 .AsNoTracking().Include(x => x.Fornecedor)
             .AsNoTracking().Include(x => x.Parcelas)
-                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!"); ;
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!");
         }
         public Parcela ListarFinanceiroPorId(int id) {
             return _bancoContext.Parcela.Include(x => x.Financeiro).ThenInclude(x => x.Contrato).FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!"); ;
@@ -493,6 +493,28 @@ namespace API_BUSESCONTROL.Repository {
 
             int qtPage = (int)Math.Ceiling((double) qtFinanceiro / 10);
             return (qtPage == 0) ? 1 : qtPage;
+        }
+
+        public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, string pesquisa) {
+            return _bancoContext.Parcela.Where(x => x.FinanceiroId == id && x.NomeParcela.Contains(pesquisa))
+                .Skip((pageNumber - 1) * 10)
+                .Take(10)
+                .ToList();
+        }
+
+        public int ReturnQtPaginasParcelas(int id, string pesquisa) {
+            int qtParcelas = _bancoContext.Parcela.Count(x => x.FinanceiroId == id && x.NomeParcela.Contains(pesquisa));
+            int qtPaginas = (int)Math.Ceiling((double)qtParcelas / 10);
+            return (qtPaginas == 0) ? 1 : qtPaginas;
+        }
+
+        public Financeiro listPorIdFinanceiroNoJoinParcelas(int? id) {
+            return _bancoContext.Financeiro
+                .AsNoTracking().Include(x => x.PessoaFisica)
+                .AsNoTracking().Include(x => x.PessoaJuridica)
+                .AsNoTracking().Include(x => x.Contrato)
+                .AsNoTracking().Include(x => x.Fornecedor)
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!");
         }
 
     }

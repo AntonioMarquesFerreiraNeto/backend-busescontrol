@@ -19,5 +19,8 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public Financeiro ListFinanceiroPorContratoAndClientesContrato(int? id);
         public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa);
         public int ReturnQtPaginas(string pesquisa);
+        public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, string pesquisa);
+        public int ReturnQtPaginasParcelas(int id, string pesquisa);
+        public Financeiro listPorIdFinanceiroNoJoinParcelas(int? id);
     }
 }

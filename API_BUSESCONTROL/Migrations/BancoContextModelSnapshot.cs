@@ -664,15 +664,15 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Rescisao", b =>
                 {
                     b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
-                        .WithMany()
+                        .WithMany("Rescisoes")
                         .HasForeignKey("ContratoId");
 
                     b.HasOne("API_BUSESCONTROL.Models.PessoaFisica", "PessoaFisica")
-                        .WithMany()
+                        .WithMany("Rescisoes")
                         .HasForeignKey("PessoaFisicaId");
 
                     b.HasOne("API_BUSESCONTROL.Models.PessoaJuridica", "PessoaJuridica")
-                        .WithMany()
+                        .WithMany("Rescisoes")
                         .HasForeignKey("PessoaJuridicaId");
 
                     b.Navigation("Contrato");
@@ -687,6 +687,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("ClientesContrato");
 
                     b.Navigation("Financeiros");
+
+                    b.Navigation("Rescisoes");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
@@ -709,6 +711,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("ClientesContrato");
 
                     b.Navigation("Financeiros");
+
+                    b.Navigation("Rescisoes");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaJuridica", b =>
@@ -716,6 +720,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("ClientesContrato");
 
                     b.Navigation("Financeiros");
+
+                    b.Navigation("Rescisoes");
                 });
 #pragma warning restore 612, 618
         }
