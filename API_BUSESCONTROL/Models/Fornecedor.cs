@@ -31,6 +31,8 @@ namespace API_BUSESCONTROL.Models {
 
         public FornecedorStatus Status { get; set; }
 
+        public List<Financeiro>? Financeiros { get; set; }
+
         public bool ValidationDate() {
 
             DateTime dataAtual = DateTime.Now.Date;

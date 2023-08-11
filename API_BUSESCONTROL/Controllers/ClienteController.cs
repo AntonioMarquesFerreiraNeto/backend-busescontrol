@@ -125,5 +125,11 @@ namespace API_BUSESCONTROL.Controllers
             var list = _clienteRepository.GetClientesAdimplentes();
             return Ok(list);
         }
+
+        [HttpGet("ClienteResponsavel/{id}")]
+        public IActionResult ClienteResponsavel(int id) {
+            var cliente = _clienteRepository.ClienteResponsavel(id);
+            return Ok(cliente);
+        }
     }
 }

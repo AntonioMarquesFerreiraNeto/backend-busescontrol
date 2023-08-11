@@ -89,4 +89,12 @@
         Atrasada = 2
     }
 
+    public enum FiltroFinanceiro : int {
+        Atrasadas = 2, 
+        Despesa = 0,
+        Receita = 1,
+        Contrato = 3,
+        Todos = 4
+    }
+
 }

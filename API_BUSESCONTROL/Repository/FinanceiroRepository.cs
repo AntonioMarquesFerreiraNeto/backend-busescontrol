@@ -3,7 +3,6 @@ using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace API_BUSESCONTROL.Repository {
     public class FinanceiroRepository : IFinanceiroRepository{

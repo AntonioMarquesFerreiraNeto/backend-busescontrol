@@ -198,7 +198,7 @@ namespace API_BUSESCONTROL.Controllers {
                 }
             }
             catch (Exception erro) {
-                return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos.");
+                return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos." + $"{erro.Message}");
             }
         }
     }

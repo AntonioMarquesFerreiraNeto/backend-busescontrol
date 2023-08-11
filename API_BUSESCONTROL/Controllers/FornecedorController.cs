@@ -61,13 +61,13 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetAtivos/{paginaAtual}/{statusPag}")]
-        public IActionResult GetFornecedores(int paginaAtual, bool statusPag) {
-            List<Fornecedor> fornecedores = _fornecedorRepository.GetFornecedoresAtivos(paginaAtual, statusPag);
+        [HttpGet("GetAtivos/{paginaAtual}/{filtro}/{pesquisa?}")]
+        public IActionResult GetFornecedores(int paginaAtual = 1, int filtro = 2, string? pesquisa = "") {
+            List<Fornecedor> fornecedores = _fornecedorRepository.GetFornecedoresAtivos(paginaAtual, filtro, pesquisa);
             fornecedores = fornecedores.Select(x => { x.Telefone = x.ReturnTelefoneFornecedor(); return x; }).ToList();
             var response = new {
                 fornecedorList = fornecedores,
-                qtPaginas = _fornecedorRepository.GetTotPaginasAtivos()
+                qtPaginas = _fornecedorRepository.GetTotPaginasAtivos(pesquisa, filtro)
             };
             return Ok(response);
         }
@@ -105,13 +105,13 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetInativos/{paginaAtual}/{status}")]
-        public IActionResult GetInativos(int paginaAtual, bool status) {
-            var fornecedores = _fornecedorRepository.GetFornecedoresInativos(paginaAtual, status);
+        [HttpGet("GetInativos/{paginaAtual}/{filtro}/{pesquisa?}")]
+        public IActionResult GetInativos(int paginaAtual = 1, int filtro = 2, string? pesquisa = "") {
+            var fornecedores = _fornecedorRepository.GetFornecedoresInativos(paginaAtual, filtro, pesquisa);
             fornecedores = fornecedores.Select(x => { x.Telefone = x.ReturnTelefoneFornecedor(); return x; }).ToList();  
             var response = new {
                 fornecedorList = fornecedores,
-                qtPaginas = _fornecedorRepository.GetTotPaginasInativos()
+                qtPaginas = _fornecedorRepository.GetTotPaginasInativos(pesquisa, filtro)
             };
             return Ok(response);
         }

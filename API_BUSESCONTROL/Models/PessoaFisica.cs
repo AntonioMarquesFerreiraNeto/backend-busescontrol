@@ -30,7 +30,7 @@ namespace API_BUSESCONTROL.Models {
 
         public int? IdVinculacaoContratual { get; set; }
 
-        public virtual List<Rescisao> Rescisoes { get; set; }
+        public virtual List<Rescisao>? Rescisoes { get; set; }
 
         public ClienteStatus Status { get; set; }
 

@@ -27,8 +27,6 @@ namespace API_BUSESCONTROL.Models {
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
         public decimal? ValorParcelaContratoPorCliente { get; set; }
 
-
-
         [Required(ErrorMessage = "Campo obrigatório!")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime? DataEmissao { get; set; }
@@ -59,7 +57,7 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<Financeiro>? Financeiros { get; set; }
 
-        public virtual List<Rescisao> Rescisoes { get; set; }
+        public virtual List<Rescisao>? Rescisoes { get; set; }
 
 
         public void SetValoresParcelas(int qtClientes) {

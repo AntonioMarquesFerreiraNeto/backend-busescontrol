@@ -28,11 +28,18 @@ namespace API_BUSESCONTROL.Repository
             }
         }
 
+        public PessoaFisica ClienteResponsavel(int id) {
+            return _bancoContext.PessoaFisica.FirstOrDefault(x => x.Id == id)!;
+        }
+
         public PessoaFisica UpdateCliente(PessoaFisica cliente) {
             try {
                 PessoaFisica clienteDB = GetClienteFisicoById(cliente.Id);
                 if (DuplicataEditar(cliente, clienteDB)) throw new Exception("Cliente já se encontra registrado!");
                 if (ValClienTResponAlterInvalid(cliente, clienteDB)) throw new Exception("Cliente inadimplente não pode ter vinculação alterada!");
+                if (string.IsNullOrEmpty(clienteDB.IdVinculacaoContratual.ToString())) {
+                    if (ValidationContratoAndamento(clienteDB.Id, cliente.IdVinculacaoContratual)) throw new Exception("Cliente possui contratos/receitas. Portanto, não pode ser menor de idade!");
+                }
                 clienteDB.Name = cliente.Name!.Trim();
                 clienteDB.DataNascimento = cliente.DataNascimento;
                 clienteDB.Cpf = cliente.Cpf!.Trim();
@@ -49,10 +56,6 @@ namespace API_BUSESCONTROL.Repository
                 clienteDB.Bairro = cliente.Bairro!.Trim();
                 clienteDB.Estado = cliente.Estado!.Trim();
                 clienteDB.Cidade = cliente.Cidade!.Trim();
-
-                if (ValidationContratoAndamento(clienteDB)) {
-                    throw new Exception("Clientes que possuem contratos em andamento não podem ser menores de idade!");
-                }
                 if (!string.IsNullOrEmpty(clienteDB.IdVinculacaoContratual.ToString()) && _bancoContext.PessoaFisica.Any(x => x.IdVinculacaoContratual == clienteDB.Id)) {
                     throw new Exception("Cliente possui menores de idade vinculado!");
                 }
@@ -65,9 +68,9 @@ namespace API_BUSESCONTROL.Repository
                 throw new Exception(error.Message);
             }
         }
-        public bool ValidationContratoAndamento(PessoaFisica pessoaFisica) {
-            PessoaFisica cliente = _bancoContext.PessoaFisica.Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato).FirstOrDefault(x => x.Id == pessoaFisica.Id);
-            if (cliente!.ClientesContrato.Any(x => x.Contrato.Aprovacao == StatusAprovacao.Aprovado && !string.IsNullOrEmpty(pessoaFisica.IdVinculacaoContratual.ToString()))) {
+        public bool ValidationContratoAndamento(int id, int? vinculacao) {
+            if (string.IsNullOrEmpty(vinculacao.ToString())) return false;
+            if (_bancoContext.Financeiro.Any(x => x.PessoaFisicaId == id)) {
                 return true;
             }
             return false;
@@ -81,7 +84,10 @@ namespace API_BUSESCONTROL.Repository
         }
 
         public PessoaFisica GetClienteFisicoById(int? id) {
-            PessoaFisica cliente = _bancoContext.PessoaFisica.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente encontrado!");
+            PessoaFisica cliente = _bancoContext.PessoaFisica
+                .Include(x => x.Financeiros)
+                .AsNoTracking()
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente encontrado!");
             return cliente;
         }
 
@@ -92,6 +98,7 @@ namespace API_BUSESCONTROL.Repository
             }
             if (ValContratoAndamentoPf(cliente.Id)) throw new Exception("Cliente possui contratos em andamento ou encerrados!");
             if (cliente.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
+            if (cliente.Financeiros.Any(x => x.FinanceiroStatus == FinanceiroStatus.Ativo)) throw new Exception("Cliente/fornecedor possui financeiro em andamento!");
             DesabilitarClientesVinculados(cliente, null!);
             cliente.Status = ClienteStatus.Inativo;
             _bancoContext.PessoaFisica.Update(cliente);
@@ -243,6 +250,7 @@ namespace API_BUSESCONTROL.Repository
             }
             if (ValContratoAndamentoPj(clienteDB.Id)) throw new Exception("Cliente possui contratos em andamento ou encerrados!");
             if (clienteDB.Adimplente == Adimplencia.Inadimplente) throw new Exception("Não é possível inativar cliente inadimplente!");
+            if (clienteDB.Financeiros.Any(x => x.FinanceiroStatus == FinanceiroStatus.Ativo)) throw new Exception("Cliente/fornecedor possui financeiro em andamento!");
 
             DesabilitarClientesVinculados(null!, clienteDB);
             clienteDB.Status = ClienteStatus.Inativo;
@@ -264,7 +272,10 @@ namespace API_BUSESCONTROL.Repository
         }
 
         public PessoaJuridica GetClienteByIdPJ(int? id) {
-            return _bancoContext.PessoaJuridica.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente não encontrado!");
+            return _bancoContext.PessoaJuridica
+                .Include(x => x.Financeiros)
+                .AsNoTracking()
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente não encontrado!");
         }
 
         public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, bool statusPagina) {

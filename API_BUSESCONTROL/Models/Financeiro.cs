@@ -120,8 +120,11 @@ namespace API_BUSESCONTROL.Models {
             if (!string.IsNullOrEmpty(ContratoId.ToString())) {
                 return (!string.IsNullOrEmpty(PessoaFisicaId.ToString())) ? $"{PessoaFisica.Name}" : $"{PessoaJuridica.RazaoSocial}";
             }
-            else {
+            else if(!string.IsNullOrEmpty(FornecedorId.ToString())) {
                 return $"{Fornecedor!.NameOrRazaoSocial}";
+            }
+            else {
+                return (!string.IsNullOrEmpty(PessoaFisicaId.ToString())) ? $"{PessoaFisica.Name}" : $"{PessoaJuridica.RazaoSocial}";
             }
         }
 

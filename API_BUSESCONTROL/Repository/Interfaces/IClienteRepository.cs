@@ -16,6 +16,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<PessoaFisica> GetClientesAdimplentes();
         public int QtPaginasClientesAtivos();
         public int QtPaginasClientesInativos();
+        public PessoaFisica ClienteResponsavel(int id);
 
         //Services dos clientes PJ.
         public PessoaJuridica CreateClientePJ(PessoaJuridica cliente);

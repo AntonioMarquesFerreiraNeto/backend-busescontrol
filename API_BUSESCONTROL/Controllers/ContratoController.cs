@@ -232,7 +232,7 @@ namespace API_BUSESCONTROL.Controllers {
                 var titulo = new Paragraph($"Contratos {txtTitulo}\n\n\n", fonteParagrafo);
                 titulo.Alignment = Element.ALIGN_CENTER;
 
-                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdf.jpeg");
+                var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
                 if (caminhoImgLeft != null) {
                     Image logo = Image.GetInstance(caminhoImgLeft);
                     float razaoImg = logo.Width / logo.Height;
@@ -244,7 +244,7 @@ namespace API_BUSESCONTROL.Controllers {
                     logo.SetAbsolutePosition(margemEsquerda, margemTopo);
                     writer.DirectContent.AddImage(logo, false);
                 }
-                var caminhoImgRight = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdfRight.jpg");
+                var caminhoImgRight = Path.Combine("ImagensPDF", "LogoPdfRight.jpg");
                 if (caminhoImgRight != null) {
                     Image logo2 = Image.GetInstance(caminhoImgRight);
                     float razaoImg = logo2.Width / logo2.Height;
@@ -366,7 +366,8 @@ namespace API_BUSESCONTROL.Controllers {
                 var titulo = new Paragraph($"Contrato de serviço Nº {contrato.Id}\n\n", fonteParagrafo);
                 titulo.Alignment = Element.ALIGN_CENTER;
 
-                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdf.jpeg");
+                var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
+
                 if (caminhoImgLeft != null) {
                     Image logo = Image.GetInstance(caminhoImgLeft);
                     float razaoImg = logo.Width / logo.Height;
@@ -378,7 +379,7 @@ namespace API_BUSESCONTROL.Controllers {
                     logo.SetAbsolutePosition(margemEsquerda, margemTopo);
                     writer.DirectContent.AddImage(logo, false);
                 }
-                var caminhoImgRight = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Users\\anton\\source\\repos\\API_BUSESCONTROL\\API_BUSESCONTROL\\ImagensPDF\\LogoPdfRight.jpg");
+                var caminhoImgRight = Path.Combine("ImagensPDF", "LogoPdfRight.jpg");
                 if (caminhoImgRight != null) {
                     Image logo2 = Image.GetInstance(caminhoImgRight);
                     float razaoImg = logo2.Width / logo2.Height;

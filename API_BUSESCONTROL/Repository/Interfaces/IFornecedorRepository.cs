@@ -7,10 +7,10 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public Fornecedor AtivarFornecedor(int id);
         public Fornecedor InativarFornecedor(int id);
         public Fornecedor GetFornecedorById(int id);
-        public List<Fornecedor> GetFornecedoresAtivos(int paginaAtual, bool status);
-        public List<Fornecedor> GetFornecedoresInativos(int paginaAtual, bool status);
+        public List<Fornecedor> GetFornecedoresAtivos(int paginaNumber, int filtro, string pesquisa);
+        public List<Fornecedor> GetFornecedoresInativos(int paginaNumber, int filtro, string pesquisa);
         public List<Fornecedor> GetAllFornecedoresAutorizados();
-        public int GetTotPaginasAtivos();
-        public int GetTotPaginasInativos();
+        public int GetTotPaginasAtivos(string pesquisa, int filtro);
+        public int GetTotPaginasInativos(string pesquisa, int filtro);
     }
 }
