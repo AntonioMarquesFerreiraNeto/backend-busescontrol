@@ -9,10 +9,10 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public Onibus UpdateOnibus(Onibus onibus);
         public Onibus InativarOnibus(int? id);
         public Onibus AtivarOnibus(int? id);
-        public int QtPaginasAtivas();
-        public int QtPaginasInativas();
-        public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginacao);
-        public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate);
+        public int QtPaginasAtivas(string? pesquisa);
+        public int QtPaginasInativas(string? pesquisa);
+        public List<Onibus> PaginateListAtivos(int paginaAtual, string? pesquisa);
+        public List<Onibus> PaginateListInativos(int paginaAtual, string? pesquisa);
         public List<Onibus> GetAll();
         public Onibus GetOnibusById(int? id);
     }

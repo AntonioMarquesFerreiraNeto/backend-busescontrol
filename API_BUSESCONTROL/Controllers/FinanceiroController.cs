@@ -6,6 +6,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Mvc;
+using Font = iTextSharp.text.Font;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
@@ -73,16 +74,16 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetFinanceiro/{pageNumber}/{pesquisa?}")]
-        public IActionResult ListarFinanceiro(int pageNumber = 1,  string? pesquisa = "") {
+        [HttpGet("GetFinanceiro/{pageNumber}/{filtro}/{pesquisa?}/")]
+        public IActionResult ListarFinanceiro(int pageNumber = 1, FiltroFinanceiro filtro = FiltroFinanceiro.Todos, string? pesquisa = "") {
             try {
-                var list = _financeiroRepository.GetPaginationAndFiltro(pageNumber, pesquisa);
+                var list = _financeiroRepository.GetPaginationAndFiltro(pageNumber, pesquisa,  filtro);
                 _financeiroRepository.TaskMonitorParcelas();
                 _financeiroRepository.TaskMonitorParcelasLancamento();
 
                 var data = new {
                     listFinanceiro = list,
-                    qtPaginas = _financeiroRepository.ReturnQtPaginas(pesquisa)
+                    qtPaginas = _financeiroRepository.ReturnQtPaginas(pesquisa, filtro)
                 };
                 return Ok(data);
             }
@@ -154,25 +155,23 @@ namespace API_BUSESCONTROL.Controllers {
                     folha.Cell(1, "I").Value = "Pagamento";
 
                     //Definindo o tamanho das colunas. 
+                    var colunas = new[] { "A", "B", "C", "D", "E", "F", "G", "H", "I"};
+                    foreach (var coluna in colunas) {
+                        var col = folha.Column(coluna);
+                        col.Width = 20;
+                        col.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+
+                        var titulo = folha.Cell(1, coluna);
+                        titulo.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                        titulo.Style.Font.SetBold();
+                        titulo.Style.Font.FontColor = XLColor.DarkBlue;
+                    }
                     var col1 = folha.Column("A");
                     var col2 = folha.Column("B");
                     var col3 = folha.Column("C");
-                    var col4 = folha.Column("D");
-                    var col5 = folha.Column("E");
-                    var col6 = folha.Column("F");
-                    var col7 = folha.Column("G");
-                    var col8 = folha.Column("H");
-                    var col9 = folha.Column("I");
-
                     col1.Width = 10;
                     col2.Width = 15;
                     col3.Width = 40;
-                    col4.Width = 20;
-                    col5.Width = 20;
-                    col6.Width = 20;
-                    col7.Width = 20;
-                    col8.Width = 20;
-                    col9.Width = 20;
 
                     foreach (var financeiro in financeiros) {
                         folha.Cell(financeiros.IndexOf(financeiro) + 2, "A").Value = financeiro.Id;
@@ -200,6 +199,303 @@ namespace API_BUSESCONTROL.Controllers {
             catch (Exception erro) {
                 return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos." + $"{erro.Message}");
             }
+        }
+
+        [HttpGet("GetRelatorioFinanceiroPdf")]
+        public IActionResult PdfRelatorioFinanceiro() {
+            try {
+                List<Financeiro> financeiros = _financeiroRepository.ListFinanceiros();
+                if (financeiros == null) {
+                    return NotFound("Desculpe, nenhum registro encontrado.");
+                }
+                var pxPorMm = 72 / 35.2f;
+                Document doc = new Document(PageSize.A4, 15 * pxPorMm, 15 * pxPorMm,
+                    15 * pxPorMm, 15 * pxPorMm);
+                MemoryStream stream = new MemoryStream();
+                PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+                writer.CloseStream = false;
+                doc.Open();
+                var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 16,
+                    iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
+                Paragraph paragrofoJustificado = new Paragraph("",
+                new Font(fonteBase, 10, Font.NORMAL));
+                Paragraph paragrofoRodape = new Paragraph("",
+                new Font(fonteBase, 09, Font.NORMAL));
+                paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
+                var titulo = new Paragraph($"Relatório financeiro\n\n\n", fonteParagrafo);
+                titulo.Alignment = Element.ALIGN_CENTER;
+
+                var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
+                if (caminhoImgLeft != null) {
+                    Image logo = Image.GetInstance(caminhoImgLeft);
+                    float razaoImg = logo.Width / logo.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo.ScaleToFit(larguraLogo, alturaImg);
+                    var margemEsquerda = doc.PageSize.Width - doc.RightMargin - larguraLogo - 2;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo.SetAbsolutePosition(margemEsquerda, margemTopo);
+                    writer.DirectContent.AddImage(logo, false);
+                }
+                var caminhoImgRight = Path.Combine("ImagensPDF", "LogoPdfRight.jpg");
+                if (caminhoImgRight != null) {
+                    Image logo2 = Image.GetInstance(caminhoImgRight);
+                    float razaoImg = logo2.Width / logo2.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo2.ScaleToFit(larguraLogo, alturaImg);
+                    var margemRight = pxPorMm * 15;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo2.SetAbsolutePosition(margemRight, margemTopo);
+                    writer.DirectContent.AddImage(logo2, false);
+                }
+                var tabela = new PdfPTable(7);
+                float[] larguraColunas = { 0.5f, 1f, 1f, 1f, 1f, 1f, 1f };
+                tabela.SetWidths(larguraColunas);
+                tabela.DefaultCell.BorderWidth = 0;
+                tabela.WidthPercentage = 105;
+                CriarCelulaTexto(tabela, "ID", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Credor/Devedor", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Status financeiro", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Receita/Despesas", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Val total", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Val efetuado", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Vencimento", PdfPCell.ALIGN_LEFT, true);
+                decimal valorTotAtivos = 0, valorTotInativos = 0, valEfetuado = 0;
+                foreach (var item in financeiros.OrderBy(x => x.DespesaReceita)) {
+                    if (item.FinanceiroStatus == FinanceiroStatus.Ativo) {
+                        valorTotAtivos += item.ValorTotDR!.Value;
+                    }
+                    else {
+                        valorTotInativos += item.ValorTotDR!.Value;
+                    }
+                    if (!string.IsNullOrEmpty(item.ValorTotalPago.ToString())) {
+                        valEfetuado += item.ValorTotalPago!.Value;
+                    }
+                    CriarCelulaTexto(tabela, item.Id.ToString(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnNameClienteOrCredor(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnStatusFinanceiro(), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, item.ReturnTypeFinanceiro(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnValorTot(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnValorTotEfetuado(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.DataVencimento!.Value.ToString("dd/MM/yyyy"), PdfPCell.ALIGN_LEFT);
+                }
+
+                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
+                //footer.Alignment = Element.ALIGN_LEFT;
+                PdfPTable footerTbl = new PdfPTable(1);
+                footerTbl.WidthPercentage = 100f;
+                footerTbl.TotalWidth = 1000f;
+                footerTbl.HorizontalAlignment = 0;
+                PdfPCell cell = new PdfPCell(footer);
+                cell.Border = 0;
+                cell.Colspan = 1;
+                cell.PaddingLeft = 0;
+                cell.HorizontalAlignment = 0;
+                footerTbl.DefaultCell.HorizontalAlignment = 0;
+                footerTbl.WidthPercentage = 100;
+                footerTbl.AddCell(cell);
+                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
+
+                string rodape = $"Quantidade de lançamentos solicitados: {financeiros.Count}" +
+                    $"\nValor total listado (ativos): {valorTotAtivos.ToString("C2")}" +
+                    $"\nValor total listado (inativos): {valorTotInativos.ToString("C2")}" +
+                    $"\nValor total efetuado: {valEfetuado.ToString("C2")}";
+                string rodape2 = $"\nDocumento gerado em: {DateTime.Now.ToString("dd/MM/yyyy")}";
+                paragrofoRodape.Add(rodape);
+                paragrofoRodape.Add(rodape2);
+                doc.Add(titulo);
+                doc.Add(paragrofoJustificado);
+                doc.Add(tabela);
+                doc.Add(paragrofoRodape);
+                doc.Close();
+
+                string nomeContrato = $"relatório financeiro";
+                stream.Flush();
+                stream.Position = 0;
+                return File(stream, "application/pdf", $"{nomeContrato}.pdf");
+            }
+            catch (Exception error) {
+                return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos." + $"{error.Message}");
+            }
+        }
+
+        [HttpGet("GetRelatorioParcelas/{financeiroId}")]
+        public IActionResult GetRelatorioParcelas(int financeiroId) {
+            try {
+                Financeiro financeiro = _financeiroRepository.listPorIdFinanceiro(financeiroId);
+                if (financeiro == null || !financeiro.Parcelas.Any()) return NotFound("Desculpe, não encontramos nenhum registro.");
+                using (var folhaBook = new XLWorkbook()) {
+                    var folha = folhaBook.AddWorksheet("Sample sheet");
+
+                    folha.Cell(1, "A").Value = "Parcela";
+                    folha.Cell(1, "B").Value = "Situação";
+                    folha.Cell(1, "C").Value = "Valor da parcela";
+                    folha.Cell(1, "D").Value = "Taxa de juros";
+                    folha.Cell(1, "E").Value = "Data de vencimento";
+                    folha.Cell(1, "F").Value = "Data de efetuação";
+
+                    var colunas = new[] { "A", "B", "C", "D", "E", "F" };
+
+                    foreach (var item in colunas) {
+                        var col = folha.Column(item);
+                        col.Width = 20;
+                        col.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+
+                        var titulo = folha.Cell(1, item);
+                        titulo.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                        titulo.Style.Font.SetBold();
+                        titulo.Style.Font.FontColor = XLColor.DarkBlue;
+                    }
+                    var col2 = folha.Column("B");
+                    col2.Width = 30;
+
+                    foreach (var item in financeiro.Parcelas!) {
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "A").Value = $"{item.ReturnNomeParcela()}";
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "B").Value = $"{item.ReturnStatusPagamento()}";
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "C").Value = $"{financeiro.ValorParcelaDR!.Value.ToString("C2")}";
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "D").Value = (!string.IsNullOrEmpty(item.ValorJuros.ToString())) ? $"{item.ValorJuros!.Value.ToString("C2")}" : "R$ 0,00";
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "E").Value = item.DataVencimentoParcela!.Value.ToString("dd/MM/yyyy");
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "F").Value = (!string.IsNullOrEmpty(item.DataEfetuacao.ToString())) ? item.DataEfetuacao!.Value.ToString("dd/MM/yyyy") : "Não possui";
+                    }
+                    using (MemoryStream stream = new MemoryStream()) {
+                        folhaBook.SaveAs(stream);
+                        string nomeArquivo = $"Parcelas - {financeiro.ReturnNameClienteOrCredor()}.xlsx";
+                        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nomeArquivo);
+                    }
+                }
+            }
+            catch (Exception error) {
+                return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos." + $"{error.Message}");
+            }
+        }
+
+        [HttpGet("GetRelatorioParcelasPdf/{financeiroId}")]
+        public IActionResult GetRelatorioParcelasPdf(int? financeiroId) {
+            try {
+                Financeiro financeiro = _financeiroRepository.listPorIdFinanceiro(financeiroId);
+                if (financeiro == null) {
+                    return NotFound("Desculpe, nenhum registro encontrado.");
+                }
+                var pxPorMm = 72 / 35.2f;
+                Document doc = new Document(PageSize.A4, 15 * pxPorMm, 15 * pxPorMm,
+                    15 * pxPorMm, 15 * pxPorMm);
+                MemoryStream stream = new MemoryStream();
+                PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+                writer.CloseStream = false;
+                doc.Open();
+                var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 16,
+                    iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
+                Paragraph paragrofoJustificado = new Paragraph("",
+                new Font(fonteBase, 10, Font.NORMAL));
+                Paragraph paragrofoRodape = new Paragraph("",
+                new Font(fonteBase, 09, Font.NORMAL));
+                paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
+                var titulo = new Paragraph($"Parcelas - {financeiro.ReturnNameClienteOrCredor()}\n\n\n", fonteParagrafo);
+                titulo.Alignment = Element.ALIGN_LEFT;
+
+                var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
+                if (caminhoImgLeft != null) {
+                    Image logo = Image.GetInstance(caminhoImgLeft);
+                    float razaoImg = logo.Width / logo.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo.ScaleToFit(larguraLogo, alturaImg);
+                    var margemEsquerda = doc.PageSize.Width - doc.RightMargin - larguraLogo - 2;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo.SetAbsolutePosition(margemEsquerda, margemTopo);
+                    writer.DirectContent.AddImage(logo, false);
+                }
+
+                var tabela = new PdfPTable(7);
+                float[] larguraColunas = { 0.4f, 0.7f, 1.1f, 1f, 1f, 1f, 1.3f };
+                tabela.SetWidths(larguraColunas);
+                tabela.DefaultCell.BorderWidth = 0;
+                tabela.WidthPercentage = 105;
+                CriarCelulaTexto(tabela, "ID", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Nome", PdfPCell.ALIGN_CENTER, true);
+                CriarCelulaTexto(tabela, "Valor das parcelas", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Taxa de juros", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Vencimento", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Efetuação", PdfPCell.ALIGN_LEFT, true);
+                CriarCelulaTexto(tabela, "Status da parcela", PdfPCell.ALIGN_CENTER, true);
+
+                foreach (var item in financeiro.Parcelas.OrderBy(x => x.DataVencimentoParcela)) {
+                    CriarCelulaTexto(tabela, item.Id.ToString(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnNomeParcela(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.Financeiro.ReturnValorParcela(), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, item.ReturnValorJuros(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnDateVencimento(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnDateEfetuacao(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.ReturnStatusPagamento(), PdfPCell.ALIGN_LEFT);
+                }
+
+                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
+                //footer.Alignment = Element.ALIGN_LEFT;
+                PdfPTable footerTbl = new PdfPTable(1);
+                footerTbl.WidthPercentage = 100f;
+                footerTbl.TotalWidth = 1000f;
+                footerTbl.HorizontalAlignment = 0;
+                PdfPCell cell = new PdfPCell(footer);
+                cell.Border = 0;
+                cell.Colspan = 1;
+                cell.PaddingLeft = 0;
+                cell.HorizontalAlignment = 0;
+                footerTbl.DefaultCell.HorizontalAlignment = 0;
+                footerTbl.WidthPercentage = 100;
+                footerTbl.AddCell(cell);
+                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
+
+                string rodape = $"Quantidade de parcelas: {financeiro.Parcelas.Count} " +
+                                $"\nValor efetuado: {financeiro.ReturnValorTotEfetuado()}" +
+                                $"\nValor total: {financeiro.ReturnValorTot()}";
+                paragrofoRodape.Add(rodape);
+                doc.Add(titulo);
+                doc.Add(paragrofoJustificado);
+                doc.Add(tabela);
+                doc.Add(paragrofoRodape);
+                doc.Close();
+
+                string nomeContrato = $"Parcelas - {financeiro.ReturnNameClienteOrCredor()}";
+                stream.Flush();
+                stream.Position = 0;
+                return File(stream, "application/pdf", $"{nomeContrato}.pdf");
+            }
+            catch (Exception erro) {
+                return BadRequest($"Desculpe, houve um erro: {erro.Message}");
+            }
+        }
+
+
+        static void CriarCelulaTexto(PdfPTable tabela, string texto, int alinhamentoHorz = PdfPCell.ALIGN_LEFT,
+                bool negrito = false, bool italico = false, int tamanhoFont = 10, int alturaCelula = 30) {
+
+            int estilo = Font.NORMAL;
+            if (negrito && italico) {
+                estilo = Font.BOLDITALIC;
+            }
+            else if (negrito) {
+                estilo = Font.BOLD;
+            }
+            else if (italico) {
+                estilo = Font.ITALIC;
+            }
+            var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+            var fonteCelula = new Font(fonteBase, tamanhoFont, estilo, BaseColor.DARK_GRAY);
+            var bgColor = BaseColor.WHITE;
+            if (tabela.Rows.Count % 2 == 1) {
+                bgColor = new BaseColor(0.95f, 0.95f, 0.95f);
+            }
+            var celula = new PdfPCell(new Phrase(texto, fonteCelula));
+            celula.HorizontalAlignment = alinhamentoHorz;
+            celula.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
+            celula.Border = 0;
+            celula.BorderWidthBottom = 1;
+            celula.BackgroundColor = bgColor;
+            celula.FixedHeight = alturaCelula;
+            tabela.AddCell(celula);
         }
     }
 }

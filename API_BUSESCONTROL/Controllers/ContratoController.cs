@@ -21,12 +21,14 @@ namespace API_BUSESCONTROL.Controllers {
 
         private readonly IContratoRepository _contratoRepository;
         private readonly IClienteRepository _clienteRepository;
+        private readonly IFinanceiroRepository _financeiroRepository;
         public string textoContratante;
         public string nomeCliente;
 
-        public ContratoController(IContratoRepository contratoRepository, IClienteRepository clienteRepository) {
+        public ContratoController(IContratoRepository contratoRepository, IClienteRepository clienteRepository, IFinanceiroRepository financeiroRepository) {
             _contratoRepository = contratoRepository;
             _clienteRepository = clienteRepository;
+            _financeiroRepository = financeiroRepository;
         }
 
         [HttpPost]
@@ -101,6 +103,7 @@ namespace API_BUSESCONTROL.Controllers {
 
         [HttpGet("GetContratosAtivos/{paginaAtual}/{statusPag}")]
         public IActionResult GetContratosAtivos(int paginaAtual, bool statusPag) {
+            _financeiroRepository.TaskMonitorPdfRescisao();
             List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, statusPag);
             var response = new {
                 contractList = contratos,
@@ -312,35 +315,6 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        static void CriarCelulaTexto(PdfPTable tabela, string texto, int alinhamentoHorz = PdfPCell.ALIGN_LEFT,
-                bool negrito = false, bool italico = false, int tamanhoFont = 10, int alturaCelula = 30) {
-
-            int estilo = Font.NORMAL;
-            if (negrito && italico) {
-                estilo = Font.BOLDITALIC;
-            }
-            else if (negrito) {
-                estilo = Font.BOLD;
-            }
-            else if (italico) {
-                estilo = Font.ITALIC;
-            }
-            var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
-            var fonteCelula = new Font(fonteBase, tamanhoFont, estilo, BaseColor.DARK_GRAY);
-            var bgColor = BaseColor.WHITE;
-            if (tabela.Rows.Count % 2 == 1) {
-                bgColor = new BaseColor(0.95f, 0.95f, 0.95f);
-            }
-            var celula = new PdfPCell(new Phrase(texto, fonteCelula));
-            celula.HorizontalAlignment = alinhamentoHorz;
-            celula.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-            celula.Border = 0;
-            celula.BorderWidthBottom = 1;
-            celula.BackgroundColor = bgColor;
-            celula.FixedHeight = alturaCelula;
-            tabela.AddCell(celula);
-        }
-
         [HttpGet("PdfContratoCliente/{id}/{clienteFisicoId}/{clienteJuridicoId}")]
         public IActionResult ReturnPdfContratoCliente(int id, int clienteFisicoId, int clienteJuridicoId) {
             try {
@@ -512,6 +486,178 @@ namespace API_BUSESCONTROL.Controllers {
             catch (Exception erro) {
                 return BadRequest(erro.Message);
             }
+        }
+
+        [HttpGet("PdfRescisao/{id}")]
+        public IActionResult PdfRescisao(int id) {
+            try {
+                ClientesContrato clientesContrato = _contratoRepository.GetClientesContratoById(id);
+                if (clientesContrato == null) {
+                    return NotFound("Desculpe, nenhum registro encontrado");
+                }
+                var pxPorMm = 72 / 25.2f;
+                Document doc = new Document(PageSize.A4, 15 * pxPorMm, 15 * pxPorMm,
+                    15 * pxPorMm, 15 * pxPorMm);
+                MemoryStream stream = new MemoryStream();
+                PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+                writer.CloseStream = false;
+                doc.Open();
+                var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 14,
+                    iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
+                Paragraph paragrofoJustificado = new Paragraph("",
+                new Font(fonteBase, 12, Font.NORMAL));
+                paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
+                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 12, Font.NORMAL));
+                paragrafoCenter.Alignment = Element.ALIGN_CENTER;
+
+                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Antonio\\Faculdade\\Sétimo período\\BusesControl--TCC-master\\BusesControl\\wwwroot\\css\\Imagens\\LogoPdf.jpeg");
+                if (caminhoImgLeft != null) {
+                    Image logo = Image.GetInstance(caminhoImgLeft);
+                    float razaoImg = logo.Width / logo.Height;
+                    float alturaImg = 84;
+                    float larguraLogo = razaoImg * alturaImg - 6f;
+                    logo.ScaleToFit(larguraLogo, alturaImg);
+                    var margemEsquerda = doc.PageSize.Width - doc.RightMargin - larguraLogo - 2;
+                    var margemTopo = doc.PageSize.Height - doc.TopMargin - 60;
+                    logo.SetAbsolutePosition(margemEsquerda, margemTopo);
+                    writer.DirectContent.AddImage(logo, false);
+                }
+
+                string titulo_contratante = "1 - CONTRATANTE";
+
+                if (!string.IsNullOrEmpty(clientesContrato.PessoaFisicaId.ToString())) {
+                    if (!string.IsNullOrEmpty(clientesContrato!.PessoaFisica!.IdVinculacaoContratual.ToString())) {
+                        PessoaFisica pessoaFisicaResponsavel = _clienteRepository.GetClienteFisicoById(clientesContrato.PessoaFisica.IdVinculacaoContratual!.Value);
+                        if (pessoaFisicaResponsavel != null) {
+                            nomeCliente = clientesContrato.PessoaFisica.Name!;
+                            textoContratante = $"{titulo_contratante}\n{pessoaFisicaResponsavel.Name} portador(a) do " +
+                                $"CPF: {pessoaFisicaResponsavel.ReturnCpfCliente()}, RG: {pessoaFisicaResponsavel.Rg}, filho(a) da Sr. {pessoaFisicaResponsavel.NameMae}, residente domiciliado no imovel Nº {pessoaFisicaResponsavel.NumeroResidencial}({pessoaFisicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaFisicaResponsavel.ComplementoResidencial}, no bairro {pessoaFisicaResponsavel.Bairro}," +
+                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato, sendo o representante legal do processo de rescisão de contrato do cliente vinculado que será descrito a seguir: " +
+                                $"\n{clientesContrato.PessoaFisica.Name} portador(a) do " +
+                                $"CPF: {clientesContrato.PessoaFisica.ReturnCpfCliente()}, RG: {clientesContrato.PessoaFisica.Rg}, filho(a) da Sr. {clientesContrato.PessoaFisica.NameMae}, residente domiciliado no imovel Nº {clientesContrato.PessoaFisica.NumeroResidencial}({clientesContrato.PessoaFisica.Logradouro}), próximo ao complemento residencial {clientesContrato.PessoaFisica.ComplementoResidencial}, no bairro {clientesContrato.PessoaFisica.Bairro}," +
+                                $" da cidade de {clientesContrato.PessoaFisica.Cidade} — {clientesContrato.PessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({clientesContrato.PessoaFisica.Ddd}){clientesContrato.PessoaFisica.ReturnTelefoneCliente()}, {clientesContrato.PessoaFisica.Email}.\n\n\n";
+                        }
+                        else {
+                            nomeCliente = clientesContrato.PessoaFisica.Name!;
+                            PessoaJuridica pessoaJuridicaResponsavel = _clienteRepository.GetClienteByIdPJ(clientesContrato.PessoaFisica.IdVinculacaoContratual.Value);
+                            textoContratante = $"{titulo_contratante}\n{pessoaJuridicaResponsavel.RazaoSocial}, inscrita no CNPJ: {pessoaJuridicaResponsavel.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridicaResponsavel.InscricaoEstadual}, inscrição municipal: {pessoaJuridicaResponsavel.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridicaResponsavel.NomeFantasia}, " +
+                            $"residente domiciliado no imovel Nº {pessoaJuridicaResponsavel.NumeroResidencial} ({pessoaJuridicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaJuridicaResponsavel.ComplementoResidencial}, no bairro {pessoaJuridicaResponsavel.Bairro}," +
+                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato, sendo o representante legal do processo de rescisão de contrato do cliente vinculado que será descrito a seguir:" +
+                            $"\n{clientesContrato.PessoaFisica.Name} portador(a) do " +
+                                $"CPF: {clientesContrato.PessoaFisica.ReturnCpfCliente()}, RG: {clientesContrato.PessoaFisica.Rg}, filho(a) da Sr. {clientesContrato.PessoaFisica.NameMae}, residente domiciliado no imovel Nº {clientesContrato.PessoaFisica.NumeroResidencial}({clientesContrato.PessoaFisica.Logradouro}), próximo ao complemento residencial {clientesContrato.PessoaFisica.ComplementoResidencial}, no bairro {clientesContrato.PessoaFisica.Bairro}," +
+                                $" da cidade de {clientesContrato.PessoaFisica.Cidade} — {clientesContrato.PessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({clientesContrato.PessoaFisica.Ddd}){clientesContrato.PessoaFisica.ReturnTelefoneCliente()}, {clientesContrato.PessoaFisica.Email}.\n\n\n";
+                        }
+
+                    }
+                    else {
+                        nomeCliente = clientesContrato.PessoaFisica.Name;
+                        textoContratante = $"{titulo_contratante}\n{clientesContrato.PessoaFisica.Name} portador(a) do " +
+                        $"CPF: {clientesContrato.PessoaFisica.ReturnCpfCliente()}, RG: {clientesContrato.PessoaFisica.Rg}, filho(a) da Sr. {clientesContrato.PessoaFisica.NameMae}, residente domiciliado no imovel Nº {clientesContrato.PessoaFisica.NumeroResidencial}({clientesContrato.PessoaFisica.Logradouro}), próximo ao complemento residencial {clientesContrato.PessoaFisica.ComplementoResidencial}, no bairro {clientesContrato.PessoaFisica.Bairro}," +
+                        $" da cidade de {clientesContrato.PessoaFisica.Cidade} — {clientesContrato.PessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({clientesContrato.PessoaFisica.Ddd}){clientesContrato.PessoaFisica.ReturnTelefoneCliente()}, {clientesContrato.PessoaFisica.Email}. Neste ato, sendo o responsável e solicitador do processo de rescisão do contrato, garantindo seus direitos legais definidos pela lei, e garantidos pela cláusula cinco do contrato.\n\n\n";
+                    }
+                }
+                else {
+                    PessoaJuridica pessoaJuridica = _clienteRepository.GetClienteByIdPJ(clientesContrato!.PessoaJuridicaId.Value);
+                    if (pessoaJuridica == null) {
+                        return NotFound("Desculpe, nenhum registro encontrado!");
+                    }
+                    nomeCliente = pessoaJuridica.NomeFantasia!;
+                    textoContratante = $"{titulo_contratante}\n{pessoaJuridica.RazaoSocial}, inscrita no CNPJ: {pessoaJuridica.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridica.InscricaoEstadual}, inscrição municipal: {pessoaJuridica.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridica.NomeFantasia}, " +
+                    $"residente domiciliado no imovel Nº {pessoaJuridica.NumeroResidencial} ({pessoaJuridica.Logradouro}), próximo ao complemento residencial {pessoaJuridica.ComplementoResidencial}, no bairro {pessoaJuridica.Bairro}," +
+                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}. Neste ato, sendo o responsável e solicitador do processo de rescisão do contrato, garantindo seus direitos legais definidos pela lei, e garantidos pela cláusula cinco do contrato.\n\n\n";
+                }
+
+                string titulo_contratada = $"2 - CONTRATADA";
+                string textoContratada = $"{titulo_contratada}\nBuss viagens LTDA, pessoa jurídica de direito privado para prestação de serviço, na proteção da LEI Nº 13.429º. " +
+                    $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 03.115.484/0001-02, sobre a liderança do sócio fundador Manoel Rodrigues." +
+                    $" Neste ato representada como  a empresa responsável pela realização da prestações de serviços do contrato.\n\n\n";
+
+
+                decimal? valorTotCliente = clientesContrato.Contrato.ValorParcelaContratoPorCliente * clientesContrato.Contrato.QtParcelas;
+                decimal valorMulta = (valorTotCliente.Value * 3) / 100;
+
+                string titulo_quinta_clausula = $"3 - PROCESSO DE RESCISÃO";
+                string QuintaClausula = $"{titulo_quinta_clausula}\n“Em caso de rescisão de contrato anterior a data acordada sem o devido pagamento da(s) parcela(s), o cliente deve estar ciente que haverá multa de 3% do valor total por cliente ( {clientesContrato.Contrato.ReturnValorTotCliente()} ), pela rescisão do contrato.”. " +
+                    $"\nCom base e asseguração da quinta cláusula do contrato, é dever do cliente realizar o pagamento de {valorMulta.ToString("C2")} para rescindir o contrato.\n\n\n";
+
+                string traco = "\n___________________________________________\n";
+                string assinaturaCliente = "Assinatura do representante legal contratante\n\n";
+                string traco2 = "___________________________________________________________\n";
+                string assinaturaEmpresa = "Assinatura da empresa representante da prestação do serviço";
+
+                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
+                //footer.Alignment = Element.ALIGN_LEFT;
+                PdfPTable footerTbl = new PdfPTable(1);
+                footerTbl.WidthPercentage = 100f;
+                footerTbl.TotalWidth = 1000f;
+                footerTbl.HorizontalAlignment = 0;
+                PdfPCell cell = new PdfPCell(footer);
+                cell.Border = 0;
+                cell.Colspan = 1;
+                cell.PaddingLeft = 0;
+                cell.HorizontalAlignment = 0;
+                footerTbl.DefaultCell.HorizontalAlignment = 0;
+                footerTbl.WidthPercentage = 100;
+                footerTbl.AddCell(cell);
+                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
+
+                paragrofoJustificado.Add(textoContratante);
+                paragrofoJustificado.Add(textoContratada);
+                paragrofoJustificado.Add(QuintaClausula);
+
+                paragrafoCenter.Add(traco);
+                paragrafoCenter.Add(assinaturaCliente);
+                paragrafoCenter.Add(traco2);
+                paragrafoCenter.Add(assinaturaEmpresa);
+
+                var titulo = new Paragraph($"Rescisão contrato Nº {clientesContrato.ContratoId} - {nomeCliente} \n\n\n", fonteParagrafo);
+                titulo.Alignment = Element.ALIGN_LEFT;
+                doc.Add(titulo);
+                doc.Add(paragrofoJustificado);
+                doc.Add(paragrafoCenter);
+
+                doc.Close();
+
+                stream.Flush();
+                stream.Position = 0;
+
+                _financeiroRepository.ConfirmarImpressaoPdf(clientesContrato);
+
+                return File(stream, "application/pdf", $"Rescisão - {nomeCliente}.pdf");
+            }
+            catch (Exception error) {
+                return BadRequest($"Desculpe, algum erro inesperado aconteceu! Detalhes do erro: {error.Message}");
+            }
+        }
+
+        static void CriarCelulaTexto(PdfPTable tabela, string texto, int alinhamentoHorz = PdfPCell.ALIGN_LEFT,
+                bool negrito = false, bool italico = false, int tamanhoFont = 10, int alturaCelula = 30) {
+
+            int estilo = Font.NORMAL;
+            if (negrito && italico) {
+                estilo = Font.BOLDITALIC;
+            }
+            else if (negrito) {
+                estilo = Font.BOLD;
+            }
+            else if (italico) {
+                estilo = Font.ITALIC;
+            }
+            var fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+            var fonteCelula = new Font(fonteBase, tamanhoFont, estilo, BaseColor.DARK_GRAY);
+            var bgColor = BaseColor.WHITE;
+            if (tabela.Rows.Count % 2 == 1) {
+                bgColor = new BaseColor(0.95f, 0.95f, 0.95f);
+            }
+            var celula = new PdfPCell(new Phrase(texto, fonteCelula));
+            celula.HorizontalAlignment = alinhamentoHorz;
+            celula.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
+            celula.Border = 0;
+            celula.BorderWidthBottom = 1;
+            celula.BackgroundColor = bgColor;
+            celula.FixedHeight = alturaCelula;
+            tabela.AddCell(celula);
         }
 
         string ReturnAprovacao(StatusAprovacao status) {

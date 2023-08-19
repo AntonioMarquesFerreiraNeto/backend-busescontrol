@@ -5,7 +5,7 @@ using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace API_BUSESCONTROL.Repository {
-    public class FinanceiroRepository : IFinanceiroRepository{
+    public class FinanceiroRepository : IFinanceiroRepository {
 
         private readonly BancoContext _bancoContext;
 
@@ -462,35 +462,83 @@ namespace API_BUSESCONTROL.Repository {
             }
         }
 
-        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa) {
+        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro) {
             if (pageNumber < 1 || string.IsNullOrEmpty(pageNumber.ToString())) throw new Exception("Ação inválida");
-            return _bancoContext.Financeiro
-                .OrderByDescending(x => x.Id)
-                .Where(x => x.PessoaFisica.Name.Contains(pesquisa) 
-                    || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) 
-                    || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) 
-                    || x.Id.ToString().Contains(pesquisa)
-                    || x.ContratoId.ToString().Contains(pesquisa))
-                .Include(x => x.Contrato)
-                .Include(x => x.PessoaFisica)
-                .Include(x => x.PessoaJuridica)
-                .Include(x => x.Fornecedor)
-                .Include(x => x.Parcelas)
-                .AsNoTracking()
-                .Skip((pageNumber - 1) * 10)
-                .Take(10)
-                .ToList();
+            switch (filtro) {
+                case FiltroFinanceiro.Todos:
+                    return _bancoContext.Financeiro
+                       .OrderByDescending(x => x.Id)
+                       .Where(x => x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa))
+                            .Include(x => x.Contrato)
+                            .Include(x => x.PessoaFisica)
+                            .Include(x => x.PessoaJuridica)
+                            .Include(x => x.Fornecedor)
+                            .Include(x => x.Parcelas)
+                            .AsNoTracking()
+                            .Skip((pageNumber - 1) * 10)
+                            .Take(10)
+                            .ToList();
+                case FiltroFinanceiro.Contrato:
+                    return _bancoContext.Financeiro
+                       .OrderByDescending(x => x.Id)
+                       .Where(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) ||  x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)))
+                            .Include(x => x.Contrato)
+                            .Include(x => x.PessoaFisica)
+                            .Include(x => x.PessoaJuridica)
+                            .Include(x => x.Fornecedor)
+                            .Include(x => x.Parcelas)
+                            .AsNoTracking()
+                            .Skip((pageNumber - 1) * 10)
+                            .Take(10)
+                            .ToList();
+                case FiltroFinanceiro.Atrasadas:
+                    return _bancoContext.Financeiro
+                       .OrderByDescending(x => x.Id)
+                       .Where(x => x.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada) && ((x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa))))
+                            .Include(x => x.Contrato)
+                            .Include(x => x.PessoaFisica)
+                            .Include(x => x.PessoaJuridica)
+                            .Include(x => x.Fornecedor)
+                            .Include(x => x.Parcelas)
+                            .AsNoTracking()
+                            .Skip((pageNumber - 1) * 10)
+                            .Take(10)
+                            .ToList();
+                default:
+                    return _bancoContext.Financeiro
+                      .OrderByDescending(x => x.Id)
+                      .Where(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)))
+                           .Include(x => x.Contrato)
+                           .Include(x => x.PessoaFisica)
+                           .Include(x => x.PessoaJuridica)
+                           .Include(x => x.Fornecedor)
+                           .Include(x => x.Parcelas)
+                           .AsNoTracking()
+                           .Skip((pageNumber - 1) * 10)
+                           .Take(10)
+                           .ToList();
+            }
         }
 
-        public int ReturnQtPaginas(string pesquisa) {
+        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro) {
 
-            int qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa)
-                || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa)
-                || x.Id.ToString().Contains(pesquisa)
-                || x.ContratoId.ToString().Contains(pesquisa));
+            var qtFinanceiro = 1;
+            switch (filtro) {
+                case FiltroFinanceiro.Todos:
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa));
+                    break;
+                case FiltroFinanceiro.Contrato:
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)));
+                    break;
+                case FiltroFinanceiro.Atrasadas:
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada) && ((x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa))));
+                    break;
+                default:
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)));
+                    break;
+            }
 
-            int qtPage = (int)Math.Ceiling((double) qtFinanceiro / 10);
+            int qtPage = (int)Math.Ceiling((double)qtFinanceiro / 10);
             return (qtPage == 0) ? 1 : qtPage;
         }
 

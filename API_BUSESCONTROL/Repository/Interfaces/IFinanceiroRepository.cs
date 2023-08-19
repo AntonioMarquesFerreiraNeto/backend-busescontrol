@@ -1,4 +1,5 @@
 ﻿using API_BUSESCONTROL.Models;
+using API_BUSESCONTROL.Models.Enums;
 
 namespace API_BUSESCONTROL.Repository.Interfaces {
     public interface IFinanceiroRepository {
@@ -17,8 +18,8 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public void TaskMonitorPdfRescisao();
         public ClientesContrato ConfirmarImpressaoPdf(ClientesContrato clientesContrato);
         public Financeiro ListFinanceiroPorContratoAndClientesContrato(int? id);
-        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa);
-        public int ReturnQtPaginas(string pesquisa);
+        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro);
+        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro);
         public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, string pesquisa);
         public int ReturnQtPaginasParcelas(int id, string pesquisa);
         public Financeiro listPorIdFinanceiroNoJoinParcelas(int? id);

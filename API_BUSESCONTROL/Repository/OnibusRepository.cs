@@ -5,8 +5,7 @@ using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace API_BUSESCONTROL.Repository
-{
+namespace API_BUSESCONTROL.Repository {
 
     public class OnibusRepository : IOnibusRepository {
 
@@ -104,50 +103,40 @@ namespace API_BUSESCONTROL.Repository
             }
         }
 
-        public List<Onibus> PaginateListAtivos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus
-                    .AsNoTracking().Include(x => x.Contratos)
-                    .Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) {
-                throw new Exception("Desculpe, ação inválida!");
-            }
-            int indice = (paginaAtual - 2) * 10;
+        public List<Onibus> PaginateListAtivos(int paginaAtual, string? pesquisa) {
+            string pesquisaPlaca = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.Onibus
-                .AsNoTracking().Include(x => x.Contratos)
-                .Where(x => x.StatusOnibus == StatusFrota.Ativo).Skip(indice).Take(10).ToList();
+                .Include(x => x.Contratos).AsNoTracking()
+                .Where(x => x.StatusOnibus == StatusFrota.Ativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)))
+                .Skip((paginaAtual - 1) * 10)
+                .Take(10)
+                .ToList();
         }
 
-        public List<Onibus> PaginateListInativos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Onibus
-                    .AsNoTracking().Include(x => x.Contratos)
-                    .Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) {
-                throw new Exception("Desculpe, ação inválida!");
-            }
-            int indice = (paginaAtual - 2) * 10;
+        public List<Onibus> PaginateListInativos(int paginaAtual, string? pesquisa) {
+            string pesquisaPlaca = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.Onibus
-                .AsNoTracking().Include(x => x.Contratos)
-                .Where(x => x.StatusOnibus == StatusFrota.Inativo).Skip(indice).Take(10).ToList();
+                .Include(x => x.Contratos).AsNoTracking()
+              .Where(x => x.StatusOnibus == StatusFrota.Inativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)))
+                .Skip((paginaAtual - 1) * 10)
+                .Take(10)
+                .ToList();
         }
 
-        public int QtPaginasAtivas() {
-            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Ativo);
-            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
+        public int QtPaginasAtivas(string? pesquisa) {
+            string pesquisaPlaca = pesquisa.Replace("-", "");
+            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Ativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
-        public int QtPaginasInativas() {
-            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Inativo);
-            //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
+        public int QtPaginasInativas(string? pesquisa) {
+            string pesquisaPlaca = pesquisa.Replace("-", "");
+            var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Inativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public List<Onibus> GetAll() {

@@ -122,47 +122,37 @@ namespace API_BUSESCONTROL.Repository
             return funcionarioDB;
         }
 
-        public List<Funcionario> PaginateListAtivos(int paginaAtual, bool statusPaginacao) {
-            //Se o statusPaginação for igual a true, deve paginar para próxima página, caso contrário, página anterior.
-            if (statusPaginacao) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                    .Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) {
-                throw new Exception("Desculpe, ação inválida!");
-            }
-            int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Ativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                .Skip(indice).Take(10).ToList();
+        public List<Funcionario> PaginateListAtivos(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
+            return _bancoContext.Funcionario
+                  .Where(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))    
+                  .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                  .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
-        public List<Funcionario> PaginateListInativos(int paginaAtual, bool statusPaginacao) {
-            //Se o statusPaginação for igual a true, deve paginar para próxima página, caso contrário, página anterior.
-            if (statusPaginacao) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                    .Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) {
-                throw new Exception("Desculpe, ação inválida!");
-            }
-            int indice = (paginaAtual - 2) * 10;
-            return _bancoContext.Funcionario.Where(x => x.Status == FuncionarioStatus.Inativo).OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                .Skip(indice).Take(10).ToList();
+        public List<Funcionario> PaginateListInativos(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
+            return _bancoContext.Funcionario
+                   .Where(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
+                   .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
+                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
-        public int QtPaginasAtivas() {
-            var qtOnibus = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo);
+        public int QtPaginasAtivas(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
-            return qtPaginas;
+            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
-        public int QtPaginasInativas() {
-            var qtOnibus = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo);
+        public int QtPaginasInativas(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
             return qtPaginas;
         }
 

@@ -11,10 +11,10 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public Funcionario AtivarFuncionario(int? id);
         public Funcionario InativarUsuario(int? id);
         public Funcionario AtivarUsuario(int? id);
-        public List<Funcionario> PaginateListAtivos(int paginaAtual, bool statusPaginacao);
-        public List<Funcionario> PaginateListInativos(int paginaAtual, bool statusPaginacao);
+        public List<Funcionario> PaginateListAtivos(int paginaAtual, string pesquisa);
+        public List<Funcionario> PaginateListInativos(int paginaAtual, string pesquisa);
         public List<Funcionario> GetAllMotoristas();
-        public int QtPaginasAtivas();
-        public int QtPaginasInativas();
+        public int QtPaginasAtivas(string pesquisa);
+        public int QtPaginasInativas(string pesquisa);
     }
 }

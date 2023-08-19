@@ -15,6 +15,35 @@ namespace API_BUSESCONTROL.Repository {
             _bancoContext = bancoContext;
         }
 
+        public List<Contrato> ListContratosAprovados() {
+            return _bancoContext.Contrato.Where(x => x.Aprovacao == StatusAprovacao.Aprovado)
+                        .Include("Motorista")
+                        .Include("Onibus")
+                        .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.Parcelas)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.PessoaJuridica)
+                        .Include(x => x.Rescisoes).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.Rescisoes).ThenInclude(x => x.PessoaJuridica)
+                        .AsNoTracking()
+                        .ToList();
+        }
+        public List<Contrato> ListContratosEmAnalise() {
+            return _bancoContext.Contrato.Where(x => x.Aprovacao == StatusAprovacao.EmAnalise && x.StatusContrato == ContratoStatus.Ativo)
+                        .Include("Motorista")
+                        .Include("Onibus")
+                        .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.Parcelas)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.Financeiros).ThenInclude(x => x.PessoaJuridica)
+                        .Include(x => x.Rescisoes).ThenInclude(x => x.PessoaFisica)
+                        .Include(x => x.Rescisoes).ThenInclude(x => x.PessoaJuridica)
+                        .AsNoTracking()
+                        .ToList();
+        }
+
         public Contrato CreateContrato(Contrato contrato, List<ClientesContrato> lista) {
             try {
                 AddClientesContrato(contrato, lista);
@@ -99,6 +128,14 @@ namespace API_BUSESCONTROL.Repository {
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                 .AsNoTracking()
                 .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, contrato não encontrado!");
+        }
+        public ClientesContrato GetClientesContratoById(int id) {
+            return _bancoContext.ClientesContrato
+                .Include(x => x.Contrato)
+                .Include(x => x.PessoaFisica)
+                .Include(x => x.PessoaJuridica)
+                .AsNoTracking()
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, registro não encontrado.");
         }
         public List<Contrato> GetAllContratosAtivos() {
             return _bancoContext.Contrato

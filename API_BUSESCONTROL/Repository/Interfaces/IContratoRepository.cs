@@ -11,10 +11,13 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public Contrato AprovarContrato(int id);
         public Contrato RevogarContrato(int id);
         public Contrato GetContratoById(int id);
+        public List<Contrato> ListContratosAprovados();
+        public List<Contrato> ListContratosEmAnalise();
         public List<Contrato> GetContratosAtivos(int paginaAtual, bool statusPag);
         public List<Contrato> GetContratosInativos(int paginaAtual, bool statusPag);
         public List<Contrato> GetAllContratosAtivos();
         public List<Contrato> GetAllContratosInativos();
+        public ClientesContrato GetClientesContratoById(int id);
         public int ReturnQtPaginasAtivos();
         public int ReturnQtPaginasInativos();
     }

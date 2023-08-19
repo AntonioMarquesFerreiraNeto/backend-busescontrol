@@ -16,20 +16,20 @@ namespace API_BUSESCONTROL.Controllers
         }
 
 
-        [HttpGet("PaginateListAtivos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetOnibusAtivosPaginate(int paginaAtual, bool statusPaginacao) {
-            var onibusList = _onibusRepository.PaginateListAtivos(paginaAtual, statusPaginacao);
-            var qtPaginate = _onibusRepository.QtPaginasAtivas();
+        [HttpGet("PaginateListAtivos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetOnibusAtivosPaginate(int paginaAtual, string? pesquisa = "") {
+            var onibusList = _onibusRepository.PaginateListAtivos(paginaAtual, pesquisa);
+            var qtPaginate = _onibusRepository.QtPaginasAtivas(pesquisa);
             var response = new {
                 OnibusList = onibusList,
                 QtPaginate = qtPaginate
             };
             return Ok(response);
         }
-        [HttpGet("PaginateListInativos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetOnibusInativosPaginate(int paginaAtual, bool statusPaginacao) {
-            var onibusList = _onibusRepository.PaginateListInativos(paginaAtual, statusPaginacao);
-            var qtPaginate = _onibusRepository.QtPaginasInativas();
+        [HttpGet("PaginateListInativos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetOnibusInativosPaginate(int paginaAtual, string? pesquisa = "") {
+            var onibusList = _onibusRepository.PaginateListInativos(paginaAtual, pesquisa);
+            var qtPaginate = _onibusRepository.QtPaginasInativas(pesquisa);
             var response = new {
                 OnibusList = onibusList,
                 QtPaginate = qtPaginate

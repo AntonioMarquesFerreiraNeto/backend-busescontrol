@@ -30,24 +30,24 @@ namespace API_BUSESCONTROL.Controllers
             }
         }
 
-        [HttpGet("PaginateAtivos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetFuncionariosAtivosPaginate(int paginaAtual, bool statusPaginacao) {
-            List<Funcionario> list = _funcionarioRepository.PaginateListAtivos(paginaAtual, statusPaginacao);
+        [HttpGet("PaginateAtivos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetFuncionariosAtivosPaginate(int paginaAtual = 1, string? pesquisa = "") {
+            List<Funcionario> list = _funcionarioRepository.PaginateListAtivos(paginaAtual, pesquisa);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
             var response = new {
                 funciList = list,
-                qtPaginate = _funcionarioRepository.QtPaginasAtivas()
+                qtPaginate = _funcionarioRepository.QtPaginasAtivas(pesquisa)
             };
             return Ok(response);
         }
 
-        [HttpGet("PaginateInativos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetFuncionariosInativosPaginate(int paginaAtual, bool statusPaginacao) {
-            List<Funcionario> list = _funcionarioRepository.PaginateListInativos(paginaAtual, statusPaginacao);
+        [HttpGet("PaginateInativos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetFuncionariosInativosPaginate(int paginaAtual = 1, string? pesquisa = "") {
+            List<Funcionario> list = _funcionarioRepository.PaginateListInativos(paginaAtual, pesquisa);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
             var response = new {
                 funciList = list,
-                qtPaginate = _funcionarioRepository.QtPaginasInativas()
+                qtPaginate = _funcionarioRepository.QtPaginasInativas(pesquisa)
             };
             return Ok(response);
         }

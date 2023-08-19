@@ -28,6 +28,7 @@ namespace API_BUSESCONTROL
             builder.Services.AddScoped<IContratoRepository, ContratoRepository>();
             builder.Services.AddScoped<IFornecedorRepository, FornecedorRepository>();
             builder.Services.AddScoped<IFinanceiroRepository, FinanceiroRepository>();
+            builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
             builder.Services.AddScoped<IEmail, Email>();
 
             builder.Services.AddCors();
