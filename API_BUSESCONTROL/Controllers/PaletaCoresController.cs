@@ -1,11 +1,13 @@
 ﻿using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_BUSESCONTROL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Assistente, Administrador")]
     public class PaletaCoresController : ControllerBase {
 
         private readonly IPaletaCoresRepository _paletaCoresRepository;

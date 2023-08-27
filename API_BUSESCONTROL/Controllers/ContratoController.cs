@@ -2,21 +2,16 @@
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Spreadsheet;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using System.Diagnostics.Contracts;
 using Font = iTextSharp.text.Font;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Assistente, Administrador")]
     public class ContratoController : ControllerBase {
 
         private readonly IContratoRepository _contratoRepository;
@@ -101,28 +96,29 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetContratosAtivos/{paginaAtual}/{statusPag}")]
-        public IActionResult GetContratosAtivos(int paginaAtual, bool statusPag) {
+        [HttpGet("GetContratosAtivos/{paginaAtual}/{filtro}/{pesquisa?}")]
+        public IActionResult GetContratosAtivos(int paginaAtual = 1, FiltroContrato filtro = FiltroContrato.Todos, string? pesquisa = "") {
             _financeiroRepository.TaskMonitorPdfRescisao();
-            List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, statusPag);
+            List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, filtro, pesquisa);
             var response = new {
                 contractList = contratos,
-                qtPaginas = _contratoRepository.ReturnQtPaginasAtivos()
+                qtPaginas = _contratoRepository.ReturnQtPaginasAtivos(filtro, pesquisa)
             };
             return Ok(response);
         }
 
-        [HttpGet("GetContratosInativos/{paginaAtual}/{statusPag}")]
-        public IActionResult GetContratosInativos(int paginaAtual, bool statusPag) {
-            List<Contrato> contratos = _contratoRepository.GetContratosInativos(paginaAtual, statusPag);
+        [HttpGet("GetContratosInativos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetContratosInativos(int paginaAtual, string? pesquisa = "") {
+            List<Contrato> contratos = _contratoRepository.GetContratosInativos(paginaAtual, pesquisa);
             var response = new {
                 contractList = contratos,
-                qtPaginas = _contratoRepository.ReturnQtPaginasInativos()
+                qtPaginas = _contratoRepository.ReturnQtPaginasInativos(pesquisa)
             };
             return Ok(response);
         }
 
         [HttpPatch("Aprovar/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult AprovarContrato(int id) {
             try {
                 _contratoRepository.AprovarContrato(id);
@@ -134,6 +130,7 @@ namespace API_BUSESCONTROL.Controllers {
         }
 
         [HttpPatch("Revogar/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult RevogarContrato(int id) {
             try {
                 _contratoRepository.RevogarContrato(id);
@@ -148,6 +145,18 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult InativarContrato(int id) {
             try {
                 _contratoRepository.InativarContrato(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpDelete("ConfirmRescisao/{contratoId}/{clienteId}")]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RescendirContrato(int contratoId, int clienteId) {
+            try {
+                _financeiroRepository.RescisaoContrato(contratoId, clienteId);
                 return NoContent();
             }
             catch (Exception error) {
@@ -182,7 +191,7 @@ namespace API_BUSESCONTROL.Controllers {
                         var titulo = folha.Cell(1, coluna);
                         titulo.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                         titulo.Style.Font.SetBold();
-                        titulo.Style.Font.FontColor = XLColor.Blue;
+                        titulo.Style.Font.FontColor = XLColor.DarkBlue;
                     }
 
 
@@ -489,6 +498,7 @@ namespace API_BUSESCONTROL.Controllers {
         }
 
         [HttpGet("PdfRescisao/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult PdfRescisao(int id) {
             try {
                 ClientesContrato clientesContrato = _contratoRepository.GetClientesContratoById(id);
@@ -622,7 +632,7 @@ namespace API_BUSESCONTROL.Controllers {
                 stream.Flush();
                 stream.Position = 0;
 
-                _financeiroRepository.ConfirmarImpressaoPdf(clientesContrato);
+                _financeiroRepository.ConfirmarImpressaoPdfRescisao(clientesContrato);
 
                 return File(stream, "application/pdf", $"Rescisão - {nomeCliente}.pdf");
             }

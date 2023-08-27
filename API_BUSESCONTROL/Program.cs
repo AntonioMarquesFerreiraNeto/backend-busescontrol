@@ -2,7 +2,11 @@ using API_BUSESCONTROL.Data;
 using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Repository;
 using API_BUSESCONTROL.Repository.Interfaces;
+using API_BUSESCONTROL.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace API_BUSESCONTROL
@@ -29,7 +33,28 @@ namespace API_BUSESCONTROL
             builder.Services.AddScoped<IFornecedorRepository, FornecedorRepository>();
             builder.Services.AddScoped<IFinanceiroRepository, FinanceiroRepository>();
             builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
+            builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IEmail, Email>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+
+
+            var key = Encoding.ASCII.GetBytes(Settings.Secrect);
+            builder.Services.AddAuthentication(auth => {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+
+            .AddJwtBearer(x => {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters {
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             builder.Services.AddCors();
 
@@ -45,12 +70,18 @@ namespace API_BUSESCONTROL
                 app.UseSwaggerUI();
             }
 
+            //Aceitando solicitações http rest full de qualquer origem
+            app.UseCors(options => {
+                options.WithOrigins("http://localhost:4200") // Substitua pelo domínio do seu aplicativo
+                       .AllowAnyMethod() // Permitir todos os métodos HTTP (GET, POST, etc.)
+                       .AllowAnyHeader() // Permitir todos os cabeçalhos
+                       .AllowCredentials(); // Permitir envio de credenciais (por exemplo, cookies)
+            });
+
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
-            //Aceitando solicitações http rest full de qualquer origem
-            app.UseCors(opcoes => opcoes.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.MapControllers();
 

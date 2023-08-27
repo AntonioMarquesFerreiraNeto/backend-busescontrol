@@ -5,8 +5,7 @@ using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace API_BUSESCONTROL.Repository
-{
+namespace API_BUSESCONTROL.Repository {
     public class ClienteRepository : IClienteRepository {
 
         private readonly BancoContext _bancoContext;
@@ -118,44 +117,37 @@ namespace API_BUSESCONTROL.Repository
             return cliente;
         }
 
-        public List<PessoaFisica> GetClientesAtivos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaFisica
-                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                    .Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
-            int indice = (paginaAtual - 2) * 10;
+        public List<PessoaFisica> GetClientesAtivos(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaFisica
-                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                .Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
-        }
-
-        public List<PessoaFisica> GetClientesInativos(int paginaAtual, bool statusPaginate) {
-            if (statusPaginate == true) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaFisica
                     .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                    .Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida");
-            int indice = (paginaAtual - 2) * 10;
+                    .Where(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                    .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+        }
+
+        public List<PessoaFisica> GetClientesInativos(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaFisica
-                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                .Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
+                .Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                .AsNoTracking()
+                .Where(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
-        public int QtPaginasClientesAtivos() {
-            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Ativo);
+        public int QtPaginasClientesAtivos(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
-        public int QtPaginasClientesInativos() {
-            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Inativo);
+        public int QtPaginasClientesInativos(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public bool Duplicata(PessoaFisica cliente) {
@@ -278,44 +270,36 @@ namespace API_BUSESCONTROL.Repository
                 .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente não encontrado!");
         }
 
-        public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, bool statusPagina) {
-            if (statusPagina) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaJuridica
-                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                    .Where(x => x.Status == ClienteStatus.Ativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
-            int indice = (paginaAtual - 2) * 10;
+        public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaJuridica
-                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                .Where(x => x.Status == ClienteStatus.Ativo).Skip(indice).Take(10).ToList();
+                   .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                   .Where(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
-        public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, bool statusPagina) {
-            if (statusPagina) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.PessoaJuridica
-                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                    .Where(x => x.Status == ClienteStatus.Inativo).Skip(indiceInicial).Take(10).ToList();
-            }
-            if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
-            int indice = (paginaAtual - 2) * 10;
+        public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaJuridica
-                .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                .Where(x => x.Status == ClienteStatus.Inativo).Skip(indice).Take(10).ToList();
+                   .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
+                   .Where(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
-        public int QtPaginasClientesAtivosPJ() {
-            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Ativo);
+        public int QtPaginasClientesAtivosPJ(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
-        public int QtPaginasClientesInativosPJ() {
-            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Inativo);
+        public int QtPaginasClientesInativosPJ(string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
+            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public PessoaJuridica PessoaJuridicaTrim(PessoaJuridica value) {

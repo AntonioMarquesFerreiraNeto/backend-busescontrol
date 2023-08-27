@@ -3,13 +3,13 @@ using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Tracing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Administrador")]
     public class RelatorioController : ControllerBase {
         
         private readonly IRelatorioRepository _relatorioRepository;

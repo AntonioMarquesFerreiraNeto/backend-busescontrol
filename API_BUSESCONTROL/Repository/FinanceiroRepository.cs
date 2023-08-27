@@ -269,7 +269,7 @@ namespace API_BUSESCONTROL.Repository {
         }
 
 
-        public ClientesContrato ConfirmarImpressaoPdf(ClientesContrato clientesContrato) {
+        public ClientesContrato ConfirmarImpressaoPdfRescisao(ClientesContrato clientesContrato) {
             ClientesContrato clientesContratoDB = _bancoContext.ClientesContrato.FirstOrDefault(x => x.Id == clientesContrato.Id);
             clientesContratoDB!.ProcessRescisao = ProcessRescendir.PdfBaixado;
             clientesContratoDB.DataEmissaoPdfRescisao = DateTime.Now.Date;
@@ -303,9 +303,9 @@ namespace API_BUSESCONTROL.Repository {
                 return null!;
             }
         }
-        public Financeiro RescisaoContrato(Financeiro financeiro) {
+        public Financeiro RescisaoContrato(int contratoId, int clienteId) {
             try {
-                if (financeiro == null) throw new Exception("Desculpe, ID não foi encontrado!");
+                Financeiro financeiro = GetFinanceiroByContratoIdAndClienteId(contratoId, clienteId);
                 if (financeiro.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada)) {
                     throw new Exception("Cliente tem parcelas atrasadas neste contrato!");
                 }
@@ -346,6 +346,16 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(erro.Message);
             }
         }
+        public Financeiro GetFinanceiroByContratoIdAndClienteId(int contratoId, int clienteId) {
+            return _bancoContext.Financeiro
+                .Include(x => x.Parcelas)
+                .Include(x => x.Contrato)
+                .Include(x => x.PessoaFisica)
+                .Include(x => x.PessoaJuridica)
+                .AsNoTracking()      
+                .FirstOrDefault(x => x.ContratoId == contratoId && (x.PessoaFisicaId == clienteId || x.PessoaJuridicaId == clienteId)) ?? throw new Exception("Desculpe, nenhum registro encontrado!");
+        }
+
         public void TaskMonitorPdfRescisao() {
             List<ClientesContrato> clientesContratos = _bancoContext.ClientesContrato.ToList();
             DateTime dataAtual = DateTime.Now.Date;
@@ -468,7 +478,7 @@ namespace API_BUSESCONTROL.Repository {
                 case FiltroFinanceiro.Todos:
                     return _bancoContext.Financeiro
                        .OrderByDescending(x => x.Id)
-                       .Where(x => x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa))
+                       .Where(x => x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa))
                             .Include(x => x.Contrato)
                             .Include(x => x.PessoaFisica)
                             .Include(x => x.PessoaJuridica)
@@ -525,7 +535,7 @@ namespace API_BUSESCONTROL.Repository {
             var qtFinanceiro = 1;
             switch (filtro) {
                 case FiltroFinanceiro.Todos:
-                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa));
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa));
                     break;
                 case FiltroFinanceiro.Contrato:
                     qtFinanceiro = _bancoContext.Financeiro.Count(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa) || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)));

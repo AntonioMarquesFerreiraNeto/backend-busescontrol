@@ -1,8 +1,7 @@
 ﻿using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.CodeDom.Compiler;
 
 namespace API_BUSESCONTROL.Controllers
 {
@@ -17,6 +16,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public IActionResult CreateFuncionario(Funcionario funcionario) {
             try {
                 if (ModelState.IsValid) {
@@ -31,6 +31,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpGet("PaginateAtivos/{paginaAtual}/{pesquisa?}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult GetFuncionariosAtivosPaginate(int paginaAtual = 1, string? pesquisa = "") {
             List<Funcionario> list = _funcionarioRepository.PaginateListAtivos(paginaAtual, pesquisa);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
@@ -42,6 +43,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpGet("PaginateInativos/{paginaAtual}/{pesquisa?}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult GetFuncionariosInativosPaginate(int paginaAtual = 1, string? pesquisa = "") {
             List<Funcionario> list = _funcionarioRepository.PaginateListInativos(paginaAtual, pesquisa);
             list = list.Select(item => { item.Telefone = item.ReturnTelefoneFuncionario(); return item; }).ToList();
@@ -53,6 +55,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult GetFuncionarioById(int? id) {
             try {
                 Funcionario funcionario = _funcionarioRepository.GetFuncionarioById(id);
@@ -64,6 +67,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Administrador")]
         public IActionResult UpdateFuncionario(Funcionario funcionario) {
             try {
                 if (ModelState.IsValid) {
@@ -78,6 +82,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpPatch("InativarFuncionario/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult InativarFuncionario(int? id) {
             try {
                 _funcionarioRepository.InativarFuncionario(id);
@@ -89,6 +94,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpPatch ("AtivarFuncionario/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult AtivarFuncionario(int? id) {
             try {
                 _funcionarioRepository.AtivarFuncionario(id);
@@ -100,6 +106,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpPatch("InativarUsuario/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult InativarUsuario(int? id) {
             try {
                 _funcionarioRepository.InativarUsuario(id);
@@ -110,6 +117,7 @@ namespace API_BUSESCONTROL.Controllers
             }
         }
         [HttpPatch("AtivarUsuario/{id}")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult AtivarUsuario(int? id) {
             try {
                 _funcionarioRepository.AtivarUsuario(id);
@@ -121,6 +129,7 @@ namespace API_BUSESCONTROL.Controllers
         }
 
         [HttpGet("MotoristasVinculacao")]
+        [Authorize(Roles = "Assistente, Administrador")]
         public IActionResult GetMotoristasAll() {
             var list = _funcionarioRepository.GetAllMotoristas();
             return Ok(list);

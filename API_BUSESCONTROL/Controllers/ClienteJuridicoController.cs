@@ -1,5 +1,6 @@
 ﻿using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace API_BUSESCONTROL.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Assistente, Administrador")]
     public class ClienteJuridicoController : ControllerBase {
 
         private readonly IClienteRepository _clienteRepository;
@@ -15,24 +17,24 @@ namespace API_BUSESCONTROL.Controllers
             _clienteRepository = clienteRepository;
         }
 
-        [HttpGet("Ativos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetClientesAtivos(int paginaAtual, bool statusPaginacao) {
-            List<PessoaJuridica> list = _clienteRepository.GetClientesAtivosPJ(paginaAtual, statusPaginacao);
+        [HttpGet("Ativos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetClientesAtivos(int paginaAtual = 1, string? pesquisa = "") {
+            List<PessoaJuridica> list = _clienteRepository.GetClientesAtivosPJ(paginaAtual, pesquisa);
             list = list.Select(x => { x.Telefone = x.ReturnTelefoneCliente(); return x; }).ToList();
             var response = new {
                 clienteList = list,
-                qtPaginas = _clienteRepository.QtPaginasClientesAtivosPJ()
+                qtPaginas = _clienteRepository.QtPaginasClientesAtivosPJ(pesquisa)
             };
             return Ok(response);
         }
 
-        [HttpGet("Inativos/{paginaAtual}/{statusPaginacao}")]
-        public IActionResult GetClientesInativos(int paginaAtual, bool statusPaginacao) {
-            List<PessoaJuridica> list = _clienteRepository.GetClientesInativosPJ(paginaAtual, statusPaginacao);
+        [HttpGet("Inativos/{paginaAtual}/{pesquisa?}")]
+        public IActionResult GetClientesInativos(int paginaAtual = 1, string? pesquisa = "") {
+            List<PessoaJuridica> list = _clienteRepository.GetClientesInativosPJ(paginaAtual, pesquisa);
             list = list.Select(x => { x.Telefone = x.ReturnTelefoneCliente(); return x; }).ToList();
             var response = new {
                 clienteList = list,
-                qtPaginas = _clienteRepository.QtPaginasClientesInativosPJ()
+                qtPaginas = _clienteRepository.QtPaginasClientesInativosPJ(pesquisa)
             };
             return Ok(response);
         }

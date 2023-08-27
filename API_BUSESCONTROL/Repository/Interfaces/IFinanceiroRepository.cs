@@ -9,14 +9,14 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public Parcela ListarFinanceiroPorId(int id);
         public Parcela ContabilizarParcela(int id);
         public Contrato ListarJoinPorId(int id);
-        public Financeiro RescisaoContrato(Financeiro financeiro);
+        public Financeiro RescisaoContrato(int contratoId, int clienteId);
         public Financeiro AdicionarLancamento(Financeiro financeiro);
         public Financeiro EditarLancamento(Financeiro financeiro);
         public Financeiro InativarReceitaOrDespesa(int id);
         public void TaskMonitorParcelas();
         public void TaskMonitorParcelasLancamento();
         public void TaskMonitorPdfRescisao();
-        public ClientesContrato ConfirmarImpressaoPdf(ClientesContrato clientesContrato);
+        public ClientesContrato ConfirmarImpressaoPdfRescisao(ClientesContrato clientesContrato);
         public Financeiro ListFinanceiroPorContratoAndClientesContrato(int? id);
         public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro);
         public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro);

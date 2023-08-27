@@ -156,74 +156,108 @@ namespace API_BUSESCONTROL.Repository {
                 .Where(x => x.StatusContrato == ContratoStatus.Inativo).ToList();
         }
 
-        public List<Contrato> GetContratosAtivos(int paginaAtual, bool statusPag) {
-            if (statusPag) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Contrato
-               .Where(x => x.StatusContrato == ContratoStatus.Ativo)
-               .OrderByDescending(x => x.Id)
-               .Skip(indiceInicial).Take(10)
-               .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
-               .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
-               .Include(x => x.Motorista)
-               .Include(x => x.Onibus)
-               .AsNoTracking()
-               .ToList();
+        public List<Contrato> GetContratosAtivos(int paginaAtual, FiltroContrato filtro, string pesquisa) {
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
+            switch (filtro) {
+                case FiltroContrato.Todos:
+                    return _bancoContext.Contrato
+                                .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Id.ToString().Contains(pesquisa))
+                                .OrderByDescending(x => x.Id)
+                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.Motorista)
+                                .Include(x => x.Onibus)
+                                .AsNoTracking()
+                                .ToList();
+                case FiltroContrato.Aguardando:
+                    return _bancoContext.Contrato
+                                .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Aguardando && x.Id.ToString().Contains(pesquisa))
+                                .OrderByDescending(x => x.Id)
+                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.Motorista)
+                                .Include(x => x.Onibus)
+                                .AsNoTracking()
+                                .ToList();
+                case FiltroContrato.EmAndamento:
+                    return _bancoContext.Contrato
+                                .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.EmAndamento && x.Id.ToString().Contains(pesquisa))
+                                .OrderByDescending(x => x.Id)
+                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.Motorista)
+                                .Include(x => x.Onibus)
+                                .AsNoTracking()
+                                .ToList();
+                case FiltroContrato.Encerrado:
+                    return _bancoContext.Contrato
+                                .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Encerrado && x.Id.ToString().Contains(pesquisa))
+                                .OrderByDescending(x => x.Id)
+                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.Motorista)
+                                .Include(x => x.Onibus)
+                                .AsNoTracking()
+                                .ToList();
+                default:
+                    return _bancoContext.Contrato
+                                .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Aprovacao == (StatusAprovacao)filtro && x.Id.ToString().Contains(pesquisa))
+                                .OrderByDescending(x => x.Id)
+                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                                .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.Motorista)
+                                .Include(x => x.Onibus)
+                                .AsNoTracking()
+                                .ToList();
+
             }
-            else {
-                if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
-                int indice = (paginaAtual - 2) * 2;
-                return _bancoContext.Contrato
-                    .Where(x => x.StatusContrato == ContratoStatus.Ativo)
-                    .OrderByDescending(x => x.Id)
-                    .Skip(indice).Take(10)
-                    .AsNoTracking().Include(x => x.Motorista)
-                    .AsNoTracking().Include(x => x.Onibus)
-                    .AsNoTracking()
-                    .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
-                    .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
-                    .AsNoTracking()
-                    .ToList();
-            }
+
         }
-        public int ReturnQtPaginasAtivos() {
-            int qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo);
+        public int ReturnQtPaginasAtivos(FiltroContrato filtro, string pesquisa) {
+            var qtItens = 0;
+            switch (filtro) {
+                case FiltroContrato.Todos:
+                    qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Id.ToString().Contains(pesquisa));
+                    break;
+                case FiltroContrato.Aguardando:
+                    qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Aguardando && x.Id.ToString().Contains(pesquisa));
+                    break;
+                case FiltroContrato.EmAndamento: 
+                           qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.EmAndamento && x.Id.ToString().Contains(pesquisa));
+                    break;
+                case FiltroContrato.Encerrado:
+                    qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Encerrado && x.Id.ToString().Contains(pesquisa));
+                    break;
+                default:
+                    qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Aprovacao == (StatusAprovacao)filtro && x.Id.ToString().Contains(pesquisa));
+                    break;
+            }
             int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
-        public List<Contrato> GetContratosInativos(int paginaAtual, bool statusPag) {
-            if (statusPag) {
-                int indiceInicial = (paginaAtual - 1) * 10;
-                return _bancoContext.Contrato
-               .Where(x => x.StatusContrato == ContratoStatus.Inativo)
-               .OrderByDescending(x => x.Id)
-               .Skip(indiceInicial).Take(10)
-               .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaFisica)
-               .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
-               .AsNoTracking().Include(x => x.Motorista)
-               .AsNoTracking().Include(x => x.Onibus)
-               .ToList();
-            }
-            else {
-                if (paginaAtual < 2) throw new Exception("Desculpe, ação inválida!");
-                int indice = (paginaAtual - 2) * 2;
-
-                return _bancoContext.Contrato
-                    .Where(x => x.StatusContrato == ContratoStatus.Inativo)
-                    .OrderByDescending(x => x.Id)
-                    .Skip(indice).Take(10)
-                    .AsNoTracking().Include(x => x.Motorista)
-                    .AsNoTracking().Include(x => x.Onibus)
-                    .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaFisica)
-                    .AsNoTracking().Include(x => x.ClientesContrato)!.ThenInclude(x => x.PessoaJuridica)
-                    .ToList();
-            }
+        public List<Contrato> GetContratosInativos(int paginaAtual, string pesquisa) {
+            if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
+            return _bancoContext.Contrato
+              .Where(x => x.StatusContrato == ContratoStatus.Inativo && x.Id.ToString().Contains(pesquisa))
+              .OrderByDescending(x => x.Id)
+              .Skip((paginaAtual - 1) * 10).Take(10)
+              .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+              .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+              .Include(x => x.Motorista)
+              .Include(x => x.Onibus)
+              .AsNoTracking()
+              .ToList();
         }
-        public int ReturnQtPaginasInativos() {
-            int qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Inativo);
+        public int ReturnQtPaginasInativos(string pesquisa) {
+            int qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Inativo && x.Id.ToString().Contains(pesquisa));
             int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
-            return qtPaginas;
+            return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public Contrato AtivarContrato(int id) {

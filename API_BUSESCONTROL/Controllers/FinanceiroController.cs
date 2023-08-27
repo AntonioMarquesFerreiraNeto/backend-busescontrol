@@ -2,15 +2,16 @@
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Mvc;
 using Font = iTextSharp.text.Font;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Administrador")]
     public class FinanceiroController : ControllerBase {
 
         private readonly IFinanceiroRepository _financeiroRepository;

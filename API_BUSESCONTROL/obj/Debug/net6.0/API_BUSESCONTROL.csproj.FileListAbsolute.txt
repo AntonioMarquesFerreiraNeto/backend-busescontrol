@@ -52,3 +52,11 @@ C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\M
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.Drawing.Common.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Debug\net6.0\System.Security.Permissions.dll

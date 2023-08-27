@@ -69,7 +69,7 @@ namespace API_BUSESCONTROL.Models {
 
         public string? Apelido { get; set; }
 
-        public string? Senha { get; set; }
+        public string? Senha { get;  set; }
 
         public FuncionarioStatus Status { get; set; }
 
@@ -96,7 +96,7 @@ namespace API_BUSESCONTROL.Models {
             Random random = new Random();
 
             int rdn = random.Next(2);
-            int tamanhoSenha = (rdn == 0) ? 8 : 10;
+            int tamanhoSenha = (rdn == 0) ? 14 : 16;
 
             string caixaCaracteres = "ABCDEFGHIJKLNOPQIWYZK" + "ABCDEFGHIJKLNOPQIWYZK".ToLower() + "@#$%&*!" + "123456789";
             StringBuilder senhaUser = new StringBuilder();
@@ -117,6 +117,10 @@ namespace API_BUSESCONTROL.Models {
         }
         public string ReturnCpfFuncionario() {
             return $"{Convert.ToUInt64(Cpf):000\\.000\\.000\\-00}";
+        }
+
+        public bool VerificarSenha(string senha) {
+            return (senha.GerarHash() == Senha) ? true : false;
         }
     }
 }

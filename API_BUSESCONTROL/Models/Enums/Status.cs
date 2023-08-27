@@ -97,4 +97,14 @@
         Todos = 4
     }
 
+    public enum FiltroContrato : int {
+        EmAnalise = 0,
+        Negado = 1,
+        Aprovado = 2,
+        Aguardando = 3,
+        EmAndamento = 4,
+        Encerrado = 5,
+        Todos = 6
+    }
+
 }

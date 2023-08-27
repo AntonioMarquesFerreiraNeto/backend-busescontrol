@@ -10,12 +10,12 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public PessoaFisica InativarCliente(int? id);
         public PessoaFisica AtivarCliente(int? id);
         public PessoaFisica GetClienteFisicoById(int? id);
-        public List<PessoaFisica> GetClientesAtivos(int paginaAtual, bool statusPagina);
-        public List<PessoaFisica> GetClientesInativos(int paginaAtual, bool statusPagina);
+        public List<PessoaFisica> GetClientesAtivos(int paginaAtual, string pesquisa);
+        public List<PessoaFisica> GetClientesInativos(int paginaAtual, string pesquisa);
         public List<PessoaFisica> GetClientesParaVinculacao();
         public List<PessoaFisica> GetClientesAdimplentes();
-        public int QtPaginasClientesAtivos();
-        public int QtPaginasClientesInativos();
+        public int QtPaginasClientesAtivos(string pesquisa);
+        public int QtPaginasClientesInativos(string pesquisa);
         public PessoaFisica ClienteResponsavel(int id);
 
         //Services dos clientes PJ.
@@ -24,10 +24,10 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public PessoaJuridica InativarClientePJ(int? id);
         public PessoaJuridica AtivarClientePJ(int? id);
         public PessoaJuridica GetClienteByIdPJ(int? id);
-        public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, bool statusPagina);
-        public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, bool statusPagina);
+        public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, string pesquisa);
+        public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, string pesquisa);
         public List<PessoaJuridica> GetClientesParaVinculacaoPJ();
-        public int QtPaginasClientesAtivosPJ();
-        public int QtPaginasClientesInativosPJ();
+        public int QtPaginasClientesAtivosPJ(string pesquisa);
+        public int QtPaginasClientesInativosPJ(string pesquisa);
     }
 }
