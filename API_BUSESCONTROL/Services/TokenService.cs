@@ -18,7 +18,7 @@ namespace API_BUSESCONTROL.Services {
                     new Claim(ClaimTypes.Email, funcionario.Email),
                     new Claim(ClaimTypes.DateOfBirth, funcionario.DataNascimento!.Value.ToString("dd/MM/yyyy"))
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(4),
+                Expires = DateTime.UtcNow.AddHours(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescricao);
