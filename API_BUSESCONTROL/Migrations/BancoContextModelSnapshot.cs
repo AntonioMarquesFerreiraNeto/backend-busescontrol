@@ -335,6 +335,9 @@ namespace API_BUSESCONTROL.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
 
+                    b.Property<string>("ChaveRedefinition")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Cidade")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -632,7 +635,7 @@ namespace API_BUSESCONTROL.Migrations
                         .HasForeignKey("ContratoId");
 
                     b.HasOne("API_BUSESCONTROL.Models.Fornecedor", "Fornecedor")
-                        .WithMany()
+                        .WithMany("Financeiros")
                         .HasForeignKey("FornecedorId");
 
                     b.HasOne("API_BUSESCONTROL.Models.PessoaFisica", "PessoaFisica")
@@ -694,6 +697,11 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
                 {
                     b.Navigation("Parcelas");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Fornecedor", b =>
+                {
+                    b.Navigation("Financeiros");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>

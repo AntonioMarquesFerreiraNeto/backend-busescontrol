@@ -71,6 +71,8 @@ namespace API_BUSESCONTROL.Models {
 
         public string? Senha { get;  set; }
 
+        public string? ChaveRedefinition { get; set; }
+
         public FuncionarioStatus Status { get; set; }
 
         public CargoFuncionario Cargo { get; set; }
@@ -112,6 +114,10 @@ namespace API_BUSESCONTROL.Models {
             Senha = Senha.GerarHash();
         }
 
+        public void SetNewPasswordHash(string senha) {
+            Senha = senha.GerarHash();
+        }
+
         public string ReturnTelefoneFuncionario() {
             return $"{long.Parse(Telefone).ToString(@"00000-0000")}";
         }
@@ -121,6 +127,17 @@ namespace API_BUSESCONTROL.Models {
 
         public bool VerificarSenha(string senha) {
             return (senha.GerarHash() == Senha) ? true : false;
+        }
+
+        public void GerarChaveRedefinition() {
+            Random random = new Random();
+            string caixaChar = "5BWwaZ6YyB6lPG48pY411DWjgQzkfDcLbNZWOI385iwEYoFD6kLFqLl3ggh3j7olD4b";
+            string chave = "";
+            for (int c = 0; c < 60; c++) {
+                int indiceChar = random.Next(0, caixaChar.Length - 1);
+                chave += caixaChar[indiceChar];
+            }
+            ChaveRedefinition = chave;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace API_BUSESCONTROL.Repository
                 if (Duplicata(funcionario)) throw new Exception("Funcionário já se encontra registrado!");
                 funcionario = TrimFuncionario(funcionario);
                 if (funcionario.Cargo != CargoFuncionario.Motorista) {
+                    funcionario.GerarChaveRedefinition();
                     funcionario.Senha = funcionario.GerarSenha();
                     if (!EnviarSenha(funcionario)) throw new Exception("Desculpe, não conseguimos enviar o e-mail com a senha.");
                     funcionario.setPasswordHash();
