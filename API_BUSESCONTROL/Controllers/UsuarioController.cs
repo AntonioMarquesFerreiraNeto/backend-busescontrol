@@ -77,6 +77,7 @@ namespace API_BUSESCONTROL.Controllers {
         }
 
         [HttpPut("AlterarSenha")]
+        [Authorize]
         public IActionResult AlterarSenha(AlterarSenha alterarSenha) {
             try {
                 if (ModelState.IsValid) {

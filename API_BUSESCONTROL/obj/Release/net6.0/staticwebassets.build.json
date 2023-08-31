@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "tdAIwEmqcyFwen2BJPM+tjKsKyx9KBc4rgoQIp89zJI=",
+  "Source": "API_BUSESCONTROL",
+  "BasePath": "_content/API_BUSESCONTROL",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

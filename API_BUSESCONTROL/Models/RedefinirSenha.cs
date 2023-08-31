@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using API_BUSESCONTROL.Models.ValidationsModels.Pessoas;
+using System.ComponentModel.DataAnnotations;
 
 namespace API_BUSESCONTROL.Models {
     public class RedefinirSenha {
@@ -7,6 +8,7 @@ namespace API_BUSESCONTROL.Models {
         public string ChaveRedefinition { get; set; }
 
         [Required (ErrorMessage = "Obrigatório!")]
+        [ValidationSenha(ErrorMessage = "Senha fraca!")]
         public string NovaSenha { get; set; }
 
         [Required(ErrorMessage = "Obrigatório!")]

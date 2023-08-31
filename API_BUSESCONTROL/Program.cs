@@ -71,11 +71,10 @@ namespace API_BUSESCONTROL
             }
 
             //Aceitando solicitações http rest full de qualquer origem
-            app.UseCors(options => {
-                options.WithOrigins("http://localhost:4200") // Substitua pelo domínio do seu aplicativo
-                       .AllowAnyMethod() // Permitir todos os métodos HTTP (GET, POST, etc.)
-                       .AllowAnyHeader() // Permitir todos os cabeçalhos
-                       .AllowCredentials(); // Permitir envio de credenciais (por exemplo, cookies)
+            app.UseCors(x => {
+                x.AllowAnyOrigin();
+                x.AllowAnyMethod();
+                x.AllowAnyHeader();
             });
 
             app.UseHttpsRedirection();

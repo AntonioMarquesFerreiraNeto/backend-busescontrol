@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using API_BUSESCONTROL.Models.ValidationsModels.Pessoas;
+using System.ComponentModel.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace API_BUSESCONTROL.Models {
     public class AlterarSenha {
@@ -10,6 +12,7 @@ namespace API_BUSESCONTROL.Models {
         public string SenhaAtual { get; set; }
 
         [Required(ErrorMessage = "Obrigatório!")]
+        [ValidationSenha(ErrorMessage = "Senha fraca!")]
         public string NewSenha { get; set; }
 
         [Required(ErrorMessage = "Obrigatório!")]

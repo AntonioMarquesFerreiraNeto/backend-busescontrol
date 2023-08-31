@@ -427,7 +427,7 @@ namespace API_BUSESCONTROL.Controllers {
 
                 string titulo_contratada = $"CONTRATADA:";
                 string textoContratada = $"{titulo_contratada}\nBuss viagens LTDA, pessoa jurídica de direito privado para prestação de serviço, na proteção da LEI Nº 13.429º. " +
-                    $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 03.115.484/0001-02, sobre a liderança do sócio fundador Manoel Rodrigues." +
+                    $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 02.116.484/0001-02, sobre a liderança do sócio fundador Manoel Hamilton Rodrigues." +
                     $" Neste ato representada como  a empresa responsável pela realização da prestações de serviços do contrato.\n\n\n";
 
                 string titulo_primeira_clausula = $"1 — CLÁUSULA PRIMEIRA";
@@ -456,7 +456,7 @@ namespace API_BUSESCONTROL.Controllers {
                 string SextaClausula = $"{titulo_sexta_clausula} \nO período da prestação do serviço será de  {ReturnPeriodoContrato(contrato)}, que é a data acordada no registro do contrato.\n\n\n";
 
                 string titulo_setima_clausula = $"7 — CLÁUSULA SÉTIMA";
-                string SetimaClausula = $"{titulo_setima_clausula}\nO CONTRATANTE fica ciente que somente será permitido o transporte de passageiros limitados à capacidade de passageiros sentados no(s) veículo(s) utilizado(s), ficando expressamente proibido o transporte de passageiros em pé ou acomodados no corredor, bem como passageiros que não estiverem constando na relação autorizada pela ANTT.\n\n\n";
+                string SetimaClausula = $"{titulo_setima_clausula}\nO contratante fica ciente que somente será permitido o transporte de passageiros limitados à capacidade de passageiros sentados no(s) veículo(s) utilizado(s), ficando expressamente proibido o transporte de passageiros em pé ou acomodados no corredor, bem como passageiros que não estiverem constando na relação autorizada pela ANTT.\n\n\n";
 
                 string traco = "\n___________________________________________\n";
                 string assinaturaCliente = "Assinatura do representante legal contratante\n\n";
