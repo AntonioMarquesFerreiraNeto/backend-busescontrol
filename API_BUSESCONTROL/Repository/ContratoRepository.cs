@@ -266,7 +266,7 @@ namespace API_BUSESCONTROL.Repository {
 
         public Contrato InativarContrato(int id) {
             Contrato contratoDB = _bancoContext.Contrato.FirstOrDefault(x => x.Id == id);
-            if (contratoDB!.Aprovacao == StatusAprovacao.Aprovado) throw new Exception("Não é possível inativar contratos em andamento.");
+            if (contratoDB!.Aprovacao == StatusAprovacao.Aprovado) throw new Exception("Não é possível inativar contratos aprovados.");
             contratoDB.StatusContrato = ContratoStatus.Inativo;
             _bancoContext.Contrato.Update(contratoDB);
             _bancoContext.SaveChanges();

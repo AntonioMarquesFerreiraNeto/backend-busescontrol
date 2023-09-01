@@ -98,7 +98,6 @@ namespace API_BUSESCONTROL.Controllers {
 
         [HttpGet("GetContratosAtivos/{paginaAtual}/{filtro}/{pesquisa?}")]
         public IActionResult GetContratosAtivos(int paginaAtual = 1, FiltroContrato filtro = FiltroContrato.Todos, string? pesquisa = "") {
-            _financeiroRepository.TaskMonitorPdfRescisao();
             List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, filtro, pesquisa);
             var response = new {
                 contractList = contratos,
@@ -521,7 +520,7 @@ namespace API_BUSESCONTROL.Controllers {
                 Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 12, Font.NORMAL));
                 paragrafoCenter.Alignment = Element.ALIGN_CENTER;
 
-                var caminhoImgLeft = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "C:\\Antonio\\Faculdade\\Sétimo período\\BusesControl--TCC-master\\BusesControl\\wwwroot\\css\\Imagens\\LogoPdf.jpeg");
+                var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
                 if (caminhoImgLeft != null) {
                     Image logo = Image.GetInstance(caminhoImgLeft);
                     float razaoImg = logo.Width / logo.Height;

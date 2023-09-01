@@ -79,8 +79,6 @@ namespace API_BUSESCONTROL.Controllers {
         public IActionResult ListarFinanceiro(int pageNumber = 1, FiltroFinanceiro filtro = FiltroFinanceiro.Todos, string? pesquisa = "") {
             try {
                 var list = _financeiroRepository.GetPaginationAndFiltro(pageNumber, pesquisa,  filtro);
-                _financeiroRepository.TaskMonitorParcelas();
-                _financeiroRepository.TaskMonitorParcelasLancamento();
 
                 var data = new {
                     listFinanceiro = list,

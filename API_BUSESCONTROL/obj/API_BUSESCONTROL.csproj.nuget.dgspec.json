@@ -53,6 +53,14 @@
               "target": "Package",
               "version": "[2.20.0, )"
             },
+            "Hangfire": {
+              "target": "Package",
+              "version": "[1.8.5, )"
+            },
+            "Hangfire.MemoryStorage": {
+              "target": "Package",
+              "version": "[1.8.0, )"
+            },
             "Microsoft.AspNetCore.Authentication": {
               "target": "Package",
               "version": "[2.1.0, )"

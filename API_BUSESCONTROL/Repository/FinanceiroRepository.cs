@@ -309,6 +309,9 @@ namespace API_BUSESCONTROL.Repository {
                 if (financeiro.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada)) {
                     throw new Exception("Cliente tem parcelas atrasadas neste contrato!");
                 }
+                if (_bancoContext.Contrato.Any(x => x.Id == contratoId && x.Andamento == Andamento.Encerrado)) {
+                    throw new Exception("O contrato está encerrado, portanto não pode realizar a rescisão!");
+                }
                 foreach (var parcela in financeiro.Parcelas) {
                     _bancoContext.Parcela.Remove(parcela);
                 }
