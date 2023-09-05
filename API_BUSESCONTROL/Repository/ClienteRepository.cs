@@ -86,7 +86,7 @@ namespace API_BUSESCONTROL.Repository {
             PessoaFisica cliente = _bancoContext.PessoaFisica
                 .Include(x => x.Financeiros)
                 .AsNoTracking()
-                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente encontrado!");
+                .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, cliente não encontrado!");
             return cliente;
         }
 

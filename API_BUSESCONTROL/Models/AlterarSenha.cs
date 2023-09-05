@@ -12,6 +12,7 @@ namespace API_BUSESCONTROL.Models {
         public string SenhaAtual { get; set; }
 
         [Required(ErrorMessage = "Obrigatório!")]
+        [MinLength(12, ErrorMessage = "Senha menor que 12 caracter!")]
         [ValidationSenha(ErrorMessage = "Senha fraca!")]
         public string NewSenha { get; set; }
 
