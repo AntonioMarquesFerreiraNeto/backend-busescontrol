@@ -524,6 +524,37 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("Rescisao");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.SubContratoMotorista", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContratoId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataFinal")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DataInicial")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("FuncionarioId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContratoId");
+
+                    b.HasIndex("FuncionarioId");
+
+                    b.ToTable("SubContratoMotorista");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
                 {
                     b.HasBaseType("API_BUSESCONTROL.Models.Cliente");
@@ -685,6 +716,25 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("PessoaJuridica");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.SubContratoMotorista", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
+                        .WithMany("SubContratoMotoristas")
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API_BUSESCONTROL.Models.Funcionario", "Funcionario")
+                        .WithMany("SubContratoMotoristas")
+                        .HasForeignKey("FuncionarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("Funcionario");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
                 {
                     b.Navigation("ClientesContrato");
@@ -692,6 +742,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("Financeiros");
 
                     b.Navigation("Rescisoes");
+
+                    b.Navigation("SubContratoMotoristas");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
@@ -707,6 +759,8 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
                 {
                     b.Navigation("Contratos");
+
+                    b.Navigation("SubContratoMotoristas");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Onibus", b =>

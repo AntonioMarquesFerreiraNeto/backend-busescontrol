@@ -21,5 +21,8 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public ClientesContrato GetClientesContratoById(int id);
         public int ReturnQtPaginasAtivos(FiltroContrato filtro, string pesquisa);
         public int ReturnQtPaginasInativos(string pesquisa);
+        public Contrato CreateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);
+        public Contrato UpdateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);
+        public Contrato DeleteMotoristaSubstituto(int id);
     }
 }

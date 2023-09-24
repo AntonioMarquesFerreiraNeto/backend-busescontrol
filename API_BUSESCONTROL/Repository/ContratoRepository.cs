@@ -126,6 +126,7 @@ namespace API_BUSESCONTROL.Repository {
                 .Include(x => x.Onibus)
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
+                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                 .AsNoTracking()
                 .FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, contrato não encontrado!");
         }
@@ -166,6 +167,7 @@ namespace API_BUSESCONTROL.Repository {
                                 .Skip((paginaAtual - 1) * 10).Take(10)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                                 .Include(x => x.Motorista)
                                 .Include(x => x.Onibus)
                                 .AsNoTracking()
@@ -177,6 +179,7 @@ namespace API_BUSESCONTROL.Repository {
                                 .Skip((paginaAtual - 1) * 10).Take(10)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                                 .Include(x => x.Motorista)
                                 .Include(x => x.Onibus)
                                 .AsNoTracking()
@@ -188,6 +191,7 @@ namespace API_BUSESCONTROL.Repository {
                                 .Skip((paginaAtual - 1) * 10).Take(10)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                                 .Include(x => x.Motorista)
                                 .Include(x => x.Onibus)
                                 .AsNoTracking()
@@ -199,6 +203,7 @@ namespace API_BUSESCONTROL.Repository {
                                 .Skip((paginaAtual - 1) * 10).Take(10)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                                 .Include(x => x.Motorista)
                                 .Include(x => x.Onibus)
                                 .AsNoTracking()
@@ -210,6 +215,7 @@ namespace API_BUSESCONTROL.Repository {
                                 .Skip((paginaAtual - 1) * 10).Take(10)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+                                .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
                                 .Include(x => x.Motorista)
                                 .Include(x => x.Onibus)
                                 .AsNoTracking()
@@ -227,8 +233,8 @@ namespace API_BUSESCONTROL.Repository {
                 case FiltroContrato.Aguardando:
                     qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Aguardando && x.Id.ToString().Contains(pesquisa));
                     break;
-                case FiltroContrato.EmAndamento: 
-                           qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.EmAndamento && x.Id.ToString().Contains(pesquisa));
+                case FiltroContrato.EmAndamento:
+                    qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.EmAndamento && x.Id.ToString().Contains(pesquisa));
                     break;
                 case FiltroContrato.Encerrado:
                     qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Encerrado && x.Id.ToString().Contains(pesquisa));
@@ -249,6 +255,7 @@ namespace API_BUSESCONTROL.Repository {
               .Skip((paginaAtual - 1) * 10).Take(10)
               .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
               .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
+              .Include(x => x.SubContratoMotoristas).ThenInclude(x => x.Funcionario)
               .Include(x => x.Motorista)
               .Include(x => x.Onibus)
               .AsNoTracking()
@@ -357,6 +364,37 @@ namespace API_BUSESCONTROL.Repository {
             _bancoContext.Contrato.Update(contratoDB);
             _bancoContext.SaveChanges();
             return contratoDB;
+        }
+
+        public Contrato CreateMotoristaSubstituto(SubContratoMotorista subContratoMotorista) {
+            if (ValDupliMotoristaData(subContratoMotorista)) throw new Exception("Motorista substituto já registrado nessas datas!"); 
+            _bancoContext.SubContratoMotorista.Add(subContratoMotorista);
+            _bancoContext.SaveChanges();
+            return GetContratoById(subContratoMotorista.ContratoId.Value);
+        }
+
+        public Contrato UpdateMotoristaSubstituto(SubContratoMotorista subContratoMotorista) {
+            SubContratoMotorista dataDB = _bancoContext.SubContratoMotorista.FirstOrDefault(x => x.Id == subContratoMotorista.Id) ?? throw new Exception("Nenhum registro encontrado!");
+            dataDB.FuncionarioId = subContratoMotorista.FuncionarioId;
+            dataDB.DataInicial = subContratoMotorista.DataInicial;
+            dataDB.DataFinal = subContratoMotorista.DataFinal;
+            _bancoContext.SubContratoMotorista.Update(dataDB);
+            _bancoContext.SaveChanges();
+            return GetContratoById(dataDB.ContratoId.Value);
+        }
+
+        public Contrato DeleteMotoristaSubstituto(int id) {
+            SubContratoMotorista subContratoMotorista = _bancoContext.SubContratoMotorista.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!");
+            _bancoContext.SubContratoMotorista.Remove(subContratoMotorista);
+            _bancoContext.SaveChanges();
+            return GetContratoById(subContratoMotorista.ContratoId.Value);
+        }
+
+        public bool ValDupliMotoristaData(SubContratoMotorista subContratoMotorista) {
+            if (_bancoContext.SubContratoMotorista.Any(x => x.FuncionarioId == subContratoMotorista.FuncionarioId && x.ContratoId == subContratoMotorista.ContratoId && (subContratoMotorista.DataInicial >= x.DataInicial && subContratoMotorista.DataFinal <= x.DataFinal))) {
+                return true;
+            }
+            return false;
         }
     }
 }
