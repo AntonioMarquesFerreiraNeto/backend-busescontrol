@@ -59,7 +59,9 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<Rescisao>? Rescisoes { get; set; }
 
-        public virtual List<SubContratoMotorista>? SubContratoMotoristas {get; set;}
+        public virtual List<SubContratoMotorista>? SubContratoMotoristas { get; set; }
+
+        public virtual List<SubContratoOnibus>? SubContratoOnibus { get; set; }
 
 
         public void SetValoresParcelas(int qtClientes) {

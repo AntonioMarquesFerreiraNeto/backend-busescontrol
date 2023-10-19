@@ -24,5 +24,8 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public Contrato CreateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);
         public Contrato UpdateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);
         public Contrato DeleteMotoristaSubstituto(int id);
+        public Contrato CreateOnibusSubstituto(SubContratoOnibus subContratoOnibus);
+        public Contrato UpdateOnibusSubstituto(SubContratoOnibus subContratoOnibus);
+        public Contrato DeleteOnibusSubstituto(int id);
     }
 }

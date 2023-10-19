@@ -204,6 +204,48 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
+
+        [HttpPost("NewSubOnibusContrato")]
+        public IActionResult NewSubOnibusContrato([FromBody] SubContratoOnibus subContratoOnibus) {
+            try {
+                if (ModelState.IsValid) {
+                    if (subContratoOnibus.ValidarDates()) return BadRequest("Data final anterior à data inicial!");
+                    var data = _contratoRepository.CreateOnibusSubstituto(subContratoOnibus);
+                    return Ok(data);
+                }
+                return BadRequest(subContratoOnibus);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpPut("UpdateSubOnibusContrato")]
+        public IActionResult UpdateSubOnibusContrato([FromBody] SubContratoOnibus subContratoOnibus) {
+            try {
+                if (ModelState.IsValid) {
+                    if (subContratoOnibus.ValidarDates()) return BadRequest("Data final anterior à data inicial!");
+                    var data = _contratoRepository.UpdateOnibusSubstituto(subContratoOnibus);
+                    return Ok(data);
+                }
+                return BadRequest(subContratoOnibus);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
+        [HttpDelete("DeleteSubOnibusContrato/{id}")]
+        public IActionResult DeleteSubOnibusContrato(int id) {
+            try {
+                var data = _contratoRepository.DeleteOnibusSubstituto(id);
+                return Ok(data);
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+
         [HttpGet("RelatorioExcel/{ativo}")]
         public IActionResult ReturnPlanilhaExcel(bool ativo) {
             try {

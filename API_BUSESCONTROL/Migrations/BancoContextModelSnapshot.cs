@@ -555,6 +555,37 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("SubContratoMotorista");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.SubContratoOnibus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContratoId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataFinal")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DataInicial")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("OnibusId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContratoId");
+
+                    b.HasIndex("OnibusId");
+
+                    b.ToTable("SubContratoOnibus");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>
                 {
                     b.HasBaseType("API_BUSESCONTROL.Models.Cliente");
@@ -733,6 +764,25 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("Contrato");
 
                     b.Navigation("Funcionario");
+                });
+
+            modelBuilder.Entity("API_BUSESCONTROL.Models.SubContratoOnibus", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
+                        .WithMany()
+                        .HasForeignKey("ContratoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API_BUSESCONTROL.Models.Onibus", "Onibus")
+                        .WithMany()
+                        .HasForeignKey("OnibusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contrato");
+
+                    b.Navigation("Onibus");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Contrato", b =>
