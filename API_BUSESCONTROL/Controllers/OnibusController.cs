@@ -1,10 +1,10 @@
 ﻿using API_BUSESCONTROL.Models;
+using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API_BUSESCONTROL.Controllers
-{
+namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Assistente, Administrador")]
@@ -116,8 +116,29 @@ namespace API_BUSESCONTROL.Controllers
 
         [HttpGet("OnibusVinculacao")]
         public IActionResult GetMotoristasAll() {
-            var list = _onibusRepository.GetAll();
+            var list = _onibusRepository.GetAllDisponiveis();
             return Ok(list);
+        }
+
+        [HttpPatch("HabilitarDisponibilidade/{id}")]
+        public IActionResult HabilitarDisponibilidade(int? id) {
+            try {
+                _onibusRepository.HabilitarDisponibilidade(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
+        [HttpPatch("DesabilitarDisponibilidade/{id}")]
+        public IActionResult DesabilitarDisponibilidade(int? id) {
+            try {
+                _onibusRepository.DesabilitarDisponibilidade(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
         }
     }
 }

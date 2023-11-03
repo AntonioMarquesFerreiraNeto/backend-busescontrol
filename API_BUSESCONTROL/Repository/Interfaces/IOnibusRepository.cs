@@ -14,6 +14,9 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<Onibus> PaginateListAtivos(int paginaAtual, string? pesquisa);
         public List<Onibus> PaginateListInativos(int paginaAtual, string? pesquisa);
         public List<Onibus> GetAll();
+        public List<Onibus> GetAllDisponiveis();
         public Onibus GetOnibusById(int? id);
+        public void HabilitarDisponibilidade(int? id);
+        public void DesabilitarDisponibilidade(int? id);
     }
 }

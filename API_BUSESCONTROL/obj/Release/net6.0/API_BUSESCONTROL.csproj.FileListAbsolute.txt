@@ -80,3 +80,4 @@ C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Release\net6.0
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Release\net6.0\tr-TR\Hangfire.Core.resources.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Release\net6.0\zh-TW\Hangfire.Core.resources.dll
 C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Release\net6.0\zh\Hangfire.Core.resources.dll
+C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\bin\Release\net6.0\Swashbuckle.AspNetCore.Annotations.dll

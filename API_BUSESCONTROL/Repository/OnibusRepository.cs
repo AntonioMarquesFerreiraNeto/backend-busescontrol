@@ -29,13 +29,16 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public Onibus GetOnibusById(int? id) {
-            Onibus onibus = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id);
-            if (onibus == null) throw new Exception("Desculpe, ônibus não encontrado!");
+            Onibus onibus = _bancoContext.Onibus.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Desculpe, ônibus não encontrado!");
             return onibus;
         }
 
         public List<Onibus> OnibusAtivosAll() {
             return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).ToList();
+        }
+
+        public List<Onibus> GetAllDisponiveis() {
+            return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo && x.Disponibilidade == Disponibilidade.Disponivel).ToList();
         }
 
         public List<Onibus> OnibusInativosAll() {
@@ -81,6 +84,7 @@ namespace API_BUSESCONTROL.Repository {
                     throw new Exception("Ônibus vinculado em contratos em andamento!");
                 }
                 onibusInativar.StatusOnibus = StatusFrota.Inativo;
+                onibusInativar.Disponibilidade = Disponibilidade.Indisponivel;
                 _bancoContext.Onibus.Update(onibusInativar);
                 _bancoContext.SaveChanges();
                 return onibusInativar;
@@ -141,6 +145,20 @@ namespace API_BUSESCONTROL.Repository {
 
         public List<Onibus> GetAll() {
             return _bancoContext.Onibus.Where(x => x.StatusOnibus == StatusFrota.Ativo).ToList();
+        }
+
+        public void HabilitarDisponibilidade(int? id) {
+            Onibus onibus = GetOnibusById(id);
+            onibus.Disponibilidade = Disponibilidade.Disponivel;
+            _bancoContext.Onibus.Update(onibus);
+            _bancoContext.SaveChanges();
+        }
+
+        public void DesabilitarDisponibilidade(int? id) {
+            Onibus onibus = GetOnibusById(id);
+            onibus.Disponibilidade = Disponibilidade.Indisponivel;
+            _bancoContext.Onibus.Update(onibus);
+            _bancoContext.SaveChanges();
         }
 
         public bool ValidationDuplicate(Onibus onibus) {

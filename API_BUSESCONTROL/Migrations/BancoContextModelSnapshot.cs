@@ -419,6 +419,9 @@ namespace API_BUSESCONTROL.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Disponibilidade")
+                        .HasColumnType("int");
+
                     b.Property<string>("Marca")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -769,13 +772,13 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.SubContratoOnibus", b =>
                 {
                     b.HasOne("API_BUSESCONTROL.Models.Contrato", "Contrato")
-                        .WithMany()
+                        .WithMany("SubContratoOnibus")
                         .HasForeignKey("ContratoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API_BUSESCONTROL.Models.Onibus", "Onibus")
-                        .WithMany()
+                        .WithMany("SubContratoOnibus")
                         .HasForeignKey("OnibusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -794,6 +797,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("Rescisoes");
 
                     b.Navigation("SubContratoMotoristas");
+
+                    b.Navigation("SubContratoOnibus");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Financeiro", b =>
@@ -816,6 +821,8 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Onibus", b =>
                 {
                     b.Navigation("Contratos");
+
+                    b.Navigation("SubContratoOnibus");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.PessoaFisica", b =>

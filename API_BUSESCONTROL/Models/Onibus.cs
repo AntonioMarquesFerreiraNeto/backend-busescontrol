@@ -42,6 +42,8 @@ namespace API_BUSESCONTROL.Models {
 
         public StatusFrota StatusOnibus { get; set; }
 
+        public Disponibilidade Disponibilidade { get; set; }
+
         public virtual List<Contrato>? Contratos { get; set; }
 
         public virtual List<SubContratoOnibus>? SubContratoOnibus { get; set; }  

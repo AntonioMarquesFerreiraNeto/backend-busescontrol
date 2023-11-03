@@ -5,6 +5,10 @@
         Ativo = 0,
         Inativo = 1
     }
+    public enum Disponibilidade : int {
+        Disponivel = 0,
+        Indisponivel = 1
+    }
 
     //Funcionário
     public enum FuncionarioStatus : int {
