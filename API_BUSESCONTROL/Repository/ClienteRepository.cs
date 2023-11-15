@@ -122,7 +122,7 @@ namespace API_BUSESCONTROL.Repository {
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaFisica
                     .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                    .Where(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                    .Where(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
                     .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
@@ -132,20 +132,20 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.PessoaFisica
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
                 .AsNoTracking()
-                .Where(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                .Where(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
                 .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
         public int QtPaginasClientesAtivos(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
+            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public int QtPaginasClientesInativos(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
+            var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
@@ -275,7 +275,7 @@ namespace API_BUSESCONTROL.Repository {
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaJuridica
                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                   .Where(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                   .Where(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
                    .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
@@ -284,22 +284,32 @@ namespace API_BUSESCONTROL.Repository {
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.PessoaJuridica
                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
-                   .Where(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)))
+                   .Where(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
                    .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
         public int QtPaginasClientesAtivosPJ(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
+            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public int QtPaginasClientesInativosPJ(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa)));
+            int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
             int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
             return (qtPaginas == 0) ? 1 : qtPaginas;
+        }
+
+        private Adimplencia? SearchByAdimplencia(string pesquisa) {
+            pesquisa = pesquisa.ToLower();
+            if ("adimplente".Contains(pesquisa)) {
+                return Adimplencia.Adimplente;
+            } else if ("inadimplente".Contains(pesquisa)) {
+                return Adimplencia.Inadimplente;
+            }
+            return null;
         }
 
         public PessoaJuridica PessoaJuridicaTrim(PessoaJuridica value) {

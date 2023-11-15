@@ -6,8 +6,7 @@ using API_BUSESCONTROL.Repository.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace API_BUSESCONTROL.Repository
-{
+namespace API_BUSESCONTROL.Repository {
     public class FuncionarioRepository : IFuncionarioRepository {
 
         private readonly BancoContext _bancoContext;
@@ -127,23 +126,36 @@ namespace API_BUSESCONTROL.Repository
             string pesquisaTel = pesquisa.Replace("-", "");
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.Funcionario
-                  .Where(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))    
+                  .Where(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)))
                   .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+        }
+        private CargoFuncionario? SearchByCargo(string pesquisa) {
+            pesquisa = pesquisa.ToLower();
+            if ("assistente".Contains(pesquisa)) {
+                return CargoFuncionario.Assistente;
+            }
+            else if ("administrador".Contains(pesquisa)) {
+                return CargoFuncionario.Administrador;
+            }
+            else if ("motorista".Contains(pesquisa)) {
+                return CargoFuncionario.Motorista;
+            }
+            return null;
         }
 
         public List<Funcionario> PaginateListInativos(int paginaAtual, string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             return _bancoContext.Funcionario
-                   .Where(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
+                   .Where(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)))
                    .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
                    .Skip((paginaAtual - 1) * 10).Take(10).ToList();
         }
 
         public int QtPaginasAtivas(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
+            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
             int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
             return (qtPaginas == 0) ? 1 : qtPaginas;
@@ -151,7 +163,7 @@ namespace API_BUSESCONTROL.Repository
 
         public int QtPaginasInativas(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
-            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
+            var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
             int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
             return qtPaginas;
