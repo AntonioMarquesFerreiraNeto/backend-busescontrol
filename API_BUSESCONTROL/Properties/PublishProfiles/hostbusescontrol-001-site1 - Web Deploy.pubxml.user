@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Esse arquivo é usado pelo processo de publicação/pacote do seu projeto Web. É possível personalizar o comportamento deste processo
+ao editar este arquivo MSBuild. Para saber mais sobre isso, visite https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword />
+    <History>True|2023-11-21T22:27:57.2622706Z;True|2023-11-20T21:05:39.3146160-03:00;True|2023-11-15T20:01:10.7842668-03:00;True|2023-11-15T19:23:43.7776133-03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

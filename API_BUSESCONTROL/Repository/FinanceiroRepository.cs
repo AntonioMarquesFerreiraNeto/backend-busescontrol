@@ -475,7 +475,7 @@ namespace API_BUSESCONTROL.Repository {
             }
         }
 
-        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro) {
+        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro, int pageSize) {
             if (pageNumber < 1 || string.IsNullOrEmpty(pageNumber.ToString())) throw new Exception("Ação inválida");
             switch (filtro) {
                 case FiltroFinanceiro.Todos:
@@ -490,8 +490,8 @@ namespace API_BUSESCONTROL.Repository {
                             .Include(x => x.Fornecedor)
                             .Include(x => x.Parcelas)
                             .AsNoTracking()
-                            .Skip((pageNumber - 1) * 10)
-                            .Take(10)
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
                             .ToList();
                 case FiltroFinanceiro.Contrato:
                     return _bancoContext.Financeiro
@@ -505,8 +505,8 @@ namespace API_BUSESCONTROL.Repository {
                             .Include(x => x.Fornecedor)
                             .Include(x => x.Parcelas)
                             .AsNoTracking()
-                            .Skip((pageNumber - 1) * 10)
-                            .Take(10)
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
                             .ToList();
                 case FiltroFinanceiro.Atrasadas:
                     return _bancoContext.Financeiro
@@ -520,8 +520,8 @@ namespace API_BUSESCONTROL.Repository {
                             .Include(x => x.Fornecedor)
                             .Include(x => x.Parcelas)
                             .AsNoTracking()
-                            .Skip((pageNumber - 1) * 10)
-                            .Take(10)
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
                             .ToList();
                 default:
                     return _bancoContext.Financeiro
@@ -535,14 +535,13 @@ namespace API_BUSESCONTROL.Repository {
                            .Include(x => x.Fornecedor)
                            .Include(x => x.Parcelas)
                            .AsNoTracking()
-                           .Skip((pageNumber - 1) * 10)
-                           .Take(10)
+                           .Skip((pageNumber - 1) * pageSize)
+                           .Take(pageSize)
                            .ToList();
             }
         }
 
-        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro) {
-
+        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro, int pageSize) {
             var qtFinanceiro = 1;
             switch (filtro) {
                 case FiltroFinanceiro.Todos:
@@ -551,7 +550,7 @@ namespace API_BUSESCONTROL.Repository {
                         || x.Pagament == SearchByPagament(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa));
                     break;
                 case FiltroFinanceiro.Contrato:
-                    qtFinanceiro = _bancoContext.Financeiro.Count(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
                         || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa) 
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
@@ -561,13 +560,13 @@ namespace API_BUSESCONTROL.Repository {
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
                 default:
-                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) && x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
+                    qtFinanceiro = _bancoContext.Financeiro.Count(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
                         || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa)
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
             }
 
-            int qtPage = (int)Math.Ceiling((double)qtFinanceiro / 10);
+            int qtPage = (int)Math.Ceiling((double)qtFinanceiro / pageSize);
             return (qtPage == 0) ? 1 : qtPage;
         }
         private ModelPagament? SearchByPagament(string pesquisa) {

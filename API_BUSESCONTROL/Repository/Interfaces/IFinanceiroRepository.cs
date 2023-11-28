@@ -18,8 +18,8 @@ namespace API_BUSESCONTROL.Repository.Interfaces {
         public void TaskMonitorPdfRescisao();
         public ClientesContrato ConfirmarImpressaoPdfRescisao(ClientesContrato clientesContrato);
         public Financeiro ListFinanceiroPorContratoAndClientesContrato(int? id);
-        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro);
-        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro);
+        public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro, int pageSize);
+        public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro, int pageSize);
         public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, string pesquisa);
         public int ReturnQtPaginasParcelas(int id, string pesquisa);
         public Financeiro listPorIdFinanceiroNoJoinParcelas(int? id);

@@ -81,11 +81,12 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<Fornecedor> GetFornecedoresAtivos(int paginaAtual, int filtro, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
             if (paginaAtual < 1) throw new Exception("Ação inválida!");
             else if (filtro == 2) {
                 return _bancoContext.Fornecedor
                 .Where(x =>
-                    x.Status == FornecedorStatus.Ativo && x.NameOrRazaoSocial!.Contains(pesquisa))
+                    x.Status == FornecedorStatus.Ativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cidade.Contains(pesquisa)))
                 .Skip((paginaAtual - 1) * 10)
                 .Take(10)
                 .ToList();
@@ -93,7 +94,7 @@ namespace API_BUSESCONTROL.Repository {
             else {
                 return _bancoContext.Fornecedor
                 .Where(x =>
-                    x.Status == FornecedorStatus.Ativo && x.NameOrRazaoSocial!.Contains(pesquisa) && x.TypePessoa == (TypePessoa)filtro)
+                    x.Status == FornecedorStatus.Ativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cidade.Contains(pesquisa)))
                 .Skip((paginaAtual - 1) * 10)
                 .Take(10)
                 .ToList();
@@ -101,17 +102,18 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<Fornecedor> GetFornecedoresInativos(int paginaAtual, int filtro, string pesquisa) {
+            string pesquisaTel = pesquisa.Replace("-", "");
             if (paginaAtual < 1) throw new Exception("Ação inválida!");
             else if (filtro != 2) {
                 return _bancoContext.Fornecedor
-                      .Where(x => x.Status == FornecedorStatus.Inativo && x.NameOrRazaoSocial!.Contains(pesquisa) && x.TypePessoa == (TypePessoa)filtro)
+                      .Where(x => x.Status == FornecedorStatus.Inativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
                       .Skip((paginaAtual - 1) * 10)
                       .Take(10)
                       .ToList();
             }
             else {
                 return _bancoContext.Fornecedor
-                     .Where(x => x.Status == FornecedorStatus.Inativo && x.NameOrRazaoSocial!.Contains(pesquisa))
+                     .Where(x => x.Status == FornecedorStatus.Inativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
                      .Skip((paginaAtual - 1) * 10)
                      .Take(10)
                      .ToList();
@@ -119,16 +121,18 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public int GetTotPaginasAtivos(string pesquisa, int filtro) {
+            string pesquisaTel = pesquisa.Replace("-", "");
             int qtItens;
-            if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && x.NameOrRazaoSocial!.Contains(pesquisa) && x.TypePessoa == (TypePessoa)filtro);
-            else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && x.NameOrRazaoSocial!.Contains(pesquisa));
+            if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
+            else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
             int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
             return (qtPaginas != 0)? qtPaginas : 1;
         }
         public int GetTotPaginasInativos(string pesquisa, int filtro) {
+            string pesquisaTel = pesquisa.Replace("-", "");
             int qtItens;
-            if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && x.NameOrRazaoSocial!.Contains(pesquisa) && x.TypePessoa == (TypePessoa)filtro); 
-            else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && x.NameOrRazaoSocial!.Contains(pesquisa));
+            if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel))); 
+            else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
             int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
             return (qtPaginas != 0) ? qtPaginas : 1;
         }

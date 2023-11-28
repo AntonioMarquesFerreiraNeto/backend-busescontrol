@@ -75,14 +75,14 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetFinanceiro/{pageNumber}/{filtro}/{pesquisa?}/")]
-        public IActionResult ListarFinanceiro(int pageNumber = 1, FiltroFinanceiro filtro = FiltroFinanceiro.Todos, string? pesquisa = "") {
+        [HttpGet("GetFinanceiro/{pageNumber}/{filtro}/{pageSize}/{pesquisa?}/")]
+        public IActionResult ListarFinanceiro(int pageNumber = 1, FiltroFinanceiro filtro = FiltroFinanceiro.Todos, int pageSize = 10, string? pesquisa = "") {
             try {
-                var list = _financeiroRepository.GetPaginationAndFiltro(pageNumber, pesquisa,  filtro);
+                var list = _financeiroRepository.GetPaginationAndFiltro(pageNumber, pesquisa,  filtro, pageSize);
 
                 var data = new {
                     listFinanceiro = list,
-                    qtPaginas = _financeiroRepository.ReturnQtPaginas(pesquisa, filtro)
+                    qtPaginas = _financeiroRepository.ReturnQtPaginas(pesquisa, filtro, pageSize)
                 };
                 return Ok(data);
             }
