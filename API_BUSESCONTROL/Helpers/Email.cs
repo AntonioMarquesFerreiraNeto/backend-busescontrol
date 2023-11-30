@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using API_BUSESCONTROL.Models;
 
 namespace API_BUSESCONTROL.Helpers {
     public class Email : IEmail {
@@ -29,9 +30,10 @@ namespace API_BUSESCONTROL.Helpers {
                 mail.Priority = MailPriority.High;
 
                 using (SmtpClient smtp = new SmtpClient(host, porta)) {
+                    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtp.UseDefaultCredentials = false;
                     smtp.Credentials = new NetworkCredential(userName, senha);
                     smtp.EnableSsl = true;
-
                     smtp.Send(mail);
                     return true;
                 }
