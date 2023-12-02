@@ -65,6 +65,7 @@ namespace API_BUSESCONTROL.Repository {
                 funcionarioDB.Logradouro = funcionario.Logradouro!.Trim();
                 funcionarioDB.ComplementoResidencial = funcionario.ComplementoResidencial!.Trim();
                 funcionarioDB.Bairro = funcionario.Bairro!.Trim();
+                funcionarioDB.Cidade = funcionario.Cidade!.Trim();
                 funcionarioDB.Estado = funcionario.Estado!.Trim();
 
                 _bancoContext.Funcionario.Update(funcionarioDB);

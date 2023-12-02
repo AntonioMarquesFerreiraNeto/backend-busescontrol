@@ -1,10 +1,12 @@
 ﻿using API_BUSESCONTROL.Models;
+using API_BUSESCONTROL.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace API_BUSESCONTROL.Services {
+namespace API_BUSESCONTROL.Services
+{
     public class TokenService : ITokenService {
 
         public string GenerateToken(Funcionario funcionario) {

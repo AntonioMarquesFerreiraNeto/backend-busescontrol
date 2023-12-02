@@ -3,6 +3,7 @@ using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Repository;
 using API_BUSESCONTROL.Repository.Interfaces;
 using API_BUSESCONTROL.Services;
+using API_BUSESCONTROL.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +37,7 @@ namespace API_BUSESCONTROL
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IEmail, Email>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<AjudantesService, AjudantesService>();
 
 
             var key = Encoding.ASCII.GetBytes(Settings.Secrect);
