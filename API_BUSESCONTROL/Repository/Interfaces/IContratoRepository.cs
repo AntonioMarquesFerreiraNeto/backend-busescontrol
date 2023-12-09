@@ -14,12 +14,12 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public Contrato GetContratoById(int id);
         public List<Contrato> ListContratosAprovados();
         public List<Contrato> ListContratosEmAnalise();
-        public List<Contrato> GetContratosAtivos(int paginaAtual, FiltroContrato filtro, string pesquisa);
+        public List<Contrato> GetContratosAtivos(int paginaAtual, FiltroContrato filtro, int pageSize, string pesquisa);
         public List<Contrato> GetContratosInativos(int paginaAtual, string pesquisa);
         public List<Contrato> GetAllContratosAtivos();
         public List<Contrato> GetAllContratosInativos();
         public ClientesContrato GetClientesContratoById(int id);
-        public int ReturnQtPaginasAtivos(FiltroContrato filtro, string pesquisa);
+        public int ReturnQtPaginasAtivos(FiltroContrato filtro, int pageSize, string pesquisa);
         public int ReturnQtPaginasInativos(string pesquisa);
         public Contrato CreateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);
         public Contrato UpdateMotoristaSubstituto(SubContratoMotorista subContratoMotorista);

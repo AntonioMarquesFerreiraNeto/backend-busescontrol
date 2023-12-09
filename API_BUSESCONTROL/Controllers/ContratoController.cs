@@ -96,12 +96,12 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetContratosAtivos/{paginaAtual}/{filtro}/{pesquisa?}")]
-        public IActionResult GetContratosAtivos(int paginaAtual = 1, FiltroContrato filtro = FiltroContrato.Todos, string? pesquisa = "") {
-            List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, filtro, pesquisa);
+        [HttpGet("GetContratosAtivos/{paginaAtual}/{filtro}/{pageSize}/{pesquisa?}")]
+        public IActionResult GetContratosAtivos(int paginaAtual = 1, FiltroContrato filtro = FiltroContrato.Todos, int pageSize = 10, string? pesquisa = "") {
+            List<Contrato> contratos = _contratoRepository.GetContratosAtivos(paginaAtual, filtro, pageSize, pesquisa);
             var response = new {
                 contractList = contratos,
-                qtPaginas = _contratoRepository.ReturnQtPaginasAtivos(filtro, pesquisa)
+                qtPaginas = _contratoRepository.ReturnQtPaginasAtivos(filtro, pageSize, pesquisa)
             };
             return Ok(response);
         }

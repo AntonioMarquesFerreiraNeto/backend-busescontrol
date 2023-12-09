@@ -158,14 +158,14 @@ namespace API_BUSESCONTROL.Repository {
                 .Where(x => x.StatusContrato == ContratoStatus.Inativo).ToList();
         }
 
-        public List<Contrato> GetContratosAtivos(int paginaAtual, FiltroContrato filtro, string pesquisa) {
+        public List<Contrato> GetContratosAtivos(int paginaAtual, FiltroContrato filtro, int pageSize, string pesquisa) {
             if (paginaAtual < 1) throw new Exception("Desculpe, ação inválida!");
             switch (filtro) {
                 case FiltroContrato.Todos:
                     return _bancoContext.Contrato
                                 .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Id.ToString().Contains(pesquisa))
                                 .OrderByDescending(x => x.Id)
-                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Skip((paginaAtual - 1) * pageSize).Take(pageSize)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                                 .Include(x => x.Motorista)
@@ -176,7 +176,7 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Contrato
                                 .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Aguardando && x.Id.ToString().Contains(pesquisa))
                                 .OrderByDescending(x => x.Id)
-                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Skip((paginaAtual - 1) * pageSize).Take(pageSize)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                                 .Include(x => x.Motorista)
@@ -187,7 +187,7 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Contrato
                                 .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.EmAndamento && x.Id.ToString().Contains(pesquisa))
                                 .OrderByDescending(x => x.Id)
-                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Skip((paginaAtual - 1) * pageSize).Take(pageSize)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                                 .Include(x => x.Motorista)
@@ -198,7 +198,7 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Contrato
                                 .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Andamento == Andamento.Encerrado && x.Id.ToString().Contains(pesquisa))
                                 .OrderByDescending(x => x.Id)
-                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Skip((paginaAtual - 1) * pageSize).Take(pageSize)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                                 .Include(x => x.Motorista)
@@ -209,7 +209,7 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Contrato
                                 .Where(x => x.StatusContrato == ContratoStatus.Ativo && x.Aprovacao == (StatusAprovacao)filtro && x.Id.ToString().Contains(pesquisa))
                                 .OrderByDescending(x => x.Id)
-                                .Skip((paginaAtual - 1) * 10).Take(10)
+                                .Skip((paginaAtual - 1) * pageSize).Take(pageSize)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaFisica)
                                 .Include(x => x.ClientesContrato).ThenInclude(x => x.PessoaJuridica)
                                 .Include(x => x.Motorista)
@@ -220,7 +220,7 @@ namespace API_BUSESCONTROL.Repository {
             }
 
         }
-        public int ReturnQtPaginasAtivos(FiltroContrato filtro, string pesquisa) {
+        public int ReturnQtPaginasAtivos(FiltroContrato filtro, int pageSize, string pesquisa) {
             var qtItens = 0;
             switch (filtro) {
                 case FiltroContrato.Todos:
@@ -239,7 +239,7 @@ namespace API_BUSESCONTROL.Repository {
                     qtItens = _bancoContext.Contrato.Count(x => x.StatusContrato == ContratoStatus.Ativo && x.Aprovacao == (StatusAprovacao)filtro && x.Id.ToString().Contains(pesquisa));
                     break;
             }
-            int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtItens / pageSize);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
