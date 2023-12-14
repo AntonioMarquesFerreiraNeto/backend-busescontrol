@@ -23,6 +23,80 @@ namespace API_BUSESCONTROL.Repository {
                 .ToList();
         }
 
+        public List<Financeiro> ListFinanceiroRelatorio(FiltroFinanceiro filtro, string pesquisa) {
+            string pesquisaValor = pesquisa.Replace(".", "").Replace(",", ".");
+            switch (filtro) {
+                case FiltroFinanceiro.Todos:
+                    return _bancoContext.Financeiro
+                                .Include(x => x.PessoaFisica)
+                                .Include(x => x.PessoaJuridica)
+                                .Include(x => x.Fornecedor)
+                                .Include(x => x.Contrato)
+                                .Include(x => x.Parcelas)
+                                .AsNoTracking()
+                                .Where(x => 
+                                    x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) ||
+                                    x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) ||
+                                    x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor) ||
+                                    x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa) ||
+                                    x.Pagament == SearchByPagament(pesquisa)
+                                )
+                                .ToList();
+                case FiltroFinanceiro.Contrato:
+                    return _bancoContext.Financeiro
+                                .Include(x => x.PessoaFisica)
+                                .Include(x => x.PessoaJuridica)
+                                .Include(x => x.Fornecedor)
+                                .Include(x => x.Contrato)
+                                .Include(x => x.Parcelas)
+                                .Where(x => 
+                                    !string.IsNullOrEmpty(x.ContratoId.ToString()) && (
+                                        x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) ||
+                                        x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) ||
+                                        x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor) ||
+                                        x.FinanceiroStatus == SearchByStatus(pesquisa) || x.Pagament == SearchByPagament(pesquisa)
+                                    )
+                                )
+                                .ToList();
+                case FiltroFinanceiro.Atrasadas:
+                    return _bancoContext.Financeiro
+                                .Include(x => x.PessoaFisica)
+                                .Include(x => x.PessoaJuridica)
+                                .Include(x => x.Fornecedor)
+                                .Include(x => x.Contrato)
+                                .Include(x => x.Parcelas)
+                                .AsNoTracking()
+                                .Where(x => 
+                                    x.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada) && (
+                                        x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) ||
+                                        x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) ||
+                                        x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor) ||
+                                        x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa) ||
+                                        x.Pagament == SearchByPagament(pesquisa)
+                                    )
+                                )
+                                .ToList();
+                default:
+                    return _bancoContext.Financeiro
+                                .Include(x => x.PessoaFisica)
+                                .Include(x => x.PessoaJuridica)
+                                .Include(x => x.Fornecedor)
+                                .Include(x => x.Contrato)
+                                .Include(x => x.Parcelas)
+                                .AsNoTracking()
+                                .Where(x => 
+                                    x.DespesaReceita == (DespesaReceita)filtro && (
+                                        x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa) ||
+                                        x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) ||
+                                        x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor) ||
+                                        x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa) ||
+                                        x.Pagament == SearchByPagament(pesquisa)
+                                    )
+                                )
+                                .ToList();
+            }
+        }
+
         public Financeiro ReturnPorId(int id) {
             return _bancoContext.Financeiro.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Nenhum registro encontrado!"); ;
         }
@@ -476,13 +550,17 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<Financeiro> GetPaginationAndFiltro(int pageNumber, string pesquisa, FiltroFinanceiro filtro, int pageSize) {
+            
             if (pageNumber < 1 || string.IsNullOrEmpty(pageNumber.ToString())) throw new Exception("Ação inválida");
+            string pesquisaValor = pesquisa.Replace(".", "").Replace(",", ".");
+
             switch (filtro) {
                 case FiltroFinanceiro.Todos:
                     return _bancoContext.Financeiro
                        .OrderByDescending(x => x.Id)
                        .Where(x => x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) 
+                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa)
+                                || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                                 || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa))
                             .Include(x => x.Contrato)
                             .Include(x => x.PessoaFisica)
@@ -497,7 +575,8 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Financeiro
                        .OrderByDescending(x => x.Id)
                        .Where(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) 
+                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)
+                                || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                                 || x.Pagament == SearchByPagament(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa)))
                             .Include(x => x.Contrato)
                             .Include(x => x.PessoaFisica)
@@ -512,7 +591,8 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Financeiro
                        .OrderByDescending(x => x.Id)
                        .Where(x => x.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada) && ((x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) 
+                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)
+                                || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                                 || x.Pagament == SearchByPagament(pesquisa)) || x.FinanceiroStatus == SearchByStatus(pesquisa)))
                             .Include(x => x.Contrato)
                             .Include(x => x.PessoaFisica)
@@ -527,7 +607,8 @@ namespace API_BUSESCONTROL.Repository {
                     return _bancoContext.Financeiro
                       .OrderByDescending(x => x.Id)
                       .Where(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) 
+                                || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa)
+                                || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                                 || x.Pagament == SearchByPagament(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa)))
                            .Include(x => x.Contrato)
                            .Include(x => x.PessoaFisica)
@@ -542,26 +623,33 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public int ReturnQtPaginas(string pesquisa, FiltroFinanceiro filtro, int pageSize) {
+            
             var qtFinanceiro = 1;
+            string pesquisaValor = pesquisa.Replace(".", "").Replace(",", ".");
+
             switch (filtro) {
                 case FiltroFinanceiro.Todos:
                     qtFinanceiro = _bancoContext.Financeiro.Count(x => x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
                         || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) 
+                        || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                         || x.Pagament == SearchByPagament(pesquisa) || x.FinanceiroStatus == SearchByStatus(pesquisa));
                     break;
                 case FiltroFinanceiro.Contrato:
                     qtFinanceiro = _bancoContext.Financeiro.Count(x => !string.IsNullOrEmpty(x.ContratoId.ToString()) && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
-                        || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa) 
+                        || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa)
+                        || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
                 case FiltroFinanceiro.Atrasadas:
                     qtFinanceiro = _bancoContext.Financeiro.Count(x => x.Parcelas.Any(x => x.StatusPagamento == SituacaoPagamento.Atrasada) && ((x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
                         || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa))
+                        || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
                 default:
                     qtFinanceiro = _bancoContext.Financeiro.Count(x => x.DespesaReceita == (DespesaReceita)filtro && (x.PessoaFisica.Name.Contains(pesquisa) || x.PessoaJuridica.NomeFantasia.Contains(pesquisa)
                         || x.Fornecedor.NameOrRazaoSocial.Contains(pesquisa) || x.Id.ToString().Contains(pesquisa) || x.ContratoId.ToString().Contains(pesquisa) || x.Pagament == SearchByPagament(pesquisa)
+                        || x.ValorTotDR.ToString()!.Contains(pesquisaValor) || x.ValorTotalPago.ToString()!.Contains(pesquisaValor)
                         || x.FinanceiroStatus == SearchByStatus(pesquisa)));
                     break;
             }

@@ -134,12 +134,12 @@ namespace API_BUSESCONTROL.Controllers {
             return Ok(data);
         }
 
-        [HttpGet("GetPlanilhaFinanceiro")]
-        public IActionResult GetPlanilhaExcelFinanceiro() {
+        [HttpGet("GetPlanilhaFinanceiro/{filtro}/{pesquisa?}")]
+        public IActionResult GetPlanilhaExcelFinanceiro(FiltroFinanceiro filtro = FiltroFinanceiro.Todos, string? pesquisa = "") {
             try {
-                List<Financeiro> financeiros = _financeiroRepository.ListFinanceiros();
+                List<Financeiro> financeiros = _financeiroRepository.ListFinanceiroRelatorio(filtro, pesquisa);
                 if (financeiros == null) {
-                    return NotFound("Desculpe, nenhum registro encontrado!");
+                    return NotFound("Desculpe, nenhum registro encontrado.");
                 }
                 using (var folhaBook = new XLWorkbook()) {
                     var folha = folhaBook.Worksheets.Add("Sample Sheet");
@@ -200,10 +200,10 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("GetRelatorioFinanceiroPdf")]
-        public IActionResult PdfRelatorioFinanceiro() {
+        [HttpGet("GetRelatorioFinanceiroPdf/{filtro}/{pesquisa?}")]
+        public IActionResult PdfRelatorioFinanceiro(FiltroFinanceiro filtro = FiltroFinanceiro.Todos, string? pesquisa = "") {
             try {
-                List<Financeiro> financeiros = _financeiroRepository.ListFinanceiros();
+                List<Financeiro> financeiros = _financeiroRepository.ListFinanceiroRelatorio(filtro, pesquisa);
                 if (financeiros == null) {
                     return NotFound("Desculpe, nenhum registro encontrado.");
                 }
@@ -300,7 +300,9 @@ namespace API_BUSESCONTROL.Controllers {
                 string rodape = $"Quantidade de lançamentos solicitados: {financeiros.Count}" +
                     $"\nValor total listado (ativos): {valorTotAtivos.ToString("C2")}" +
                     $"\nValor total listado (inativos): {valorTotInativos.ToString("C2")}" +
-                    $"\nValor total efetuado: {valEfetuado.ToString("C2")}";
+                    $"\nValor total efetuado: {valEfetuado.ToString("C2")}" +
+                    $"\nFiltro aplicado: {ReturnFiltroString(filtro)}" + 
+                    $"\nPesquisa aplicada: {(!string.IsNullOrEmpty(pesquisa) ? pesquisa : "nenhuma")}";
                 string rodape2 = $"\nDocumento gerado em: {DateTime.Now.ToString("dd/MM/yyyy")}";
                 paragrofoRodape.Add(rodape);
                 paragrofoRodape.Add(rodape2);
@@ -317,6 +319,15 @@ namespace API_BUSESCONTROL.Controllers {
             }
             catch (Exception error) {
                 return BadRequest("Desculpe, houve um erro interno, notifique o problema para solucionarmos." + $"{error.Message}");
+            }
+        }
+        private static string ReturnFiltroString(FiltroFinanceiro filtro) {
+            switch (filtro) {
+                case FiltroFinanceiro.Todos: return "Todos";
+                case FiltroFinanceiro.Contrato: return "Contratos";
+                case FiltroFinanceiro.Atrasadas: return "Atrasados";
+                case FiltroFinanceiro.Receita: return "Receitas";
+                default: return "Despesas";
             }
         }
 

@@ -1390,6 +1390,39 @@ DROP PROCEDURE MigrationsScript;
 
 COMMIT;
 
+START TRANSACTION;
+
+DROP PROCEDURE IF EXISTS MigrationsScript;
+DELIMITER //
+CREATE PROCEDURE MigrationsScript()
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM `__EFMigrationsHistory` WHERE `MigrationId` = '20231101200324_inclusão da flag de disponibilidade') THEN
+
+    ALTER TABLE `Onibus` ADD `Disponibilidade` int NOT NULL DEFAULT 0;
+
+    END IF;
+END //
+DELIMITER ;
+CALL MigrationsScript();
+DROP PROCEDURE MigrationsScript;
+
+DROP PROCEDURE IF EXISTS MigrationsScript;
+DELIMITER //
+CREATE PROCEDURE MigrationsScript()
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM `__EFMigrationsHistory` WHERE `MigrationId` = '20231101200324_inclusão da flag de disponibilidade') THEN
+
+    INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+    VALUES ('20231101200324_inclusão da flag de disponibilidade', '6.0.1');
+
+    END IF;
+END //
+DELIMITER ;
+CALL MigrationsScript();
+DROP PROCEDURE MigrationsScript;
+
+COMMIT;
+
 DROP PROCEDURE `POMELO_BEFORE_DROP_PRIMARY_KEY`;
 
 DROP PROCEDURE `POMELO_AFTER_ADD_PRIMARY_KEY`;

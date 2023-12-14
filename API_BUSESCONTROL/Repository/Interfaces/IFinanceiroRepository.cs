@@ -4,6 +4,7 @@ using API_BUSESCONTROL.Models.Enums;
 namespace API_BUSESCONTROL.Repository.Interfaces {
     public interface IFinanceiroRepository {
         public List<Financeiro> ListFinanceiros();
+        public List<Financeiro> ListFinanceiroRelatorio(FiltroFinanceiro filtro, string pesquuisa);
         public Financeiro ReturnPorId(int id);
         public Financeiro listPorIdFinanceiro(int? id);
         public Parcela ListarFinanceiroPorId(int id);
