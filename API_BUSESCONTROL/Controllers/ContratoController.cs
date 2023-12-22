@@ -7,6 +7,8 @@ using iTextSharp.text;
 using Microsoft.AspNetCore.Mvc;
 using Font = iTextSharp.text.Font;
 using Microsoft.AspNetCore.Authorization;
+using Humanizer;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
@@ -283,8 +285,8 @@ namespace API_BUSESCONTROL.Controllers {
                         folha.Cell(contratos.IndexOf(item) + 2, "C").Value = item.DataVencimento!.Value.ToString("dd/MM/yyyy");
                         folha.Cell(contratos.IndexOf(item) + 2, "D").Value = item.ValorMonetario!.Value.ToString("C2");
                         folha.Cell(contratos.IndexOf(item) + 2, "E").Value = (item.Pagament == 0) ? "Parcelado" : "À vista";
-                        folha.Cell(contratos.IndexOf(item) + 2, "F").Value = ReturnAprovacao(item.Aprovacao);
-                        folha.Cell(contratos.IndexOf(item) + 2, "G").Value = ReturnAndamento(item.Andamento);
+                        folha.Cell(contratos.IndexOf(item) + 2, "F").Value = item.Aprovacao.Humanize();
+                        folha.Cell(contratos.IndexOf(item) + 2, "G").Value = item.Andamento.Humanize();
                     }
 
                     using (MemoryStream stream = new MemoryStream()) {
@@ -369,8 +371,8 @@ namespace API_BUSESCONTROL.Controllers {
                     CriarCelulaTexto(tabela, valorTot, PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.QtParcelas.ToString(), PdfPCell.ALIGN_CENTER);
                     CriarCelulaTexto(tabela, (item.Pagament == ModelPagament.Parcelado) ? "Parcelado" : "À vista", PdfPCell.ALIGN_CENTER);
-                    CriarCelulaTexto(tabela, ReturnAprovacao(item.Aprovacao), PdfPCell.ALIGN_CENTER);
-                    CriarCelulaTexto(tabela, ReturnAndamento(item.Andamento), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, item.Aprovacao.Humanize(), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, item.Andamento.Humanize(), PdfPCell.ALIGN_CENTER);
                 }
 
                 Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
@@ -424,9 +426,9 @@ namespace API_BUSESCONTROL.Controllers {
                 var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 16,
                     iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
                 Paragraph paragrofoJustificado = new Paragraph("",
-                new Font(fonteBase, 12, Font.NORMAL));
+                new Font(fonteBase, 11, Font.NORMAL));
                 paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
-                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 12, Font.NORMAL));
+                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 11, Font.NORMAL));
                 paragrafoCenter.Alignment = Element.ALIGN_CENTER;
                 var titulo = new Paragraph($"Contrato de serviço Nº {contrato.Id}\n\n", fonteParagrafo);
                 titulo.Alignment = Element.ALIGN_CENTER;
@@ -457,7 +459,7 @@ namespace API_BUSESCONTROL.Controllers {
                     writer.DirectContent.AddImage(logo2, false);
                 }
 
-                string titulo_contratante = "\nCONTRATANTE:";
+                string titulo_contratante = "\nCONTRATANTE";
 
                 if (clienteFisicoId != 0) {
                     var data = contrato.ClientesContrato.FirstOrDefault(x => x.PessoaFisicaId == clienteFisicoId);
@@ -471,20 +473,20 @@ namespace API_BUSESCONTROL.Controllers {
                             nomeCliente = pessoaFisica.Name!;
                             textoContratante = $"{titulo_contratante}\n{pessoaFisicaResponsavel.Name} portador(a) do " +
                                 $"CPF: {pessoaFisicaResponsavel.ReturnCpfCliente()}, RG: {pessoaFisicaResponsavel.Rg}, filho(a) da Sr. {pessoaFisicaResponsavel.NameMae}, residente domiciliado no imovel Nº {pessoaFisicaResponsavel.NumeroResidencial}({pessoaFisicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaFisicaResponsavel.ComplementoResidencial}, no bairro {pessoaFisicaResponsavel.Bairro}," +
-                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato representado(a) como responsável legal pelo(a) requerente do contrato que será descrito a seguir: " +
-                                $"\n{pessoaFisica.Name} portador(a) do " +
+                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato representado(a) como responsável legal pelo(a) requerente do contrato que será descrito a seguir: " +
+                                $"{pessoaFisica.Name} portador(a) do " +
                                 $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
                         }
                         else {
                             nomeCliente = pessoaFisica.Name!;
                             PessoaJuridica pessoaJuridicaResponsavel = _clienteRepository.GetClienteByIdPJ(pessoaFisica.IdVinculacaoContratual.Value);
                             textoContratante = $"{titulo_contratante}\n{pessoaJuridicaResponsavel.RazaoSocial}, inscrita no CNPJ: {pessoaJuridicaResponsavel.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridicaResponsavel.InscricaoEstadual}, inscrição municipal: {pessoaJuridicaResponsavel.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridicaResponsavel.NomeFantasia}, " +
                             $"residente domiciliado no imovel Nº {pessoaJuridicaResponsavel.NumeroResidencial} ({pessoaJuridicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaJuridicaResponsavel.ComplementoResidencial}, no bairro {pessoaJuridicaResponsavel.Bairro}," +
-                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato representada como responsável legal pelo(a) requerente do contrato que será descrito a seguir:" +
-                            $"\n{pessoaFisica.Name} portador(a) do " +
+                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato representada como responsável legal pelo(a) requerente do contrato que será descrito a seguir:" +
+                            $"{pessoaFisica.Name} portador(a) do " +
                                 $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
                         }
 
                     }
@@ -492,7 +494,7 @@ namespace API_BUSESCONTROL.Controllers {
                         nomeCliente = pessoaFisica.Name!;
                         textoContratante = $"{titulo_contratante}\n{pessoaFisica.Name} portador(a) do " +
                         $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                        $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}. Neste ato representado(a) como o requerente do contrato.\n\n\n";
+                        $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Neste ato representado(a) como o requerente do contrato, no qual os meios de contatos são ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
                     }
                 }
                 else {
@@ -504,26 +506,26 @@ namespace API_BUSESCONTROL.Controllers {
                     nomeCliente = pessoaJuridica.NomeFantasia!;
                     textoContratante = $"{titulo_contratante}\n{pessoaJuridica.RazaoSocial}, inscrita no CNPJ: {pessoaJuridica.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridica.InscricaoEstadual}, inscrição municipal: {pessoaJuridica.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridica.NomeFantasia}, " +
                     $"residente domiciliado no imovel Nº {pessoaJuridica.NumeroResidencial} ({pessoaJuridica.Logradouro}), próximo ao complemento residencial {pessoaJuridica.ComplementoResidencial}, no bairro {pessoaJuridica.Bairro}," +
-                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}. Neste ato representada como a requerente do contrato.\n\n\n";
+                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Neste ato representada como a requerente do contrato, no qual os meios de contatos são Canais de comunicação: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}.\n\n\n";
                 }
 
-                string titulo_contratada = $"CONTRATADA:";
+                string titulo_contratada = $"CONTRATADA";
                 string textoContratada = $"{titulo_contratada}\nBuss viagens LTDA, pessoa jurídica de direito privado para prestação de serviço, na proteção da LEI Nº 13.429º. " +
                     $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 02.116.484/0001-02, sobre a liderança do sócio fundador Manoel Hamilton Rodrigues." +
                     $" Neste ato representada como  a empresa responsável pela realização da prestações de serviços do contrato.\n\n\n";
 
-                string titulo_primeira_clausula = $"1 — CLÁUSULA PRIMEIRA";
+                string titulo_primeira_clausula = $"CLÁUSULA PRIMEIRA";
                 string PrimeiraClausula = $"{titulo_primeira_clausula}\nO presente contrato tem por objeto a prestação de serviço especial de transporte rodoviário na rota definida no registro do contrato: {contrato.Detalhamento}\n\n\n";
 
-                string titulo_segunda_clausula = $"2 — CLÁUSULA SEGUNDA";
-                string SegundaClausula = $"{titulo_segunda_clausula} \nO(s) veículo(s) que realizará(ão) o transporte será(ão) discriminado(s) a seguir: \n" +
-                    $"  • Veículo {contrato.Onibus!.Marca}, modelo {contrato.Onibus.NameBus}, placa {contrato.Onibus.Placa}, número de chassi {contrato.Onibus.Chassi}, veículo {contrato.Onibus.CorBus!.ToLower()}, fabricado em {contrato.Onibus.DataFabricacao}, e com capacidade de lotação para {contrato.Onibus.Assentos} passageiros.\n No caso de problemas com o(s) veículo(s) acima designado(s), " +
+                string titulo_segunda_clausula = $"CLÁUSULA SEGUNDA";
+                string SegundaClausula = $"{titulo_segunda_clausula} \nO(s) veículo(s) que realizará(ão) o transporte será(ão) discriminado(s) a seguir: " +
+                    $"Veículo {contrato.Onibus!.Marca}, modelo {contrato.Onibus.NameBus}, placa {contrato.Onibus.ReturnPlacaFormatada()}, número de chassi {contrato.Onibus.Chassi}, veículo {contrato.Onibus.CorBus!.ToLower()}, fabricado em {contrato.Onibus.DataFabricacao}, e com capacidade de lotação para {contrato.Onibus.Assentos} passageiros.No caso de problemas com o(s) veículo(s) acima designado(s), " +
                     $"poderá ser utilizado outro veículo, desde que conste habilitado no Sistema de Habilitação de Transportes de Passageiros – SisHAB, da ANTT. \n\n";
 
-                string titulo_terceira_clausula = $"\n3 — CLÁUSULA TERCEIRA";
+                string titulo_terceira_clausula = $"\nCLÁUSULA TERCEIRA";
                 string TerceiraClausula = $"{titulo_terceira_clausula} \nO contratante deve estar ciente que deverá cumprir com as datas de pagamento determinadas do contrato. Desta forma, estando ciente de valores de juros adicionais em caso de inadimplência. Nos quais são 2% ao mês por parcela atrasada.\n\n\n";
 
-                string titulo_quarta_clausula = $"4 — CLÁUSULA QUARTA";
+                string titulo_quarta_clausula = $"CLÁUSULA QUARTA";
                 string QuartaClausula;
                 if (contrato.Pagament == Models.Enums.ModelPagament.Avista) {
                     QuartaClausula = $"{titulo_quarta_clausula} \nPelos serviços prestados a Contratante pagará a Contratada o valor de {contrato.ReturnValorTotCliente()}, na data atual com três dias úteis. Em parcela única, pois, o contrato foi deferido como à vista.\n\n";
@@ -531,13 +533,13 @@ namespace API_BUSESCONTROL.Controllers {
                 else {
                     QuartaClausula = $"{titulo_quarta_clausula} \nPelos serviços prestados a Contratante pagará a Contratada o valor de {contrato.ReturnValorTotCliente()}, e os respectivos pagamentos serão realizados dia {contrato.ReturnDiaPagamento()} de cada mês. Dividos em {contrato.QtParcelas} parcelas no valor {contrato.ValorParcelaContratoPorCliente!.Value.ToString("C2")}. No entanto, a primeira parcela do contrato terá três dias úteis para realização do pagamento após a aprovação do contrato.\n\n";
                 }
-                string titulo_quinta_clausula = $"\n5 — CLÁUSULA QUINTA";
+                string titulo_quinta_clausula = $"\nCLÁUSULA QUINTA";
                 string QuintaClausula = $"{titulo_quinta_clausula}\nEm caso de rescisão de contrato anterior a data acordada sem o devido pagamento da(s) parcela(s), o cliente deve estar ciente que haverá multa de 3% do valor total por cliente ( {contrato.ReturnValorTotCliente()} ), pela rescisão do contrato.\n\n\n";
 
-                string titulo_sexta_clausula = $"6 — CLÁUSULA SEXTA";
+                string titulo_sexta_clausula = $"CLÁUSULA SEXTA";
                 string SextaClausula = $"{titulo_sexta_clausula} \nO período da prestação do serviço será de  {ReturnPeriodoContrato(contrato)}, que é a data acordada no registro do contrato.\n\n\n";
 
-                string titulo_setima_clausula = $"7 — CLÁUSULA SÉTIMA";
+                string titulo_setima_clausula = $"CLÁUSULA SÉTIMA";
                 string SetimaClausula = $"{titulo_setima_clausula}\nO contratante fica ciente que somente será permitido o transporte de passageiros limitados à capacidade de passageiros sentados no(s) veículo(s) utilizado(s), ficando expressamente proibido o transporte de passageiros em pé ou acomodados no corredor, bem como passageiros que não estiverem constando na relação autorizada pela ANTT.\n\n\n";
 
                 string traco = "\n___________________________________________\n";
@@ -567,7 +569,7 @@ namespace API_BUSESCONTROL.Controllers {
                 doc.Add(titulo);
                 doc.Add(paragrofoJustificado);
                 doc.Add(paragrafoCenter);
-
+                writer.PageEvent = new RodapeEvento();
                 doc.Close();
 
                 stream.Flush();
@@ -576,6 +578,22 @@ namespace API_BUSESCONTROL.Controllers {
             }
             catch (Exception erro) {
                 return BadRequest(erro.Message);
+            }
+        }
+
+        public class RodapeEvento : PdfPageEventHelper {
+            public override void OnEndPage(PdfWriter writer, Document doc) {
+                AdicionarDataNoRodape(writer, doc);
+            }
+            private void AdicionarDataNoRodape(PdfWriter writer, Document doc) {
+                PdfContentByte cb = writer.DirectContent;
+                float posX = doc.PageSize.Width - doc.RightMargin + 20;
+                float posY = doc.Bottom - 30;
+                BaseFont fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                cb.BeginText();
+                cb.SetFontAndSize(fonteBase, 9);
+                cb.ShowTextAligned(Element.ALIGN_RIGHT, $"Documento gerado em {DateTime.Now.ToString("dd/MM/yyyy")}", posX, posY, 0);
+                cb.EndText();
             }
         }
 
@@ -598,9 +616,9 @@ namespace API_BUSESCONTROL.Controllers {
                 var fonteParagrafo = new iTextSharp.text.Font(fonteBase, 14,
                     iTextSharp.text.Font.NORMAL, BaseColor.DARK_GRAY);
                 Paragraph paragrofoJustificado = new Paragraph("",
-                new Font(fonteBase, 12, Font.NORMAL));
+                new Font(fonteBase, 11, Font.NORMAL));
                 paragrofoJustificado.Alignment = Element.ALIGN_JUSTIFIED;
-                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 12, Font.NORMAL));
+                Paragraph paragrafoCenter = new Paragraph("", new Font(fonteBase, 11, Font.NORMAL));
                 paragrafoCenter.Alignment = Element.ALIGN_CENTER;
 
                 var caminhoImgLeft = Path.Combine("ImagensPDF", "LogoPdf.jpeg");
@@ -616,7 +634,7 @@ namespace API_BUSESCONTROL.Controllers {
                     writer.DirectContent.AddImage(logo, false);
                 }
 
-                string titulo_contratante = "1 - CONTRATANTE";
+                string titulo_contratante = "CONTRATANTE";
 
                 if (!string.IsNullOrEmpty(clientesContrato.PessoaFisicaId.ToString())) {
                     if (!string.IsNullOrEmpty(clientesContrato!.PessoaFisica!.IdVinculacaoContratual.ToString())) {
@@ -626,7 +644,7 @@ namespace API_BUSESCONTROL.Controllers {
                             textoContratante = $"{titulo_contratante}\n{pessoaFisicaResponsavel.Name} portador(a) do " +
                                 $"CPF: {pessoaFisicaResponsavel.ReturnCpfCliente()}, RG: {pessoaFisicaResponsavel.Rg}, filho(a) da Sr. {pessoaFisicaResponsavel.NameMae}, residente domiciliado no imovel Nº {pessoaFisicaResponsavel.NumeroResidencial}({pessoaFisicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaFisicaResponsavel.ComplementoResidencial}, no bairro {pessoaFisicaResponsavel.Bairro}," +
                                 $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato, sendo o representante legal do processo de rescisão de contrato do cliente vinculado que será descrito a seguir: " +
-                                $"\n{clientesContrato.PessoaFisica.Name} portador(a) do " +
+                                $"{clientesContrato.PessoaFisica.Name} portador(a) do " +
                                 $"CPF: {clientesContrato.PessoaFisica.ReturnCpfCliente()}, RG: {clientesContrato.PessoaFisica.Rg}, filho(a) da Sr. {clientesContrato.PessoaFisica.NameMae}, residente domiciliado no imovel Nº {clientesContrato.PessoaFisica.NumeroResidencial}({clientesContrato.PessoaFisica.Logradouro}), próximo ao complemento residencial {clientesContrato.PessoaFisica.ComplementoResidencial}, no bairro {clientesContrato.PessoaFisica.Bairro}," +
                                 $" da cidade de {clientesContrato.PessoaFisica.Cidade} — {clientesContrato.PessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({clientesContrato.PessoaFisica.Ddd}){clientesContrato.PessoaFisica.ReturnTelefoneCliente()}, {clientesContrato.PessoaFisica.Email}.\n\n\n";
                         }
@@ -636,7 +654,7 @@ namespace API_BUSESCONTROL.Controllers {
                             textoContratante = $"{titulo_contratante}\n{pessoaJuridicaResponsavel.RazaoSocial}, inscrita no CNPJ: {pessoaJuridicaResponsavel.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridicaResponsavel.InscricaoEstadual}, inscrição municipal: {pessoaJuridicaResponsavel.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridicaResponsavel.NomeFantasia}, " +
                             $"residente domiciliado no imovel Nº {pessoaJuridicaResponsavel.NumeroResidencial} ({pessoaJuridicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaJuridicaResponsavel.ComplementoResidencial}, no bairro {pessoaJuridicaResponsavel.Bairro}," +
                             $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato, sendo o representante legal do processo de rescisão de contrato do cliente vinculado que será descrito a seguir:" +
-                            $"\n{clientesContrato.PessoaFisica.Name} portador(a) do " +
+                            $"{clientesContrato.PessoaFisica.Name} portador(a) do " +
                                 $"CPF: {clientesContrato.PessoaFisica.ReturnCpfCliente()}, RG: {clientesContrato.PessoaFisica.Rg}, filho(a) da Sr. {clientesContrato.PessoaFisica.NameMae}, residente domiciliado no imovel Nº {clientesContrato.PessoaFisica.NumeroResidencial}({clientesContrato.PessoaFisica.Logradouro}), próximo ao complemento residencial {clientesContrato.PessoaFisica.ComplementoResidencial}, no bairro {clientesContrato.PessoaFisica.Bairro}," +
                                 $" da cidade de {clientesContrato.PessoaFisica.Cidade} — {clientesContrato.PessoaFisica.Estado}. Tendo como forma de contato os seguintes canais: ({clientesContrato.PessoaFisica.Ddd}){clientesContrato.PessoaFisica.ReturnTelefoneCliente()}, {clientesContrato.PessoaFisica.Email}.\n\n\n";
                         }
@@ -660,7 +678,7 @@ namespace API_BUSESCONTROL.Controllers {
                     $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Tendo como forma de contato os seguintes canais: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}. Neste ato, sendo o responsável e solicitador do processo de rescisão do contrato, garantindo seus direitos legais definidos pela lei, e garantidos pela cláusula cinco do contrato.\n\n\n";
                 }
 
-                string titulo_contratada = $"2 - CONTRATADA";
+                string titulo_contratada = $"CONTRATADA";
                 string textoContratada = $"{titulo_contratada}\nBuss viagens LTDA, pessoa jurídica de direito privado para prestação de serviço, na proteção da LEI Nº 13.429º. " +
                     $"Localizada na cidade de Goianésia (GO) — Brasil, inscrita no CNPJ nº 03.115.484/0001-02, sobre a liderança do sócio fundador Manoel Rodrigues." +
                     $" Neste ato representada como  a empresa responsável pela realização da prestações de serviços do contrato.\n\n\n";
@@ -669,30 +687,14 @@ namespace API_BUSESCONTROL.Controllers {
                 decimal? valorTotCliente = clientesContrato.Contrato.ValorParcelaContratoPorCliente * clientesContrato.Contrato.QtParcelas;
                 decimal valorMulta = (valorTotCliente.Value * 3) / 100;
 
-                string titulo_quinta_clausula = $"3 - PROCESSO DE RESCISÃO";
+                string titulo_quinta_clausula = $"PROCESSO DE RESCISÃO";
                 string QuintaClausula = $"{titulo_quinta_clausula}\n“Em caso de rescisão de contrato anterior a data acordada sem o devido pagamento da(s) parcela(s), o cliente deve estar ciente que haverá multa de 3% do valor total por cliente ( {clientesContrato.Contrato.ReturnValorTotCliente()} ), pela rescisão do contrato.”. " +
-                    $"\nCom base e asseguração da quinta cláusula do contrato, é dever do cliente realizar o pagamento de {valorMulta.ToString("C2")} para rescindir o contrato.\n\n\n";
+                    $"Com base e asseguração da quinta cláusula do contrato, é dever do cliente realizar o pagamento de {valorMulta.ToString("C2")} para rescindir o contrato.\n\n\n";
 
                 string traco = "\n___________________________________________\n";
                 string assinaturaCliente = "Assinatura do representante legal contratante\n\n";
                 string traco2 = "___________________________________________________________\n";
                 string assinaturaEmpresa = "Assinatura da empresa representante da prestação do serviço";
-
-                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
-                //footer.Alignment = Element.ALIGN_LEFT;
-                PdfPTable footerTbl = new PdfPTable(1);
-                footerTbl.WidthPercentage = 100f;
-                footerTbl.TotalWidth = 1000f;
-                footerTbl.HorizontalAlignment = 0;
-                PdfPCell cell = new PdfPCell(footer);
-                cell.Border = 0;
-                cell.Colspan = 1;
-                cell.PaddingLeft = 0;
-                cell.HorizontalAlignment = 0;
-                footerTbl.DefaultCell.HorizontalAlignment = 0;
-                footerTbl.WidthPercentage = 100;
-                footerTbl.AddCell(cell);
-                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
 
                 paragrofoJustificado.Add(textoContratante);
                 paragrofoJustificado.Add(textoContratada);
@@ -708,6 +710,7 @@ namespace API_BUSESCONTROL.Controllers {
                 doc.Add(titulo);
                 doc.Add(paragrofoJustificado);
                 doc.Add(paragrafoCenter);
+                writer.PageEvent = new RodapeEvento();
 
                 doc.Close();
 
@@ -752,22 +755,6 @@ namespace API_BUSESCONTROL.Controllers {
             tabela.AddCell(celula);
         }
 
-        string ReturnAprovacao(StatusAprovacao status) {
-            switch (status) {
-                case StatusAprovacao.EmAnalise: return "Em análise";
-                case StatusAprovacao.Negado: return "Negado";
-                case StatusAprovacao.Aprovado: return "Aprovado";
-                default: return "Status não encontrado.";
-            }
-        }
-        string ReturnAndamento(Andamento andamento) {
-            switch (andamento) {
-                case Andamento.Aguardando: return "Em tramitação";
-                case Andamento.EmAndamento: return "Em andamento";
-                case Andamento.Encerrado: return "Encerrado";
-                default: return "status não encontrado";
-            }
-        }
         string ReturnPeriodoContrato(Contrato contrato) {
             return $"{contrato.DataEmissao!.Value.ToString("dd/MM/yyyy")} até {contrato.DataVencimento!.Value.ToString("dd/MM/yyyy")}";
         }

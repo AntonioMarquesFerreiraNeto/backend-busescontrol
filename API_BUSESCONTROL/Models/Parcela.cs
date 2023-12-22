@@ -43,10 +43,5 @@ namespace API_BUSESCONTROL.Models {
             }
             return "Não efetuado";
         }
-        public string ReturnStatusPagamento() {
-            if (StatusPagamento == SituacaoPagamento.AguardandoPagamento) return "Aguardando pagamento";
-            else if (StatusPagamento == SituacaoPagamento.PagamentoContabilizado) return "Pagamento efetuado";
-            else return "Atrasada";
-        }
     }
 }

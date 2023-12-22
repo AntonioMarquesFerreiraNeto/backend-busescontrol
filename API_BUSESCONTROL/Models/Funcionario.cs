@@ -1,6 +1,5 @@
 ﻿using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Models.Enums;
-using API_BUSESCONTROL.Models.ValidationsModels;
 using API_BUSESCONTROL.Models.ValidationsModels.Pessoas;
 using System.ComponentModel.DataAnnotations;
 using System.Text;

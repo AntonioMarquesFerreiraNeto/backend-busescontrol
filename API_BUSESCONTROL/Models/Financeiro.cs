@@ -111,11 +111,6 @@ namespace API_BUSESCONTROL.Models {
             return $"{valorMulta.ToString("C2")}";
         }
 
-        public string ReturnTypePagament() {
-            string msgPagament = (Pagament == ModelPagament.Avista) ? "À vista" : "Parcelado";
-            return msgPagament;
-        }
-
         public string ReturnNameClienteOrCredor() {
             if (!string.IsNullOrEmpty(ContratoId.ToString())) {
                 return (!string.IsNullOrEmpty(PessoaFisicaId.ToString())) ? $"{PessoaFisica.Name}" : $"{PessoaJuridica.RazaoSocial}";
@@ -126,26 +121,6 @@ namespace API_BUSESCONTROL.Models {
             else {
                 return (!string.IsNullOrEmpty(PessoaFisicaId.ToString())) ? $"{PessoaFisica.Name}" : $"{PessoaJuridica.RazaoSocial}";
             }
-        }
-
-        public string ReturnTypeFinanceiro() {
-            string type = (DespesaReceita == DespesaReceita.Receita) ? "Receita" : "Despesa";
-            return type;
-        }
-        public string ReturnTypeEfetuacao() {
-            if (TypeEfetuacao == TypeEfetuacao.Debito) {
-                return $"Débito";
-            }
-            else if (TypeEfetuacao == TypeEfetuacao.Credito) {
-                return $"Crédito";
-            }
-            else {
-                return "Em espécie";
-            }
-        }
-        public string ReturnStatusFinanceiro() {
-            if (FinanceiroStatus == FinanceiroStatus.Ativo) return "Ativado";
-            return "Inativo";
         }
         public string ReturnValorTot() {
             return $"{ValorTotDR!.Value.ToString("C2")}";

@@ -3,6 +3,7 @@ using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
 using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
 using DocumentFormat.OpenXml.Presentation;
 using Microsoft.EntityFrameworkCore;
 
@@ -362,7 +363,7 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public Contrato CreateMotoristaSubstituto(SubContratoMotorista subContratoMotorista) {
-            if (ValDupliMotoristaData(subContratoMotorista)) throw new Exception("Motorista substituto já registrado nessas datas!"); 
+            if (ValDupliMotoristaData(subContratoMotorista)) throw new Exception("Motorista substituto já registrado nessas datas!");
             _bancoContext.SubContratoMotorista.Add(subContratoMotorista);
             _bancoContext.SaveChanges();
             return GetContratoById(subContratoMotorista.ContratoId.Value);

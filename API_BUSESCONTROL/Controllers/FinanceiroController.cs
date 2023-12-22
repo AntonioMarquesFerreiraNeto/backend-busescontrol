@@ -7,6 +7,7 @@ using iTextSharp.text;
 using Microsoft.AspNetCore.Mvc;
 using Font = iTextSharp.text.Font;
 using Microsoft.AspNetCore.Authorization;
+using Humanizer;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
@@ -124,12 +125,12 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
-        [HttpGet("PagAndFiltrosParcelas/{id}/{pageNumber}/{pesquisa?}")]
-        public IActionResult PagAndFiltrosParcelas(int id, int pageNumber = 1, string? pesquisa = "") {
-            var list = _financeiroRepository.GetPaginationAndFiltroParcelas(id, pageNumber, pesquisa);
+        [HttpGet("PagAndFiltrosParcelas/{id}/{pageNumber}/{pageSize}/{pesquisa?}")]
+        public IActionResult PagAndFiltrosParcelas(int id, int pageNumber = 1, int pageSize = 10, string? pesquisa = "") {
+            var list = _financeiroRepository.GetPaginationAndFiltroParcelas(id, pageNumber, pageSize, pesquisa);
             var data = new {
                 listParcela = list,
-                qtPaginas = _financeiroRepository.ReturnQtPaginasParcelas(id, pesquisa)
+                qtPaginas = _financeiroRepository.ReturnQtPaginasParcelas(id, pageSize, pesquisa)
             };
             return Ok(data);
         }
@@ -181,12 +182,12 @@ namespace API_BUSESCONTROL.Controllers {
                             folha.Cell(financeiros.IndexOf(financeiro) + 2, "B").Value = "Nulo";
                         }
                         folha.Cell(financeiros.IndexOf(financeiro) + 2, "C").Value = financeiro.ReturnNameClienteOrCredor();
-                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "D").Value = financeiro.ReturnStatusFinanceiro();
-                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "E").Value = financeiro.ReturnTypeFinanceiro();
+                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "D").Value = financeiro.FinanceiroStatus.Humanize();
+                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "E").Value = financeiro.DespesaReceita.Humanize();
                         folha.Cell(financeiros.IndexOf(financeiro) + 2, "F").Value = financeiro.ReturnValorTot();
                         folha.Cell(financeiros.IndexOf(financeiro) + 2, "G").Value = financeiro.ReturnValorTotEfetuado();
                         folha.Cell(financeiros.IndexOf(financeiro) + 2, "H").Value = financeiro.DataVencimento.Value.ToString("dd/MM/yyyy");
-                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "I").Value = financeiro.ReturnTypePagament();
+                        folha.Cell(financeiros.IndexOf(financeiro) + 2, "I").Value = financeiro.Pagament.Humanize();
                     }
                     using (MemoryStream stream = new MemoryStream()) {
                         folhaBook.SaveAs(stream);
@@ -274,28 +275,12 @@ namespace API_BUSESCONTROL.Controllers {
                     }
                     CriarCelulaTexto(tabela, item.Id.ToString(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.ReturnNameClienteOrCredor(), PdfPCell.ALIGN_LEFT);
-                    CriarCelulaTexto(tabela, item.ReturnStatusFinanceiro(), PdfPCell.ALIGN_CENTER);
-                    CriarCelulaTexto(tabela, item.ReturnTypeFinanceiro(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.FinanceiroStatus.Humanize(), PdfPCell.ALIGN_CENTER);
+                    CriarCelulaTexto(tabela, item.DespesaReceita.Humanize(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.ReturnValorTot(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.ReturnValorTotEfetuado(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.DataVencimento!.Value.ToString("dd/MM/yyyy"), PdfPCell.ALIGN_LEFT);
                 }
-
-                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
-                //footer.Alignment = Element.ALIGN_LEFT;
-                PdfPTable footerTbl = new PdfPTable(1);
-                footerTbl.WidthPercentage = 100f;
-                footerTbl.TotalWidth = 1000f;
-                footerTbl.HorizontalAlignment = 0;
-                PdfPCell cell = new PdfPCell(footer);
-                cell.Border = 0;
-                cell.Colspan = 1;
-                cell.PaddingLeft = 0;
-                cell.HorizontalAlignment = 0;
-                footerTbl.DefaultCell.HorizontalAlignment = 0;
-                footerTbl.WidthPercentage = 100;
-                footerTbl.AddCell(cell);
-                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
 
                 string rodape = $"Quantidade de lançamentos solicitados: {financeiros.Count}" +
                     $"\nValor total listado (ativos): {valorTotAtivos.ToString("C2")}" +
@@ -310,6 +295,7 @@ namespace API_BUSESCONTROL.Controllers {
                 doc.Add(paragrofoJustificado);
                 doc.Add(tabela);
                 doc.Add(paragrofoRodape);
+                writer.PageEvent = new RodapeEvento();
                 doc.Close();
 
                 string nomeContrato = $"relatório financeiro";
@@ -363,7 +349,7 @@ namespace API_BUSESCONTROL.Controllers {
 
                     foreach (var item in financeiro.Parcelas!) {
                         folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "A").Value = $"{item.ReturnNomeParcela()}";
-                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "B").Value = $"{item.ReturnStatusPagamento()}";
+                        folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "B").Value = $"{item.StatusPagamento.Humanize()}";
                         folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "C").Value = $"{financeiro.ValorParcelaDR!.Value.ToString("C2")}";
                         folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "D").Value = (!string.IsNullOrEmpty(item.ValorJuros.ToString())) ? $"{item.ValorJuros!.Value.ToString("C2")}" : "R$ 0,00";
                         folha.Cell(financeiro.Parcelas.IndexOf(item) + 2, "E").Value = item.DataVencimentoParcela!.Value.ToString("dd/MM/yyyy");
@@ -439,24 +425,8 @@ namespace API_BUSESCONTROL.Controllers {
                     CriarCelulaTexto(tabela, item.ReturnValorJuros(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.ReturnDateVencimento(), PdfPCell.ALIGN_LEFT);
                     CriarCelulaTexto(tabela, item.ReturnDateEfetuacao(), PdfPCell.ALIGN_LEFT);
-                    CriarCelulaTexto(tabela, item.ReturnStatusPagamento(), PdfPCell.ALIGN_LEFT);
+                    CriarCelulaTexto(tabela, item.StatusPagamento.Humanize(), PdfPCell.ALIGN_LEFT);
                 }
-
-                Paragraph footer = new Paragraph($"Data de emissão do documento: {DateTime.Now:dd/MM/yyyy}", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK));
-                //footer.Alignment = Element.ALIGN_LEFT;
-                PdfPTable footerTbl = new PdfPTable(1);
-                footerTbl.WidthPercentage = 100f;
-                footerTbl.TotalWidth = 1000f;
-                footerTbl.HorizontalAlignment = 0;
-                PdfPCell cell = new PdfPCell(footer);
-                cell.Border = 0;
-                cell.Colspan = 1;
-                cell.PaddingLeft = 0;
-                cell.HorizontalAlignment = 0;
-                footerTbl.DefaultCell.HorizontalAlignment = 0;
-                footerTbl.WidthPercentage = 100;
-                footerTbl.AddCell(cell);
-                footerTbl.WriteSelectedRows(0, -30, 350, 30, writer.DirectContent);
 
                 string rodape = $"Quantidade de parcelas: {financeiro.Parcelas.Count} " +
                                 $"\nValor efetuado: {financeiro.ReturnValorTotEfetuado()}" +
@@ -466,6 +436,7 @@ namespace API_BUSESCONTROL.Controllers {
                 doc.Add(paragrofoJustificado);
                 doc.Add(tabela);
                 doc.Add(paragrofoRodape);
+                writer.PageEvent = new RodapeEvento();
                 doc.Close();
 
                 string nomeContrato = $"Parcelas - {financeiro.ReturnNameClienteOrCredor()}";
@@ -478,6 +449,21 @@ namespace API_BUSESCONTROL.Controllers {
             }
         }
 
+        public class RodapeEvento : PdfPageEventHelper {
+            public override void OnEndPage(PdfWriter writer, Document doc) {
+                AdicionarDataNoRodape(writer, doc);
+            }
+            private void AdicionarDataNoRodape(PdfWriter writer, Document doc) {
+                PdfContentByte cb = writer.DirectContent;
+                float posX = doc.PageSize.Width - doc.RightMargin + 20;
+                float posY = doc.Bottom - 20;
+                BaseFont fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                cb.BeginText();
+                cb.SetFontAndSize(fonteBase, 9);
+                cb.ShowTextAligned(Element.ALIGN_RIGHT, $"Documento gerado em {DateTime.Now.ToString("dd/MM/yyyy")}", posX, posY, 0);
+                cb.EndText();
+            }
+        }
 
         static void CriarCelulaTexto(PdfPTable tabela, string texto, int alinhamentoHorz = PdfPCell.ALIGN_LEFT,
                 bool negrito = false, bool italico = false, int tamanhoFont = 10, int alturaCelula = 30) {

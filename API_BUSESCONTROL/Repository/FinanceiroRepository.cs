@@ -678,16 +678,16 @@ namespace API_BUSESCONTROL.Repository {
             return null;
         }
 
-        public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, string pesquisa) {
+        public List<Parcela> GetPaginationAndFiltroParcelas(int id, int pageNumber, int pageSize, string pesquisa) {
             return _bancoContext.Parcela.Where(x => x.FinanceiroId == id && x.NomeParcela.Contains(pesquisa))
-                .Skip((pageNumber - 1) * 10)
-                .Take(10)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
         }
 
-        public int ReturnQtPaginasParcelas(int id, string pesquisa) {
+        public int ReturnQtPaginasParcelas(int id, int pageSize, string pesquisa) {
             int qtParcelas = _bancoContext.Parcela.Count(x => x.FinanceiroId == id && x.NomeParcela.Contains(pesquisa));
-            int qtPaginas = (int)Math.Ceiling((double)qtParcelas / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtParcelas / pageSize);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 

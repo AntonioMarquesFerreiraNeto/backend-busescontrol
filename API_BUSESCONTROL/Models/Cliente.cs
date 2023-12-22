@@ -60,10 +60,5 @@ namespace API_BUSESCONTROL.Models {
             string tel = Telefone;
             return $"{long.Parse(tel).ToString(@"00000-0000")}";
         }
-
-        /*public string ReturnAdimplenciaCliente() {
-            string situacao = (Adimplente == Adimplencia.Adimplente) ? "Cliente adimplente" : "Cliente inadimplente";
-            return situacao;
-        }*/
     }
 }

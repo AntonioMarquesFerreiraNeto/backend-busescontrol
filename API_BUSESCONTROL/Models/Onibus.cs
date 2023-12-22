@@ -1,8 +1,7 @@
 ﻿using API_BUSESCONTROL.Models.Enums;
-using API_BUSESCONTROL.Models.ValidationsModels;
 using API_BUSESCONTROL.Models.ValidationsModels.Frota;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
+using System.Text.RegularExpressions;
 
 namespace API_BUSESCONTROL.Models {
     public class Onibus {
@@ -48,11 +47,10 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<SubContratoOnibus>? SubContratoOnibus { get; set; }  
 
-        public string ReturnStatusOnibus() {
-            if (StatusOnibus == StatusFrota.Ativo) {
-                return "Ativos";
-            }
-            return "Inativos";
+        public string ReturnPlacaFormatada() {
+            var letras = Regex.Replace(Placa, "[0-9]", "");
+            var numbers = Regex.Replace(Placa, "[^0-9]", "");
+            return $"{letras}-{numbers}";
         }
     }
 }
