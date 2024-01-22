@@ -1,5 +1,6 @@
 ﻿namespace API_BUSESCONTROL.Services {
     public class AjudantesService {  
+
         public List<EstadoAndUF> ReturnListEstadoUF() {
             List<EstadoAndUF> list = new List<EstadoAndUF>();
             list!.Add(new EstadoAndUF { UF = "AC", Estado = "Acre" });
@@ -35,5 +36,6 @@
             public string Estado { get; set; }
             public string UF { get; set; }
         }
+
     }
 }

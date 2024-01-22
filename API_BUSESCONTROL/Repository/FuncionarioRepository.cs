@@ -3,6 +3,7 @@ using API_BUSESCONTROL.Helpers;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
+using API_BUSESCONTROL.Services.Interfaces;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -11,10 +12,12 @@ namespace API_BUSESCONTROL.Repository {
 
         private readonly BancoContext _bancoContext;
         private readonly IEmail _email;
+        private readonly ILembreteService _lembreteService;
 
-        public FuncionarioRepository(BancoContext bancoContext, IEmail email) {
+        public FuncionarioRepository(BancoContext bancoContext, IEmail email, ILembreteService lembreteService) {
             _bancoContext = bancoContext;
             _email = email;
+            _lembreteService = lembreteService;
         }
 
         public Funcionario CreateFuncionario(Funcionario funcionario) {
@@ -91,6 +94,7 @@ namespace API_BUSESCONTROL.Repository {
             funcionarioDB.Status = FuncionarioStatus.Ativo;
             _bancoContext.Funcionario.Update(funcionarioDB);
             _bancoContext.SaveChanges();
+            if(funcionarioDB.Cargo != CargoFuncionario.Motorista) _lembreteService.PostNotiFuncionarioEnabled(funcionarioDB.Id);
             return funcionarioDB;
         }
 
@@ -172,6 +176,10 @@ namespace API_BUSESCONTROL.Repository {
 
         public List<Funcionario> GetAllMotoristas() {
             return _bancoContext.Funcionario.Where(x => x.Cargo == CargoFuncionario.Motorista && x.Status == FuncionarioStatus.Ativo).ToList();
+        }
+
+        public List<Funcionario> GetAllUsuarios() {
+            return _bancoContext.Funcionario.Where(x => x.Cargo != CargoFuncionario.Motorista && x.StatusUsuario == UsuarioStatus.Ativo).ToList();
         }
 
         public Funcionario TrimFuncionario(Funcionario value) {

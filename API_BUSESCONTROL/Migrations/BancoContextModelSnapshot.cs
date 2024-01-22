@@ -397,6 +397,38 @@ namespace API_BUSESCONTROL.Migrations
                     b.ToTable("Funcionario");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Lembrete", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Conteudo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("FuncionarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NameRemetente")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("NivelAcesso")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeLembrete")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FuncionarioId");
+
+                    b.ToTable("Lembrete");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Onibus", b =>
                 {
                     b.Property<int?>("Id")
@@ -720,6 +752,15 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("PessoaJuridica");
                 });
 
+            modelBuilder.Entity("API_BUSESCONTROL.Models.Lembrete", b =>
+                {
+                    b.HasOne("API_BUSESCONTROL.Models.Funcionario", "Funcionario")
+                        .WithMany("Lembretes")
+                        .HasForeignKey("FuncionarioId");
+
+                    b.Navigation("Funcionario");
+                });
+
             modelBuilder.Entity("API_BUSESCONTROL.Models.Parcela", b =>
                 {
                     b.HasOne("API_BUSESCONTROL.Models.Financeiro", "Financeiro")
@@ -814,6 +855,8 @@ namespace API_BUSESCONTROL.Migrations
             modelBuilder.Entity("API_BUSESCONTROL.Models.Funcionario", b =>
                 {
                     b.Navigation("Contratos");
+
+                    b.Navigation("Lembretes");
 
                     b.Navigation("SubContratoMotoristas");
                 });

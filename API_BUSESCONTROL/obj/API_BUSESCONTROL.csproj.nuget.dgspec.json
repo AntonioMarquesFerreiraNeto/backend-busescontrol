@@ -55,11 +55,19 @@
             },
             "Hangfire": {
               "target": "Package",
-              "version": "[1.8.5, )"
+              "version": "[1.8.7, )"
+            },
+            "Hangfire.Core": {
+              "target": "Package",
+              "version": "[1.8.7, )"
             },
             "Hangfire.MemoryStorage": {
               "target": "Package",
               "version": "[1.8.0, )"
+            },
+            "Hangfire.Redis": {
+              "target": "Package",
+              "version": "[2.0.1, )"
             },
             "Humanizer": {
               "target": "Package",

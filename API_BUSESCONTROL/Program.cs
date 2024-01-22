@@ -38,7 +38,8 @@ namespace API_BUSESCONTROL
             builder.Services.AddScoped<IEmail, Email>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<AjudantesService, AjudantesService>();
-
+            builder.Services.AddScoped<ILembreteService, LembreteService>();
+            builder.Services.AddScoped<ILembreteRepository, LembreteRepository>();
 
             var key = Encoding.ASCII.GetBytes(Settings.Secrect);
             builder.Services.AddAuthentication(auth => {

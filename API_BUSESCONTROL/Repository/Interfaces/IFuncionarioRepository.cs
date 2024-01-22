@@ -16,5 +16,6 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<Funcionario> GetAllMotoristas();
         public int QtPaginasAtivas(string pesquisa);
         public int QtPaginasInativas(string pesquisa);
+        public List<Funcionario> GetAllUsuarios();
     }
 }

@@ -82,6 +82,8 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<SubContratoMotorista>? SubContratoMotoristas { get; set; }
 
+        public virtual List<Lembrete>? Lembretes { get; set; }
+
         public bool ValidarSenha(string senha) {
             if (senha.GerarHash() == Senha) {
                 return true;

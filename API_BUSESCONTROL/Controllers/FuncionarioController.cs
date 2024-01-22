@@ -134,5 +134,11 @@ namespace API_BUSESCONTROL.Controllers
             var list = _funcionarioRepository.GetAllMotoristas();
             return Ok(list);
         }
+
+        [HttpGet("GetAllUsuarios")]
+        public IActionResult GetAllUsuarios() {
+            var list = _funcionarioRepository.GetAllUsuarios();
+            return Ok(list);
+        }
     }
 }

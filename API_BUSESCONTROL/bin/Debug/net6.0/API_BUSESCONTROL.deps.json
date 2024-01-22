@@ -10,8 +10,10 @@
         "dependencies": {
           "ClosedXML": "0.102.0",
           "DocumentFormat.OpenXml": "2.20.0",
-          "Hangfire": "1.8.5",
+          "Hangfire": "1.8.7",
+          "Hangfire.Core": "1.8.7",
           "Hangfire.MemoryStorage": "1.8.0",
+          "Hangfire.Redis": "2.0.1",
           "Humanizer": "2.14.1",
           "Microsoft.AspNetCore.Authentication": "2.1.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.0",
@@ -73,32 +75,32 @@
           }
         }
       },
-      "Hangfire/1.8.5": {
+      "Hangfire/1.8.7": {
         "dependencies": {
-          "Hangfire.AspNetCore": "1.8.5",
-          "Hangfire.Core": "1.8.5",
-          "Hangfire.SqlServer": "1.8.5"
+          "Hangfire.AspNetCore": "1.8.7",
+          "Hangfire.Core": "1.8.7",
+          "Hangfire.SqlServer": "1.8.7"
         }
       },
-      "Hangfire.AspNetCore/1.8.5": {
+      "Hangfire.AspNetCore/1.8.7": {
         "dependencies": {
-          "Hangfire.NetCore": "1.8.5"
+          "Hangfire.NetCore": "1.8.7"
         },
         "runtime": {
           "lib/netcoreapp3.0/Hangfire.AspNetCore.dll": {
-            "assemblyVersion": "1.8.5.0",
-            "fileVersion": "1.8.5.0"
+            "assemblyVersion": "1.8.7.0",
+            "fileVersion": "1.8.7.0"
           }
         }
       },
-      "Hangfire.Core/1.8.5": {
+      "Hangfire.Core/1.8.7": {
         "dependencies": {
           "Newtonsoft.Json": "11.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/Hangfire.Core.dll": {
-            "assemblyVersion": "1.8.5.0",
-            "fileVersion": "1.8.5.0"
+            "assemblyVersion": "1.8.7.0",
+            "fileVersion": "1.8.7.0"
           }
         },
         "resources": {
@@ -148,7 +150,7 @@
       },
       "Hangfire.MemoryStorage/1.8.0": {
         "dependencies": {
-          "Hangfire.Core": "1.8.5"
+          "Hangfire.Core": "1.8.7"
         },
         "runtime": {
           "lib/netstandard1.3/Hangfire.MemoryStorage.dll": {
@@ -157,28 +159,29 @@
           }
         }
       },
-      "Hangfire.NetCore/1.8.5": {
+      "Hangfire.NetCore/1.8.7": {
         "dependencies": {
-          "Hangfire.Core": "1.8.5",
+          "Hangfire.Core": "1.8.7",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "3.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
         },
         "runtime": {
           "lib/netstandard2.1/Hangfire.NetCore.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
+            "assemblyVersion": "1.8.7.0",
+            "fileVersion": "1.8.7.0"
           }
         }
       },
-      "Hangfire.SqlServer/1.8.5": {
+      "Hangfire.Redis/2.0.1": {},
+      "Hangfire.SqlServer/1.8.7": {
         "dependencies": {
-          "Hangfire.Core": "1.8.5"
+          "Hangfire.Core": "1.8.7"
         },
         "runtime": {
           "lib/netstandard2.0/Hangfire.SqlServer.dll": {
-            "assemblyVersion": "1.8.5.0",
-            "fileVersion": "1.8.5.0"
+            "assemblyVersion": "1.8.7.0",
+            "fileVersion": "1.8.7.0"
           }
         }
       },
@@ -1937,26 +1940,26 @@
       "path": "excelnumberformat/1.1.0",
       "hashPath": "excelnumberformat.1.1.0.nupkg.sha512"
     },
-    "Hangfire/1.8.5": {
+    "Hangfire/1.8.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Abnr/4fDi+BegLgou39KxLpjlJxYcYcpC7f4QR4aBocJPNLqdChsBFK+KhKaAMczWIrwWsYne3lLJXrwlZQLiA==",
-      "path": "hangfire/1.8.5",
-      "hashPath": "hangfire.1.8.5.nupkg.sha512"
+      "sha512": "sha512-cGLQjoupHjcPTtMQCVMo6vYSGWgW0JDb5JXsdx7EJHzpePg4Yrb7gbtRTc+o2Dw8pg0X6v6IBJQiloJxMBSf3A==",
+      "path": "hangfire/1.8.7",
+      "hashPath": "hangfire.1.8.7.nupkg.sha512"
     },
-    "Hangfire.AspNetCore/1.8.5": {
+    "Hangfire.AspNetCore/1.8.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-STs4GxcT0eVrA1DZZ065RadOUOMTm2XkdWLiESx8VAJT9uPxNw8bC7tYpeYh0CddTDo6xjy21v/E4nIC0Cp9Yg==",
-      "path": "hangfire.aspnetcore/1.8.5",
-      "hashPath": "hangfire.aspnetcore.1.8.5.nupkg.sha512"
+      "sha512": "sha512-YPkC/N5jyl5dlxT1p7AHIQcUcW29EOlRhxfR/MV7KV2g/NcBVnzzjwd3u9hYYG6/8a5baaY+hhS20f/szyKa4g==",
+      "path": "hangfire.aspnetcore/1.8.7",
+      "hashPath": "hangfire.aspnetcore.1.8.7.nupkg.sha512"
     },
-    "Hangfire.Core/1.8.5": {
+    "Hangfire.Core/1.8.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OA5D59dkgS04rU9UDQkSypT36pn5RbtFpFZwhbHA4LL3VDeE0aaf4rShvKRJihJze62fr5AhjktJf4cJMDpYyQ==",
-      "path": "hangfire.core/1.8.5",
-      "hashPath": "hangfire.core.1.8.5.nupkg.sha512"
+      "sha512": "sha512-aCd7AcBCVPINE4sBWvoDFVFT8KKZOQIkPnqUjpuR15thsolxTBC+heUS4nI4YF3e2AKmavyS+a7lcMFNS+L76Q==",
+      "path": "hangfire.core/1.8.7",
+      "hashPath": "hangfire.core.1.8.7.nupkg.sha512"
     },
     "Hangfire.MemoryStorage/1.8.0": {
       "type": "package",
@@ -1965,19 +1968,26 @@
       "path": "hangfire.memorystorage/1.8.0",
       "hashPath": "hangfire.memorystorage.1.8.0.nupkg.sha512"
     },
-    "Hangfire.NetCore/1.8.5": {
+    "Hangfire.NetCore/1.8.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ZwVZBBkzEpWlcXLvuytMghT+EYzvQDbdsGK6zO+ygWsW6I7GxKPxsY/U+9DEj3xB0lqqFmOUnBmOea5AvC7K8A==",
-      "path": "hangfire.netcore/1.8.5",
-      "hashPath": "hangfire.netcore.1.8.5.nupkg.sha512"
+      "sha512": "sha512-hkHRwrV+89/2gAw6tL3Wom15FeNcrrqGrlTtlCO704WgxzA7vcPUPXYY2wzISpQCuvT+VyIZDdsTkFqtG4ywOA==",
+      "path": "hangfire.netcore/1.8.7",
+      "hashPath": "hangfire.netcore.1.8.7.nupkg.sha512"
     },
-    "Hangfire.SqlServer/1.8.5": {
+    "Hangfire.Redis/2.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-U7lYPtSPjgxkCHAeGwtXWiTTIUReuR/+rS4F5ZLZbxYiLT1PXVpw3HJ/9Mgf09ReGCLTto6QLCep+BPjLH8Wvg==",
-      "path": "hangfire.sqlserver/1.8.5",
-      "hashPath": "hangfire.sqlserver.1.8.5.nupkg.sha512"
+      "sha512": "sha512-kE8e1lBcUB4aOc30ieSdsKqE9PSGMEM4Eb0Qmy9e4gseXzhzXokdMXJ2/mMEa5DQiXT2O7aBNubigDnNExusdg==",
+      "path": "hangfire.redis/2.0.1",
+      "hashPath": "hangfire.redis.2.0.1.nupkg.sha512"
+    },
+    "Hangfire.SqlServer/1.8.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kJIfY4zxKUf35wlGXdxxiHKv5m4np03QuD74PMVuuRaSyvi4t41StynO5TCTEPn8yB1yBafRo766Zeva2TlfrA==",
+      "path": "hangfire.sqlserver/1.8.7",
+      "hashPath": "hangfire.sqlserver.1.8.7.nupkg.sha512"
     },
     "Humanizer/2.14.1": {
       "type": "package",

@@ -3,14 +3,18 @@ using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using API_BUSESCONTROL.Services.Interfaces;
+using Humanizer;
 
 namespace API_BUSESCONTROL.Repository {
     public class FinanceiroRepository : IFinanceiroRepository {
 
         private readonly BancoContext _bancoContext;
+        private readonly ILembreteService _lembreteService;
 
-        public FinanceiroRepository(BancoContext bancoContext) {
+        public FinanceiroRepository(BancoContext bancoContext, ILembreteService lembreteService) {
             _bancoContext = bancoContext;
+            _lembreteService = lembreteService;
         }
 
         public List<Financeiro> ListFinanceiros() {
@@ -305,8 +309,11 @@ namespace API_BUSESCONTROL.Repository {
                     || x2.StatusPagamento == SituacaoPagamento.AguardandoPagamento)).ToList().Count;
                     if (contParcelasAtrasadasOrPendente == 0) {
                         Contrato contratoDB = _bancoContext.Contrato.FirstOrDefault(x => x.Id == contrato.Id);
-                        contratoDB!.Andamento = Andamento.Encerrado;
-                        _bancoContext.Update(contratoDB);
+                        if (contratoDB!.Andamento != Andamento.Encerrado) {
+                            contratoDB!.Andamento = Andamento.Encerrado;
+                            _lembreteService.PostNotiContratoEncerrado(contratoDB.Id);
+                            _bancoContext.Update(contratoDB);
+                        }
                     }
                 }
             }
@@ -349,6 +356,8 @@ namespace API_BUSESCONTROL.Repository {
             clientesContratoDB.DataEmissaoPdfRescisao = DateTime.Now.Date;
             _bancoContext.ClientesContrato.Update(clientesContratoDB);
             _bancoContext.SaveChanges();
+            if (clientesContrato.PessoaFisicaId != null) _lembreteService.PostNotiProcessRescisao(clientesContrato.PessoaFisica!.Name, clientesContrato.PessoaFisicaId, clientesContrato.ContratoId);
+            else _lembreteService.PostNotiProcessRescisao(clientesContrato.PessoaJuridica!.RazaoSocial, clientesContrato.PessoaJuridicaId, clientesContrato.ContratoId);
             return clientesContratoDB;
         }
         public Financeiro ListFinanceiroPorContratoAndClientesContrato(int? id) {

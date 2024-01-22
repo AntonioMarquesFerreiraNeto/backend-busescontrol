@@ -1,5 +1,4 @@
 ﻿using API_BUSESCONTROL.Data;
-using API_BUSESCONTROL.Migrations;
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;

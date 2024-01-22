@@ -2,6 +2,7 @@
 using API_BUSESCONTROL.Models;
 using API_BUSESCONTROL.Models.Enums;
 using API_BUSESCONTROL.Repository.Interfaces;
+using API_BUSESCONTROL.Services.Interfaces;
 using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
 using DocumentFormat.OpenXml.Presentation;
@@ -11,9 +12,11 @@ namespace API_BUSESCONTROL.Repository {
     public class ContratoRepository : IContratoRepository {
 
         private readonly BancoContext _bancoContext;
+        private readonly ILembreteService _lembreteService;
 
-        public ContratoRepository(BancoContext bancoContext) {
+        public ContratoRepository(BancoContext bancoContext, ILembreteService lembreteService) {
             _bancoContext = bancoContext;
+            _lembreteService = lembreteService;
         }
 
         public List<Contrato> ListContratosAprovados() {
@@ -51,6 +54,7 @@ namespace API_BUSESCONTROL.Repository {
                 contrato.SetValoresParcelas(lista.Count);
                 _bancoContext.Contrato.Add(contrato);
                 _bancoContext.SaveChanges();
+                _lembreteService.PostNotiNewContrato(contrato.Id);
                 return contrato;
             }
             catch (Exception error) {

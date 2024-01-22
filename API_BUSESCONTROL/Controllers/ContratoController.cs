@@ -473,20 +473,20 @@ namespace API_BUSESCONTROL.Controllers {
                             nomeCliente = pessoaFisica.Name!;
                             textoContratante = $"{titulo_contratante}\n{pessoaFisicaResponsavel.Name} portador(a) do " +
                                 $"CPF: {pessoaFisicaResponsavel.ReturnCpfCliente()}, RG: {pessoaFisicaResponsavel.Rg}, filho(a) da Sr. {pessoaFisicaResponsavel.NameMae}, residente domiciliado no imovel Nº {pessoaFisicaResponsavel.NumeroResidencial}({pessoaFisicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaFisicaResponsavel.ComplementoResidencial}, no bairro {pessoaFisicaResponsavel.Bairro}," +
-                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()}, {pessoaFisicaResponsavel.Email}. Neste ato representado(a) como responsável legal pelo(a) requerente do contrato que será descrito a seguir: " +
+                                $" da cidade de {pessoaFisicaResponsavel.Cidade} — {pessoaFisicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaFisicaResponsavel.Ddd}){pessoaFisicaResponsavel.ReturnTelefoneCliente()} e {pessoaFisicaResponsavel.Email}. Neste ato representado(a) como responsável legal pelo(a) requerente do contrato que será descrito a seguir: " +
                                 $"{pessoaFisica.Name} portador(a) do " +
                                 $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()} e {pessoaFisica.Email}.\n\n\n";
                         }
                         else {
                             nomeCliente = pessoaFisica.Name!;
                             PessoaJuridica pessoaJuridicaResponsavel = _clienteRepository.GetClienteByIdPJ(pessoaFisica.IdVinculacaoContratual.Value);
                             textoContratante = $"{titulo_contratante}\n{pessoaJuridicaResponsavel.RazaoSocial}, inscrita no CNPJ: {pessoaJuridicaResponsavel.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridicaResponsavel.InscricaoEstadual}, inscrição municipal: {pessoaJuridicaResponsavel.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridicaResponsavel.NomeFantasia}, " +
                             $"residente domiciliado no imovel Nº {pessoaJuridicaResponsavel.NumeroResidencial} ({pessoaJuridicaResponsavel.Logradouro}), próximo ao complemento residencial {pessoaJuridicaResponsavel.ComplementoResidencial}, no bairro {pessoaJuridicaResponsavel.Bairro}," +
-                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()}, {pessoaJuridicaResponsavel.Email}. Neste ato representada como responsável legal pelo(a) requerente do contrato que será descrito a seguir:" +
+                            $" da cidade de {pessoaJuridicaResponsavel.Cidade} — {pessoaJuridicaResponsavel.Estado}, no qual os meios de contatos são ({pessoaJuridicaResponsavel.Ddd}){pessoaJuridicaResponsavel.ReturnTelefoneCliente()} e {pessoaJuridicaResponsavel.Email}. Neste ato representada como responsável legal pelo(a) requerente do contrato que será descrito a seguir:" +
                             $"{pessoaFisica.Name} portador(a) do " +
                                 $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                                $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Canais de comunicação: ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()} e {pessoaFisica.Email}.\n\n\n";
                         }
 
                     }
@@ -494,7 +494,7 @@ namespace API_BUSESCONTROL.Controllers {
                         nomeCliente = pessoaFisica.Name!;
                         textoContratante = $"{titulo_contratante}\n{pessoaFisica.Name} portador(a) do " +
                         $"CPF: {pessoaFisica.ReturnCpfCliente()}, RG: {pessoaFisica.Rg}, filho(a) da Sr. {pessoaFisica.NameMae}, residente domiciliado no imovel Nº {pessoaFisica.NumeroResidencial}({pessoaFisica.Logradouro}), próximo ao complemento residencial {pessoaFisica.ComplementoResidencial}, no bairro {pessoaFisica.Bairro}," +
-                        $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Neste ato representado(a) como o requerente do contrato, no qual os meios de contatos são ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()}, {pessoaFisica.Email}.\n\n\n";
+                        $" da cidade de {pessoaFisica.Cidade} — {pessoaFisica.Estado}. Neste ato representado(a) como o requerente do contrato, no qual os meios de contatos são ({pessoaFisica.Ddd}){pessoaFisica.ReturnTelefoneCliente()} e {pessoaFisica.Email}.\n\n\n";
                     }
                 }
                 else {
@@ -506,7 +506,7 @@ namespace API_BUSESCONTROL.Controllers {
                     nomeCliente = pessoaJuridica.NomeFantasia!;
                     textoContratante = $"{titulo_contratante}\n{pessoaJuridica.RazaoSocial}, inscrita no CNPJ: {pessoaJuridica.ReturnCnpjCliente()}, inscrição estadual: {pessoaJuridica.InscricaoEstadual}, inscrição municipal: {pessoaJuridica.InscricaoMunicipal}, portadora do nome fantasia {pessoaJuridica.NomeFantasia}, " +
                     $"residente domiciliado no imovel Nº {pessoaJuridica.NumeroResidencial} ({pessoaJuridica.Logradouro}), próximo ao complemento residencial {pessoaJuridica.ComplementoResidencial}, no bairro {pessoaJuridica.Bairro}," +
-                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Neste ato representada como a requerente do contrato, no qual os meios de contatos são Canais de comunicação: ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()}, {pessoaJuridica.Email}.\n\n\n";
+                    $" da cidade de {pessoaJuridica.Cidade} — {pessoaJuridica.Estado}. Neste ato representada como a requerente do contrato, no qual os meios de contatos são ({pessoaJuridica.Ddd}){pessoaJuridica.ReturnTelefoneCliente()} e {pessoaJuridica.Email}.\n\n\n";
                 }
 
                 string titulo_contratada = $"CONTRATADA";

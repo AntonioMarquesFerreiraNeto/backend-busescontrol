@@ -26,6 +26,7 @@ namespace API_BUSESCONTROL.Data {
         public DbSet<ClientesContrato> ClientesContrato { get; set; }
         public DbSet<SubContratoMotorista> SubContratoMotorista { get; set; }
         public DbSet<SubContratoOnibus> SubContratoOnibus { get; set; }
+        public DbSet<Lembrete> Lembrete { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
