@@ -30,11 +30,23 @@ namespace API_BUSESCONTROL.Data {
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
+            //Adicionando os mapeamento do sistema no contexto. 
             modelBuilder.ApplyConfiguration(new MapContrato());
             modelBuilder.ApplyConfiguration(new MapClientesContrato());
             modelBuilder.ApplyConfiguration(new MapFinanceiro());
             modelBuilder.ApplyConfiguration(new MapRescisao());
-            base.OnModelCreating(modelBuilder);
+
+            //Mapeamento dos relacionamentos de lembretes.
+            modelBuilder.Entity<Funcionario>()
+               .HasMany(funci => funci.Lembretes)
+               .WithOne(lembrete => lembrete.Funcionario)
+               .HasForeignKey(lembrete => lembrete.FuncionarioId);
+            modelBuilder.Entity<Funcionario>()
+                .HasMany(funci => funci.LembretesEnviados)
+                .WithOne(x => x.Remetente)
+                .HasForeignKey(x => x.RemetenteId);
+
+            base.OnModelCreating(modelBuilder);            
         }
     }
 }

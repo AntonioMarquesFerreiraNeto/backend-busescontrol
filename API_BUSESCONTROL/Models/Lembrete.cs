@@ -2,6 +2,7 @@
 using static API_BUSESCONTROL.Models.Enums.LembreteEnum;
 
 namespace API_BUSESCONTROL.Models {
+
     public class Lembrete {
         
         public int Id { get; set; }      
@@ -16,10 +17,13 @@ namespace API_BUSESCONTROL.Models {
         public NivelAcesso NivelAcesso { get; set; }
         
         public Funcionario? Funcionario { get; set; }
+
+        public Funcionario? Remetente { get; set; }
         
         public int? FuncionarioId { get; set; }
-        
-        public string? NameRemetente { get; set; }
-    
+
+        public int? RemetenteId { get; set; }
+      
     }
+
 }

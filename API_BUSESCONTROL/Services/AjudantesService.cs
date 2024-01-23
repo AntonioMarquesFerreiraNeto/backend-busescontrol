@@ -2,8 +2,8 @@
     public class AjudantesService {  
 
         public List<EstadoAndUF> ReturnListEstadoUF() {
-            List<EstadoAndUF> list = new List<EstadoAndUF>();
-            list!.Add(new EstadoAndUF { UF = "AC", Estado = "Acre" });
+            List<EstadoAndUF> list = new List<EstadoAndUF>()!;
+            list.Add(new EstadoAndUF { UF = "AC", Estado = "Acre" });
             list.Add(new EstadoAndUF { UF = "AL", Estado = "Alagoas" });
             list.Add(new EstadoAndUF { UF = "AP", Estado = "Amapá" });
             list.Add(new EstadoAndUF { UF = "AM", Estado = "Amazonas" });

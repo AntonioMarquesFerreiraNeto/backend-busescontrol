@@ -84,6 +84,8 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<Lembrete>? Lembretes { get; set; }
 
+        public virtual List<Lembrete>? LembretesEnviados { get; set; }
+ 
         public bool ValidarSenha(string senha) {
             if (senha.GerarHash() == Senha) {
                 return true;

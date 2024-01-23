@@ -55,5 +55,26 @@ namespace API_BUSESCONTROL.Controllers {
             int count = _lembreteRepository.GetCountLembreteNotificacoes(usuarioId, roleNumber);
             return Ok(count);
         }
+
+        [HttpGet("GetAllEnviadasByRemetenteId/{remetenteId}")]
+        public IActionResult GetAllEnviadasByRemetenteId(int remetenteId) {
+            List<Lembrete> enviadas = _lembreteRepository.GetAllEnviadasByRemetenteId(remetenteId);
+            var response = new {
+                list = enviadas.OrderByDescending(x => x.Id),
+                listCount = enviadas.Count
+            };
+            return Ok(response);
+        }
+
+        [HttpDelete("DeleteMensagemEnviadaById/{id}")]
+        public IActionResult DeleteMensagemEnviadaById(int id) {
+            try {
+                _lembreteRepository.DeleteMensagemById(id);
+                return NoContent();
+            }
+            catch (Exception error) {
+                return StatusCode(500, error.Message);
+            }
+        }
     }
 }

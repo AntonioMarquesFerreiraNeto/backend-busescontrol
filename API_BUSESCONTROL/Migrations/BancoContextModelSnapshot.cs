@@ -413,10 +413,10 @@ namespace API_BUSESCONTROL.Migrations
                     b.Property<int?>("FuncionarioId")
                         .HasColumnType("int");
 
-                    b.Property<string>("NameRemetente")
-                        .HasColumnType("longtext");
-
                     b.Property<int>("NivelAcesso")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RemetenteId")
                         .HasColumnType("int");
 
                     b.Property<int>("TypeLembrete")
@@ -425,6 +425,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FuncionarioId");
+
+                    b.HasIndex("RemetenteId");
 
                     b.ToTable("Lembrete");
                 });
@@ -758,7 +760,13 @@ namespace API_BUSESCONTROL.Migrations
                         .WithMany("Lembretes")
                         .HasForeignKey("FuncionarioId");
 
+                    b.HasOne("API_BUSESCONTROL.Models.Funcionario", "Remetente")
+                        .WithMany("LembretesEnviados")
+                        .HasForeignKey("RemetenteId");
+
                     b.Navigation("Funcionario");
+
+                    b.Navigation("Remetente");
                 });
 
             modelBuilder.Entity("API_BUSESCONTROL.Models.Parcela", b =>
@@ -857,6 +865,8 @@ namespace API_BUSESCONTROL.Migrations
                     b.Navigation("Contratos");
 
                     b.Navigation("Lembretes");
+
+                    b.Navigation("LembretesEnviados");
 
                     b.Navigation("SubContratoMotoristas");
                 });
