@@ -1,4 +1,5 @@
 ﻿namespace API_BUSESCONTROL.Services {
+
     public class AjudantesService {  
 
         public List<EstadoAndUF> ReturnListEstadoUF() {
@@ -37,5 +38,11 @@
             public string UF { get; set; }
         }
 
+        public static DateTime ReturnDataAtualUTC3() {
+            DateTime dateNow = DateTime.UtcNow.AddHours(-3);
+            return dateNow;
+        }
+
     }
+
 }

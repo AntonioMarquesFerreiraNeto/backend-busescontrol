@@ -30,7 +30,7 @@ namespace API_BUSESCONTROL.Repository {
         }
 
         public List<Lembrete> GetAllLembreteMensagens(int usuarioId, int roleNumber) {
-            return _bancoContext.Lembrete.Include(x => x.Remetente).AsNoTracking().Where(x => x.TypeLembrete == TypeLembrete.Mensagem && (x.FuncionarioId == usuarioId || x.NivelAcesso == NivelAcesso.Todos || x.NivelAcesso == (NivelAcesso)roleNumber)).ToList();
+            return _bancoContext.Lembrete.Include(x => x.Remetente).Include(x => x.Funcionario).AsNoTracking().Where(x => x.TypeLembrete == TypeLembrete.Mensagem && (x.FuncionarioId == usuarioId || x.NivelAcesso == NivelAcesso.Todos || x.NivelAcesso == (NivelAcesso)roleNumber)).ToList();
         }
 
         public List<Lembrete> GetAllLembreteNotificacoes(int usuarioId, int roleNumber) {

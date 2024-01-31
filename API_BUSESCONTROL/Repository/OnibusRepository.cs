@@ -113,8 +113,8 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.Onibus
                 .Include(x => x.Contratos).AsNoTracking()
                 .Where(x => x.StatusOnibus == StatusFrota.Ativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)))
-                .Skip((paginaAtual - 1) * 10)
-                .Take(10)
+                .Skip((paginaAtual - 1) * 15)
+                .Take(15)
                 .ToList();
         }
 
@@ -124,22 +124,22 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.Onibus
                 .Include(x => x.Contratos).AsNoTracking()
               .Where(x => x.StatusOnibus == StatusFrota.Inativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)))
-                .Skip((paginaAtual - 1) * 10)
-                .Take(10)
+                .Skip((paginaAtual - 1) * 15)
+                .Take(15)
                 .ToList();
         }
 
         public int QtPaginasAtivas(string? pesquisa) {
             string pesquisaPlaca = pesquisa.Replace("-", "");
             var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Ativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public int QtPaginasInativas(string? pesquisa) {
             string pesquisaPlaca = pesquisa.Replace("-", "");
             var qtOnibus = _bancoContext.Onibus.Count(x => x.StatusOnibus == StatusFrota.Inativo && (x.Marca!.Contains(pesquisa) || x.NameBus!.Contains(pesquisa) || x.CorBus!.Contains(pesquisa) || x.Placa!.Contains(pesquisaPlaca) || x.DataFabricacao!.Contains(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtOnibus / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 

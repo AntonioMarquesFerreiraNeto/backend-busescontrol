@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Esse arquivo é usado pelo processo de publicação/pacote do seu projeto Web. É possível personalizar o comportamento deste processo
+ao editar este arquivo MSBuild. Para saber mais sobre isso, visite https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword />
+    <History>True|2024-01-31T20:20:56.9739987Z;True|2024-01-30T19:05:02.4551812-03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="ConnectionMysql">
+      <Value>Server=MYSQL5048.site4now.net%3bDatabase=db_aa4b31_servbus%3bUid=aa4b31_servbus%3bPwd=5555%40rootdev2</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

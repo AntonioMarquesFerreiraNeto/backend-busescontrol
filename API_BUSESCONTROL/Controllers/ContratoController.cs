@@ -9,6 +9,7 @@ using Font = iTextSharp.text.Font;
 using Microsoft.AspNetCore.Authorization;
 using Humanizer;
 using DocumentFormat.OpenXml.Bibliography;
+using API_BUSESCONTROL.Services;
 
 namespace API_BUSESCONTROL.Controllers {
     [Route("api/[controller]")]
@@ -592,7 +593,7 @@ namespace API_BUSESCONTROL.Controllers {
                 BaseFont fonteBase = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 cb.BeginText();
                 cb.SetFontAndSize(fonteBase, 9);
-                cb.ShowTextAligned(Element.ALIGN_RIGHT, $"Documento gerado em {DateTime.Now.ToString("dd/MM/yyyy")}", posX, posY, 0);
+                cb.ShowTextAligned(Element.ALIGN_RIGHT, $"Documento gerado em {AjudantesService.ReturnDataAtualUTC3().ToString("dd/MM/yyyy")}", posX, posY, 0);
                 cb.EndText();
             }
         }

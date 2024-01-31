@@ -123,7 +123,7 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.PessoaFisica
                     .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
                     .Where(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
-                    .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                    .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
 
         public List<PessoaFisica> GetClientesInativos(int paginaAtual, string pesquisa) {
@@ -133,20 +133,20 @@ namespace API_BUSESCONTROL.Repository {
                 .Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
                 .AsNoTracking()
                 .Where(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
-                .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
 
         public int QtPaginasClientesAtivos(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
+            int qtPaginas = (int)Math.Ceiling((double)totClientes / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public int QtPaginasClientesInativos(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             var totClientes = _bancoContext.PessoaFisica.Count(x => x.Status == ClienteStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
+            int qtPaginas = (int)Math.Ceiling((double)totClientes / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
@@ -276,7 +276,7 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.PessoaJuridica
                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
                    .Where(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
-                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                   .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
 
         public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, string pesquisa) {
@@ -285,20 +285,20 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.PessoaJuridica
                    .AsNoTracking().Include(x => x.ClientesContrato).ThenInclude(x => x.Contrato)
                    .Where(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)))
-                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                   .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
 
         public int QtPaginasClientesAtivosPJ(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Ativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
+            int qtPaginas = (int)Math.Ceiling((double)totClientes / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
         public int QtPaginasClientesInativosPJ(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             int totClientes = _bancoContext.PessoaJuridica.Count(x => x.Status == ClienteStatus.Inativo && (x.RazaoSocial!.Contains(pesquisa) || x.Telefone!.Contains(pesquisaTel) || x.Cidade!.Contains(pesquisa) || x.Adimplente == SearchByAdimplencia(pesquisa)));
-            int qtPaginas = (int)Math.Ceiling((double)totClientes / 10);
+            int qtPaginas = (int)Math.Ceiling((double)totClientes / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 

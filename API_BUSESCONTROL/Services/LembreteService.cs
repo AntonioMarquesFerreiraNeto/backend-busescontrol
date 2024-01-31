@@ -4,6 +4,7 @@ using API_BUSESCONTROL.Services.Interfaces;
 using static API_BUSESCONTROL.Models.Enums.LembreteEnum;
 
 namespace API_BUSESCONTROL.Services {
+
     public class LembreteService : ILembreteService {
 
         private readonly ILembreteRepository _lembreteRepository;

@@ -86,16 +86,16 @@ namespace API_BUSESCONTROL.Repository {
                 return _bancoContext.Fornecedor
                 .Where(x =>
                     x.Status == FornecedorStatus.Ativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cidade.Contains(pesquisa)))
-                .Skip((paginaAtual - 1) * 10)
-                .Take(10)
+                .Skip((paginaAtual - 1) * 15)
+                .Take(15)
                 .ToList();
             }
             else {
                 return _bancoContext.Fornecedor
                 .Where(x =>
                     x.Status == FornecedorStatus.Ativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cidade.Contains(pesquisa)))
-                .Skip((paginaAtual - 1) * 10)
-                .Take(10)
+                .Skip((paginaAtual - 1) * 15)
+                .Take(15)
                 .ToList();
             }
         }
@@ -106,15 +106,15 @@ namespace API_BUSESCONTROL.Repository {
             else if (filtro != 2) {
                 return _bancoContext.Fornecedor
                       .Where(x => x.Status == FornecedorStatus.Inativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
-                      .Skip((paginaAtual - 1) * 10)
-                      .Take(10)
+                      .Skip((paginaAtual - 1) * 15)
+                      .Take(15)
                       .ToList();
             }
             else {
                 return _bancoContext.Fornecedor
                      .Where(x => x.Status == FornecedorStatus.Inativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)))
-                     .Skip((paginaAtual - 1) * 10)
-                     .Take(10)
+                     .Skip((paginaAtual - 1) * 15)
+                     .Take(15)
                      .ToList();
             }
         }
@@ -124,7 +124,7 @@ namespace API_BUSESCONTROL.Repository {
             int qtItens;
             if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
             else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Ativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
-            int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtItens / 15);
             return (qtPaginas != 0)? qtPaginas : 1;
         }
         public int GetTotPaginasInativos(string pesquisa, int filtro) {
@@ -132,7 +132,7 @@ namespace API_BUSESCONTROL.Repository {
             int qtItens;
             if(filtro != 2) qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && x.TypePessoa == (TypePessoa)filtro && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel))); 
             else qtItens = _bancoContext.Fornecedor.Count(x => x.Status == FornecedorStatus.Inativo && (x.NameOrRazaoSocial!.Contains(pesquisa) || x.Cidade.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel)));
-            int qtPaginas = (int)Math.Ceiling((double)qtItens / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtItens / 15);
             return (qtPaginas != 0) ? qtPaginas : 1;
         }
 

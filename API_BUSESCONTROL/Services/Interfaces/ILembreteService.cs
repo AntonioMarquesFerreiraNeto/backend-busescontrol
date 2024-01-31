@@ -1,4 +1,5 @@
 ﻿namespace API_BUSESCONTROL.Services.Interfaces {
+    
     public interface ILembreteService {
         public void PostNotiFuncionarioEnabled(int funcionarioId);
         public void PostNotiNewContrato(int contratoId);

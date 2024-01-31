@@ -3,6 +3,7 @@ using API_BUSESCONTROL.Models.ValidationsModels.Contratos;
 using System.ComponentModel.DataAnnotations;
 
 namespace API_BUSESCONTROL.Models {
+
     public class Contrato {
 
         public int Id { get; set; }
@@ -63,7 +64,6 @@ namespace API_BUSESCONTROL.Models {
 
         public virtual List<SubContratoOnibus>? SubContratoOnibus { get; set; }
 
-
         public void SetValoresParcelas(int qtClientes) {
             ValorParcelaContrato = ValorMonetario / QtParcelas;
             ValorParcelaContratoPorCliente = ValorParcelaContrato / qtClientes;
@@ -74,7 +74,7 @@ namespace API_BUSESCONTROL.Models {
                 return true;
             }
             return false;
-        } 
+        }
 
         public bool ValidationDatas() {
             if (DataEmissao >= DataVencimento) {
@@ -87,7 +87,7 @@ namespace API_BUSESCONTROL.Models {
             if (DataEmissao!.Value.Date < DateTime.Now.Date || DataEmissao.Value.Date > DateTime.Now.Date) {
                 return true;
             }
-            return false; 
+            return false;
         }
 
         public bool ValidationDataVencimento() {

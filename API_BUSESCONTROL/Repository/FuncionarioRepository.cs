@@ -133,7 +133,7 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.Funcionario
                   .Where(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)))
                   .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                  .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                  .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
         private CargoFuncionario? SearchByCargo(string pesquisa) {
             pesquisa = pesquisa.ToLower();
@@ -155,14 +155,14 @@ namespace API_BUSESCONTROL.Repository {
             return _bancoContext.Funcionario
                    .Where(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)))
                    .OrderBy(x => x.Cargo == CargoFuncionario.Motorista)
-                   .Skip((paginaAtual - 1) * 10).Take(10).ToList();
+                   .Skip((paginaAtual - 1) * 15).Take(15).ToList();
         }
 
         public int QtPaginasAtivas(string pesquisa) {
             string pesquisaTel = pesquisa.Replace("-", "");
             var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Ativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 15);
             return (qtPaginas == 0) ? 1 : qtPaginas;
         }
 
@@ -170,7 +170,7 @@ namespace API_BUSESCONTROL.Repository {
             string pesquisaTel = pesquisa.Replace("-", "");
             var qtFuncionario = _bancoContext.Funcionario.Count(x => x.Status == FuncionarioStatus.Inativo && (x.Name!.Contains(pesquisa) || x.Email!.Contains(pesquisa) || x.Telefone.Contains(pesquisaTel) || x.Cargo == SearchByCargo(pesquisa)));
             //Arredonda o resultado para cima, caso  o mesmo seja flutuante.
-            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 10);
+            int qtPaginas = (int)Math.Ceiling((double)qtFuncionario / 15);
             return qtPaginas;
         }
 
