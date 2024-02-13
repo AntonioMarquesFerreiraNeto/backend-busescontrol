@@ -14,6 +14,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<PessoaFisica> GetClientesInativos(int paginaAtual, string pesquisa);
         public List<PessoaFisica> GetClientesParaVinculacao();
         public List<PessoaFisica> GetClientesAdimplentes();
+        public List<PessoaFisica> GetClientesContractEditAdimplentes(int contratoId);
         public int QtPaginasClientesAtivos(string pesquisa);
         public int QtPaginasClientesInativos(string pesquisa);
         public PessoaFisica ClienteResponsavel(int id);
@@ -27,6 +28,7 @@ namespace API_BUSESCONTROL.Repository.Interfaces
         public List<PessoaJuridica> GetClientesAtivosPJ(int paginaAtual, string pesquisa);
         public List<PessoaJuridica> GetClientesInativosPJ(int paginaAtual, string pesquisa);
         public List<PessoaJuridica> GetClientesParaVinculacaoPJ();
+        public List<PessoaJuridica> GetClientesPJContractEditAdimplentes(int contratoId);
         public int QtPaginasClientesAtivosPJ(string pesquisa);
         public int QtPaginasClientesInativosPJ(string pesquisa);
     }

@@ -4,7 +4,7 @@
     <Controller_SelectedScaffolderID>MvcControllerEmptyScaffolder</Controller_SelectedScaffolderID>
     <Controller_SelectedScaffolderCategoryPath>root/Common/MVC/Controller</Controller_SelectedScaffolderCategoryPath>
     <ActiveDebugProfile>API_BUSESCONTROL</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\Properties\PublishProfiles\servbusescontrol-001-site1 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\anton\source\repos\API_BUSESCONTROL\API_BUSESCONTROL\Properties\PublishProfiles\servbusescontrol-001-site1 - FTP.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

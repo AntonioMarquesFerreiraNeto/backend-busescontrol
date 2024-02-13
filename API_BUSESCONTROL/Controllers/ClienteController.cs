@@ -124,6 +124,12 @@ namespace API_BUSESCONTROL.Controllers
             return Ok(list);
         }
 
+        [HttpGet("ClientesAdimplentesContratoEdit/{contratoId}")]
+        public IActionResult ClientesContractEditAdimplentes(int contratoId) {
+            var list = _clienteRepository.GetClientesContractEditAdimplentes(contratoId);
+            return Ok(list);
+        }
+
         [HttpGet("ClienteResponsavel/{id}")]
         public IActionResult ClienteResponsavel(int id) {
             var cliente = _clienteRepository.ClienteResponsavel(id);

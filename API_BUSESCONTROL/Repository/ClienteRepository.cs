@@ -369,5 +369,13 @@ namespace API_BUSESCONTROL.Repository {
                 }
             }
         }
+
+        public List<PessoaFisica> GetClientesContractEditAdimplentes(int contratoId) {
+            return _bancoContext.PessoaFisica.Where(x => x.Status == ClienteStatus.Ativo && (x.ClientesContrato.Any(x => x.ContratoId == contratoId) || x.Adimplente == Adimplencia.Adimplente)).ToList();
+        }
+
+        public List<PessoaJuridica> GetClientesPJContractEditAdimplentes(int contratoId) {
+            return _bancoContext.PessoaJuridica.Where(x => x.Status == ClienteStatus.Ativo && (x.ClientesContrato.Any(x => x.ContratoId == contratoId) || x.Adimplente == Adimplencia.Adimplente)).ToList();
+        }
     }
 }
