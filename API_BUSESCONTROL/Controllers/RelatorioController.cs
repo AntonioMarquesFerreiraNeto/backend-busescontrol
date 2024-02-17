@@ -29,10 +29,13 @@ namespace API_BUSESCONTROL.Controllers {
                 relatorio.ValTotDespesas = _relatorioRepository.ValorTotDespesas();
                 relatorio.ValTotEfetuadoReceita = _relatorioRepository.ValorTotPagoReceitas();
                 relatorio.ValTotEfetuadoDespesa = _relatorioRepository.ValorTotPagoDespesas();
-                relatorio.ValTotContratos = _relatorioRepository.ValorTotContratos();
+                relatorio.ValTotContratos = relatorio.ValTotAprovados + relatorio.ValTotEmAnalise;
                 relatorio.ValTotPago = _relatorioRepository.ValorTotPagoContrato();
-                relatorio.ValTotPendente = _relatorioRepository.ValorTotPendenteContrato();
+                relatorio.ValTotPendente = relatorio.ReturnValorPendente();
+                relatorio.ValorJurosAndMultas = _relatorioRepository.ValorJurosAndMultas();
+                relatorio.ValorReceitasComuns = _relatorioRepository.ValorReceitasComuns();
                 relatorio.QtContratos = _relatorioRepository.QtContratos();
+                relatorio.QtContratosEncerrados = _relatorioRepository.QtContratosEncerrados();
                 relatorio.QtContratosAprovados = _relatorioRepository.QtContratosAprovados();
                 relatorio.QtContratosNegados = _relatorioRepository.QtContratosNegados();
                 relatorio.QtContratosEmAnalise = _relatorioRepository.QtContratosEmAnalise();
@@ -40,10 +43,7 @@ namespace API_BUSESCONTROL.Controllers {
                 relatorio.QtClientesAdimplente = _relatorioRepository.QtClientesAdimplentes();
                 relatorio.QtClientesInadimplente = _relatorioRepository.QtClientesInadimplentes();
                 relatorio.QtClientesVinculados = _relatorioRepository.QtClientesVinculados();
-                relatorio.QtMotorista = _relatorioRepository.QtMotoristas();
-                relatorio.QtMotoristaVinculado = _relatorioRepository.QtMotoristasVinculados();
-                relatorio.QtOnibus = _relatorioRepository.QtOnibus();
-                relatorio.QtOnibusVinculado = _relatorioRepository.QtOnibusVinculados();
+                relatorio.SimpleAnalytics = _relatorioRepository.ReturnSimpleAnalytics();
                 return Ok(relatorio);
             }
             catch (Exception error) {

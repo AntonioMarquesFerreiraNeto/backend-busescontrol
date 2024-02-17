@@ -2,6 +2,7 @@
 
 namespace API_BUSESCONTROL.Models {
     public class Rescisao {
+
         public int Id { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]

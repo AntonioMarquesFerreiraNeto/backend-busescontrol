@@ -535,11 +535,6 @@ namespace API_BUSESCONTROL.Repository {
                 throw new Exception(error.Message);
             }
         }
-        //Atualiza a quantidade de parcelas de clientes que não foram excluídos, mas tiveram a quantidade de parcelas editadas.
-        public void UpdateFinanceiro(Financeiro financeiro) {
-
-        }
-
 
         public Financeiro InativarReceitaOrDespesa(int id) {
             try {

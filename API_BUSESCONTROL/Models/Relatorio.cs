@@ -5,7 +5,6 @@ namespace API_BUSESCONTROL.Models {
 
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
         public decimal? ValTotAprovados { get; set; }
-
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
         public decimal? ValTotEmAnalise { get; set; }
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
@@ -24,7 +23,12 @@ namespace API_BUSESCONTROL.Models {
         public decimal? ValTotEfetuadoDespesa { get; set; }
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
         public decimal? ValTotReprovados { get; set; }
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
+        public decimal? ValorReceitasComuns { get; set; }
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
+        public decimal? ValorJurosAndMultas { get; set;}
 
+        public int? QtContratosEncerrados { get; set; }
         public int? QtContratosAprovados { get; set; }
         public int? QtContratosEmAnalise { get; set; }
         public int? QtContratosNegados { get; set; }
@@ -37,34 +41,11 @@ namespace API_BUSESCONTROL.Models {
         public int? QtMotoristaVinculado { get; set; }
         public int? QtOnibus { get; set; }
         public int? QtOnibusVinculado { get; set; }
+        
+        public SimpleAnalytics? SimpleAnalytics { get; set; }
 
-        public string ReturnPercentualContrato(int? qtPercentual) {
-            float percentual = float.Parse(qtPercentual.ToString());
-            float result = (percentual / (int)QtContratos) * 100;
-            return $"{result.ToString("F2")}%";
+        public decimal? ReturnValorPendente() {
+            return ValTotContratos - ValTotPago;
         }
-        public string ReturnPercentualValorContrato(decimal? value) {
-            if (ValTotAprovados != 0) {
-                decimal? result = value / ValTotAprovados * 100;
-                return $"{result.Value.ToString("F2")}%";
-            }
-            return $"";
-        }
-        public string ReturnPercentualCliente(int? qtPercentual) {
-            float percentual = float.Parse(qtPercentual.ToString());
-            float result = (percentual / (int)QtClientes) * 100;
-            return $"{result.ToString("F2")}%";
-        }
-        public string ReturnPercentualMotorista(int? qtPercentual) {
-            float percentual = float.Parse(qtPercentual.ToString());
-            float result = (percentual / (int)QtMotorista) * 100;
-            return $"{result.ToString("F2")}%";
-        }
-        public string ReturnPercentualOnibus(int? qtPercentual) {
-            float percentual = float.Parse(qtPercentual.ToString());
-            float result = (percentual / (int)QtOnibus) * 100;
-            return $"{result.ToString("F2")}%";
-        }
-
     }
 }
